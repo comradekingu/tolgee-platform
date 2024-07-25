@@ -1066,6 +1066,7 @@ export interface components {
         | "slack_not_configured"
         | "slack_workspace_already_connected"
         | "slack_connection_error"
+        | "email_verification_code_not_valid"
         | "task_not_found";
       params?: { [key: string]: unknown }[];
     };
@@ -1140,6 +1141,14 @@ export interface components {
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
+      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example 200001,200004
        */
@@ -1154,14 +1163,6 @@ export interface components {
        * @example 200001,200004
        */
       stateChangeLanguageIds?: number[];
-      /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
       /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
@@ -1360,6 +1361,14 @@ export interface components {
       assignees?: number[];
       state?: "IN_PROGRESS" | "DONE";
     };
+    SimpleUserAccountModel: {
+      /** Format: int64 */
+      id: number;
+      username: string;
+      name?: string;
+      avatar?: components["schemas"]["Avatar"];
+      deleted: boolean;
+    };
     TaskModel: {
       /** Format: int64 */
       id: number;
@@ -1369,30 +1378,19 @@ export interface components {
       language: components["schemas"]["LanguageModel"];
       /** Format: int64 */
       dueDate?: number;
-      assignees: components["schemas"]["UserAccountModel"][];
+      assignees: components["schemas"]["SimpleUserAccountModel"][];
       /** Format: int64 */
       totalItems: number;
       /** Format: int64 */
       doneItems: number;
       /** Format: int64 */
       baseWordCount: number;
-      author?: components["schemas"]["UserAccountModel"];
+      author?: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       closedAt?: number;
       state: "IN_PROGRESS" | "DONE";
-    };
-    UserAccountModel: {
-      /** Format: int64 */
-      id: number;
-      username: string;
-      name?: string;
-      emailAwaitingVerification?: string;
-      avatar?: components["schemas"]["Avatar"];
-      globalServerRole: "USER" | "ADMIN";
-      deleted: boolean;
-      disabled: boolean;
     };
     AutoTranslationSettingsDto: {
       /** Format: int64 */
@@ -2051,15 +2049,6 @@ export interface components {
       /** @description If true, only updates keys, skipping the creation of new keys */
       createNewKeys: boolean;
     };
-    /** @description User who created the comment */
-    SimpleUserAccountModel: {
-      /** Format: int64 */
-      id: number;
-      username: string;
-      name?: string;
-      avatar?: components["schemas"]["Avatar"];
-      deleted: boolean;
-    };
     TranslationCommentModel: {
       /**
        * Format: int64
@@ -2215,7 +2204,6 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
-      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
@@ -2226,6 +2214,7 @@ export interface components {
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      description: string;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2361,9 +2350,10 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
-      description: string;
       /** Format: int64 */
       id: number;
+      projectName: string;
+      userFullName?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
@@ -2371,8 +2361,7 @@ export interface components {
       /** Format: int64 */
       lastUsedAt?: number;
       username?: string;
-      projectName: string;
-      userFullName?: string;
+      description: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -2456,13 +2445,13 @@ export interface components {
       type: "TRANSLATE" | "REVIEW";
       keys: number[];
     };
-    TaskScopeView: {
+    KeysScopeView: {
       /** Format: int64 */
       keyCount: number;
       /** Format: int64 */
-      characterCount: number;
-      /** Format: int64 */
       wordCount: number;
+      /** Format: int64 */
+      characterCount: number;
     };
     GetKeysRequestDto: {
       keys: components["schemas"]["KeyDefinitionDto"][];
@@ -2799,6 +2788,7 @@ export interface components {
         | "slack_not_configured"
         | "slack_workspace_already_connected"
         | "slack_connection_error"
+        | "email_verification_code_not_valid"
         | "task_not_found";
       params?: { [key: string]: unknown }[];
     };
@@ -3377,14 +3367,14 @@ export interface components {
       language: components["schemas"]["LanguageModel"];
       /** Format: int64 */
       dueDate?: number;
-      assignees: components["schemas"]["UserAccountModel"][];
+      assignees: components["schemas"]["SimpleUserAccountModel"][];
       /** Format: int64 */
       totalItems: number;
       /** Format: int64 */
       doneItems: number;
       /** Format: int64 */
       baseWordCount: number;
-      author?: components["schemas"]["UserAccountModel"];
+      author?: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
@@ -3512,22 +3502,22 @@ export interface components {
         | "SLACK_INTEGRATION"
       )[];
       quickStart?: components["schemas"]["QuickStartModel"];
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
       id: number;
+      basePermissions: components["schemas"]["PermissionModel"];
       /**
        * @description The role of currently authorized user.
        *
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      basePermissions: components["schemas"]["PermissionModel"];
-      avatar?: components["schemas"]["Avatar"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example btforg */
       slug: string;
+      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3588,9 +3578,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
-      description?: string;
       name: string;
       displayName?: string;
+      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3667,23 +3657,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
-      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
       baseTranslation?: string;
+      translation?: string;
       namespace?: string;
+      description?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
-      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
       baseTranslation?: string;
+      translation?: string;
       namespace?: string;
+      description?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4229,7 +4219,6 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
-      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
@@ -4240,6 +4229,7 @@ export interface components {
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      description: string;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4356,9 +4346,10 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
-      description: string;
       /** Format: int64 */
       id: number;
+      projectName: string;
+      userFullName?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
@@ -4366,8 +4357,7 @@ export interface components {
       /** Format: int64 */
       lastUsedAt?: number;
       username?: string;
-      projectName: string;
-      userFullName?: string;
+      description: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -4375,6 +4365,17 @@ export interface components {
         users?: components["schemas"]["UserAccountModel"][];
       };
       page?: components["schemas"]["PageMetadata"];
+    };
+    UserAccountModel: {
+      /** Format: int64 */
+      id: number;
+      username: string;
+      name?: string;
+      emailAwaitingVerification?: string;
+      avatar?: components["schemas"]["Avatar"];
+      globalServerRole: "USER" | "ADMIN";
+      deleted: boolean;
+      disabled: boolean;
     };
     UserTotpDisableRequestDto: {
       password: string;
@@ -10469,7 +10470,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["TaskScopeView"];
+          "application/json": components["schemas"]["KeysScopeView"];
         };
       };
       /** Bad Request */
@@ -10520,6 +10521,7 @@ export interface operations {
         size?: number;
         /** Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
         sort?: string[];
+        search?: string;
       };
       path: {
         projectId: number;
