@@ -345,7 +345,7 @@ class UserAccountService(
     pageable: Pageable,
     search: String?,
     exceptUserId: Long? = null,
-    filters: UserAccountFilters? = null
+    filters: UserAccountFilters? = null,
   ): Page<UserAccountInProjectView> {
     return userAccountRepository.getAllInProject(projectId, pageable, search = search, exceptUserId, filters)
   }
