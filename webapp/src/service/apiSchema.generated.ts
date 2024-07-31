@@ -2206,15 +2206,15 @@ export interface components {
       token: string;
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
+      description: string;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2354,14 +2354,14 @@ export interface components {
       id: number;
       projectName: string;
       userFullName?: string;
+      username?: string;
+      description: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
-      username?: string;
-      description: string;
+      /** Format: int64 */
+      expiresAt?: number;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -3507,14 +3507,14 @@ export interface components {
       /** Format: int64 */
       id: number;
       basePermissions: components["schemas"]["PermissionModel"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /**
        * @description The role of currently authorized user.
        *
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
       /** @example btforg */
       slug: string;
       avatar?: components["schemas"]["Avatar"];
@@ -3660,20 +3660,20 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
       description?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
       description?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4085,7 +4085,9 @@ export interface components {
        */
       unresolvedCommentCount: number;
       /** Format: int64 */
-      assignedTaskId?: number;
+      taskId?: number;
+      taskState?: "IN_PROGRESS" | "DONE" | "CLOSED";
+      taskAssigned?: boolean;
       /** @description Was translation memory used to translate this? */
       fromTranslationMemory: boolean;
     };
@@ -4221,15 +4223,15 @@ export interface components {
       user: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
+      description: string;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4350,14 +4352,14 @@ export interface components {
       id: number;
       projectName: string;
       userFullName?: string;
+      username?: string;
+      description: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
-      username?: string;
-      description: string;
+      /** Format: int64 */
+      expiresAt?: number;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -10537,6 +10539,8 @@ export interface operations {
         filterNotProject?: number[];
         /** Filter tasks by language */
         filterLanguage?: number[];
+        /** Filter tasks by translation */
+        filterTranslation?: number[];
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */
@@ -13524,6 +13528,8 @@ export interface operations {
         filterNotProject?: number[];
         /** Filter tasks by language */
         filterLanguage?: number[];
+        /** Filter tasks by translation */
+        filterTranslation?: number[];
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */
