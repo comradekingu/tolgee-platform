@@ -1782,8 +1782,8 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
-      contentStorageType?: "S3" | "AZURE";
       enabled?: boolean;
+      contentStorageType?: "S3" | "AZURE";
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -2217,13 +2217,13 @@ export interface components {
       id: number;
       description: string;
       /** Format: int64 */
-      createdAt: number;
-      /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
-      lastUsedAt?: number;
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2366,11 +2366,11 @@ export interface components {
       description: string;
       username?: string;
       /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -2454,13 +2454,14 @@ export interface components {
       type: "TRANSLATE" | "REVIEW";
       keys: number[];
     };
-    KeysScopeView: {
+    KeyScopeWithIdsView: {
       /** Format: int64 */
       keyCount: number;
       /** Format: int64 */
-      wordCount: number;
-      /** Format: int64 */
       characterCount: number;
+      /** Format: int64 */
+      wordCount: number;
+      keyIds: number[];
     };
     GetKeysRequestDto: {
       keys: components["schemas"]["KeyDefinitionDto"][];
@@ -3518,6 +3519,8 @@ export interface components {
       /** Format: int64 */
       id: number;
       basePermissions: components["schemas"]["PermissionModel"];
+      /** @example btforg */
+      slug: string;
       /** @example This is a beautiful organization full of beautiful and clever people */
       description?: string;
       /**
@@ -3526,8 +3529,6 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example btforg */
-      slug: string;
       avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
@@ -3680,20 +3681,20 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      description?: string;
       namespace?: string;
-      baseTranslation?: string;
+      description?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
       name: string;
       /** Format: int64 */
       id: number;
-      description?: string;
       namespace?: string;
-      baseTranslation?: string;
+      description?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4251,13 +4252,13 @@ export interface components {
       id: number;
       description: string;
       /** Format: int64 */
-      createdAt: number;
-      /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
-      lastUsedAt?: number;
+      createdAt: number;
+      /** Format: int64 */
+      updatedAt: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4381,11 +4382,11 @@ export interface components {
       description: string;
       username?: string;
       /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -10450,6 +10451,16 @@ export interface operations {
   };
   createTasks: {
     parameters: {
+      query: {
+        filterState?: (
+          | "UNTRANSLATED"
+          | "TRANSLATED"
+          | "REVIEWED"
+          | "DISABLED"
+        )[];
+        filterOutdated?: boolean;
+        filterNotOutdated?: boolean;
+      };
       path: {
         projectId: number;
       };
@@ -10498,6 +10509,16 @@ export interface operations {
   };
   calculateScope: {
     parameters: {
+      query: {
+        filterState?: (
+          | "UNTRANSLATED"
+          | "TRANSLATED"
+          | "REVIEWED"
+          | "DISABLED"
+        )[];
+        filterOutdated?: boolean;
+        filterNotOutdated?: boolean;
+      };
       path: {
         projectId: number;
       };
@@ -10506,7 +10527,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["KeysScopeView"];
+          "application/json": components["schemas"]["KeyScopeWithIdsView"];
         };
       };
       /** Bad Request */
@@ -10626,6 +10647,16 @@ export interface operations {
   };
   createTask: {
     parameters: {
+      query: {
+        filterState?: (
+          | "UNTRANSLATED"
+          | "TRANSLATED"
+          | "REVIEWED"
+          | "DISABLED"
+        )[];
+        filterOutdated?: boolean;
+        filterNotOutdated?: boolean;
+      };
       path: {
         projectId: number;
       };
