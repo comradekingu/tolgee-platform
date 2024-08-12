@@ -20,9 +20,14 @@ import io.tolgee.service.TaskService
 import io.tolgee.service.security.UserAccountService
 import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.PagedModel
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -122,6 +127,25 @@ class TaskController(
   ): List<TaskPerUserReportModel> {
     val result = taskService.getReport(projectHolder.projectEntity, taskId)
     return result.map { taskPerUserReportModelAssembler.toModel(it) }
+  }
+
+  @GetMapping("/{taskId}/csv-report")
+  @Operation(summary = "Report who did what")
+  @UseDefaultPermissions
+  @AllowApiAccess
+  fun getCsvReport(
+    @PathVariable
+    taskId: Long,
+  ): ResponseEntity<ByteArrayResource> {
+    val byteArray = taskService.getExcelFile(projectHolder.projectEntity, taskId)
+    val resource = ByteArrayResource(byteArray)
+
+    val headers = HttpHeaders()
+    headers.contentType = MediaType.APPLICATION_OCTET_STREAM
+    headers.setContentDispositionFormData("attachment", "report.xlsx")
+    headers.contentLength = byteArray.size.toLong()
+
+    return ResponseEntity(resource, headers, HttpStatus.OK)
   }
 
   @PutMapping("/{taskId}/keys")

@@ -32,6 +32,14 @@ export const TaskMenu = ({
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
+  const reportMutation = useApiMutation({
+    url: '/v2/projects/{projectId}/tasks/{taskId}/csv-report',
+    method: 'get',
+    fetchOptions: {
+      rawResponse: true,
+    },
+  });
+
   function handleClose() {
     confirmation({
       title: <T keyName="task_menu_close_confirmation_title" />,
@@ -64,6 +72,26 @@ export const TaskMenu = ({
           messageService.success(
             <T keyName="task_menu_state_changed_success" />
           );
+        },
+      }
+    );
+  }
+
+  function handleGetCsvReport() {
+    reportMutation.mutate(
+      {
+        path: { projectId: project.id, taskId: task.id },
+      },
+      {
+        async onSuccess(result) {
+          onClose();
+          const res = result as unknown as Response;
+          const data = await res.blob();
+          const url = URL.createObjectURL(data);
+          const a = document.createElement('a');
+          a.download = `report.xlsx`;
+          a.href = url;
+          a.click();
         },
       }
     );
@@ -111,7 +139,9 @@ export const TaskMenu = ({
       <MenuItem onClick={onClose}>{t('task_menu_clone_task')}</MenuItem>
       <MenuItem onClick={onClose}>{t('task_menu_create_review_task')}</MenuItem>
       <Divider />
-      <MenuItem onClick={onClose}>{t('task_menu_generate_report')}</MenuItem>
+      <MenuItem onClick={handleGetCsvReport}>
+        {t('task_menu_generate_report')}
+      </MenuItem>
     </Menu>
   );
 };

@@ -596,6 +596,9 @@ export interface paths {
   "/v2/projects/{projectId}/tasks/{taskId}/per-user-report": {
     get: operations["getPerUserReport"];
   };
+  "/v2/projects/{projectId}/tasks/{taskId}/csv-report": {
+    get: operations["getCsvReport"];
+  };
   "/v2/projects/{projectId}/tasks/possible-assignees": {
     get: operations["getPossibleAssignees"];
   };
@@ -2213,17 +2216,17 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
+      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
-      expiresAt?: number;
-      description: string;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2359,18 +2362,18 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
+      description: string;
       /** Format: int64 */
       id: number;
       projectName: string;
       userFullName?: string;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
       username?: string;
-      description: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -2456,11 +2459,11 @@ export interface components {
     };
     KeysScopeView: {
       /** Format: int64 */
-      keyCount: number;
-      /** Format: int64 */
       wordCount: number;
       /** Format: int64 */
       characterCount: number;
+      /** Format: int64 */
+      keyCount: number;
     };
     GetKeysRequestDto: {
       keys: components["schemas"]["KeyDefinitionDto"][];
@@ -3513,6 +3516,8 @@ export interface components {
         | "SLACK_INTEGRATION"
       )[];
       quickStart?: components["schemas"]["QuickStartModel"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
@@ -3524,11 +3529,9 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
+      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
-      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3589,9 +3592,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
+      description?: string;
       name: string;
       displayName?: string;
-      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3677,23 +3680,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
       namespace?: string;
-      description?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
       namespace?: string;
-      description?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4247,17 +4250,17 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
+      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
-      expiresAt?: number;
-      description: string;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4374,18 +4377,18 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
+      description: string;
       /** Format: int64 */
       id: number;
       projectName: string;
       userFullName?: string;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
       username?: string;
-      description: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -14238,6 +14241,54 @@ export interface operations {
       200: {
         content: {
           "application/json": components["schemas"]["TaskPerUserReportModel"][];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+    };
+  };
+  getCsvReport: {
+    parameters: {
+      path: {
+        taskId: number;
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": string;
         };
       };
       /** Bad Request */

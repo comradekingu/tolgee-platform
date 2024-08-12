@@ -1,5 +1,6 @@
 package io.tolgee.service
 
+import io.tolgee.component.task.TaskReportHelper
 import io.tolgee.constants.Message
 import io.tolgee.dtos.request.task.*
 import io.tolgee.exceptions.BadRequestException
@@ -25,6 +26,7 @@ import io.tolgee.service.security.SecurityService
 import io.tolgee.service.translation.TranslationService
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import org.apache.commons.io.output.ByteArrayOutputStream
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DataIntegrityViolationException
@@ -325,11 +327,10 @@ class TaskService(
         filters,
       )
     return taskRepository.calculateScope(
-        projectEntity.id,
-        projectEntity.baseLanguage!!.id,
-        relevantKeys,
-      )
-
+      projectEntity.id,
+      projectEntity.baseLanguage!!.id,
+      relevantKeys,
+    )
   }
 
   fun getTranslationsWithTasks(
@@ -451,5 +452,24 @@ class TaskService(
         baseCharacterCount = scope.baseCharacterCount,
       )
     }
+  }
+
+  fun getExcelFile(
+    projectEntity: Project,
+    taskId: Long,
+  ): ByteArray {
+    val task = getTask(projectEntity, taskId)
+    val report = getReport(projectEntity, taskId)
+
+    val workbook = TaskReportHelper(task, report).generateExcelReport()
+
+    // Write the workbook to a byte array output stream
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    workbook.use { wb ->
+      wb.write(byteArrayOutputStream)
+    }
+
+    val byteArray = byteArrayOutputStream.toByteArray()
+    return byteArray
   }
 }
