@@ -10,6 +10,7 @@ import io.tolgee.hateoas.task.TaskPerUserReportModelAssembler
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModel
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModelAssembler
 import io.tolgee.model.enums.Scope
+import io.tolgee.model.enums.TaskState
 import io.tolgee.model.views.ExtendedUserAccountInProject
 import io.tolgee.model.views.KeysScopeView
 import io.tolgee.model.views.TaskWithScopeView
@@ -19,6 +20,7 @@ import io.tolgee.security.authentication.AllowApiAccess
 import io.tolgee.security.authorization.RequiresProjectPermissions
 import io.tolgee.security.authorization.UseDefaultPermissions
 import io.tolgee.service.TaskService
+import io.tolgee.service.security.SecurityService
 import io.tolgee.service.security.UserAccountService
 import jakarta.validation.Valid
 import org.springdoc.core.annotations.ParameterObject
@@ -51,6 +53,7 @@ class TaskController(
   private val userAccountInProjectModelAssembler: UserAccountInProjectModelAssembler,
   private val pagedUserResourcesAssembler: PagedResourcesAssembler<ExtendedUserAccountInProject>,
   private val taskPerUserReportModelAssembler: TaskPerUserReportModelAssembler,
+  private val securityService: SecurityService
 ) {
   @GetMapping("")
   @Operation(summary = "Get tasks")
@@ -176,9 +179,27 @@ class TaskController(
     taskService.updateTaskKeys(projectHolder.projectEntity, taskId, dto)
   }
 
+  @PostMapping("/{taskId}/finish")
+  @Operation(summary = "Finish task")
+  // permissions checked inside
+  @UseDefaultPermissions
+  @AllowApiAccess
+  fun finishTask(
+    @PathVariable
+    taskId: Long,
+  ): TaskModel {
+    // user can only finish tasks assigned to him
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
+    val task = taskService.updateTask(projectHolder.projectEntity, taskId, UpdateTaskRequest(
+      state = TaskState.DONE
+    ))
+    return taskModelAssembler.toModel(task)
+  }
+
   @PutMapping("/{taskId}/keys/{keyId}")
   @Operation(summary = "Update task key")
-  @RequiresProjectPermissions([Scope.TASKS_EDIT])
+  // permissions checked inside
+  @UseDefaultPermissions
   @AllowApiAccess
   fun updateTaskKey(
     @PathVariable
@@ -188,6 +209,8 @@ class TaskController(
     @RequestBody @Valid
     dto: UpdateTaskKeyRequest,
   ): UpdateTaskKeyResponse {
+    // user can only update tasks assigned to him
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
     return taskService.updateTaskKey(projectHolder.projectEntity, taskId, keyId, dto)
   }
 

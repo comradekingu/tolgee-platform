@@ -1,4 +1,7 @@
-import { usePutTask, usePutTaskTranslation } from 'tg.service/TranslationHooks';
+import {
+  useFinishTask,
+  usePutTaskTranslation,
+} from 'tg.service/TranslationHooks';
 import { useProject } from 'tg.hooks/useProject';
 
 import { SetTaskTranslationState, UpdateTask } from '../types';
@@ -12,13 +15,12 @@ type Props = {
 
 export const useTaskService = ({ translations }: Props) => {
   const project = useProject();
-  const putTask = usePutTask();
+  const finishTask = useFinishTask();
   const putTaskTranslation = usePutTaskTranslation();
 
-  const updateTask = ({ taskId, data }: UpdateTask) => {
-    return putTask.mutateAsync({
+  const handleFinishTask = ({ taskId, data }: UpdateTask) => {
+    return finishTask.mutateAsync({
       path: { projectId: project.id, taskId: taskId },
-      content: { 'application/json': data },
     });
   };
 
@@ -64,7 +66,7 @@ export const useTaskService = ({ translations }: Props) => {
                 <T keyName="task_finished_confirmation_confirm" />
               ),
               onConfirm() {
-                updateTask({
+                handleFinishTask({
                   taskId: data.taskId,
                   data: { state: 'DONE' },
                 }).then(() => {
@@ -79,6 +81,6 @@ export const useTaskService = ({ translations }: Props) => {
 
   return {
     setTaskTranslationState,
-    isLoading: putTaskTranslation.isLoading || putTask.isLoading,
+    isLoading: putTaskTranslation.isLoading || finishTask.isLoading,
   };
 };

@@ -49,6 +49,12 @@ export const usePutTask = () =>
     method: 'put',
   });
 
+export const useFinishTask = () =>
+  useApiMutation({
+    url: '/v2/projects/{projectId}/tasks/{taskId}/finish',
+    method: 'post',
+  });
+
 export const usePutTaskTranslation = () =>
   useApiMutation({
     url: '/v2/projects/{projectId}/tasks/{taskId}/keys/{keyId}',

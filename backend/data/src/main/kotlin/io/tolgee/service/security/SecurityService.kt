@@ -14,8 +14,10 @@ import io.tolgee.model.translation.Translation
 import io.tolgee.repository.KeyRepository
 import io.tolgee.security.ProjectHolder
 import io.tolgee.security.authentication.AuthenticationFacade
+import io.tolgee.service.TaskService
 import io.tolgee.service.language.LanguageService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
@@ -33,6 +35,10 @@ class SecurityService(
 
   @set:Autowired
   lateinit var userAccountService: UserAccountService
+
+  @set:Autowired
+  @Lazy
+  lateinit var taskService: TaskService
 
   fun checkAnyProjectPermission(projectId: Long) {
     if (
@@ -75,6 +81,20 @@ class SecurityService(
 
     val apiKey = activeApiKey ?: return
     checkProjectPermission(projectId, requiredPermission, apiKey)
+  }
+
+  fun hasTaskEditScopeOrIsAssigned(
+    projectId: Long,
+    taskId: Long,
+  ) {
+    try {
+      checkProjectPermission(projectId, Scope.TASKS_EDIT)
+    } catch (err: PermissionException) {
+      val assignees = taskService.findAssigneeById(projectId, taskId, activeUser.id)
+      if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
+        throw PermissionException()
+      }
+    }
   }
 
   fun checkProjectPermission(

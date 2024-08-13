@@ -3,6 +3,7 @@ package io.tolgee.repository
 import io.tolgee.dtos.request.task.TaskFilters
 import io.tolgee.dtos.request.task.TranslationScopeFilters
 import io.tolgee.model.Project
+import io.tolgee.model.UserAccount
 import io.tolgee.model.task.Task
 import io.tolgee.model.task.TaskId
 import io.tolgee.model.views.KeysScopeView
@@ -254,4 +255,21 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     taskId: Long,
     baseLangId: Long,
   ): List<TaskPerUserReportView>
+
+
+  @Query(
+    """
+      select u
+      from UserAccount u
+        join u.tasks tk
+      where tk.id = :taskId
+        and tk.project.id = :projectId
+        and u.id = :userId
+    """
+  )
+  fun findAssigneeById(
+    projectId: Long,
+    taskId: Long,
+    userId: Long
+  ): List<UserAccount>
 }

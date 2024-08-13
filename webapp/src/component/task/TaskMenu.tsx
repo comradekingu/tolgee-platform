@@ -11,6 +11,7 @@ import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 
 import { getLinkToTask, useTaskReport } from './utils';
 import { InitialValues, TaskCreateDialog } from './taskCreate/TaskCreateDialog';
+import { useUser } from 'tg.globalContext/helpers';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
@@ -32,11 +33,18 @@ export const TaskMenu = ({
   project,
   projectScopes,
 }: Props) => {
+  const user = useUser();
   const isOpen = Boolean(anchorEl);
   const [taskCreate, setTaskCreate] = useState<Partial<InitialValues>>();
   const updateMutation = useApiMutation({
     url: '/v2/projects/{projectId}/tasks/{taskId}',
     method: 'put',
+    invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
+  });
+
+  const finishMutation = useApiMutation({
+    url: '/v2/projects/{projectId}/tasks/{taskId}/finish',
+    method: 'post',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
@@ -58,6 +66,9 @@ export const TaskMenu = ({
     projectScopes ?? projectLoadable.data?.computedPermission.scopes ?? [];
 
   const canEditTask = scopes?.includes('tasks.edit');
+  const canMarkAsDone =
+    scopes.includes('tasks.edit') ||
+    Boolean(task.assignees.find((u) => u.id === user?.id));
 
   const languagesLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/languages',
@@ -103,6 +114,22 @@ export const TaskMenu = ({
       {
         path: { projectId: project.id, taskId: task.id },
         content: { 'application/json': { state } },
+      },
+      {
+        onSuccess() {
+          onClose();
+          messageService.success(
+            <T keyName="task_menu_state_changed_success" />
+          );
+        },
+      }
+    );
+  }
+
+  function handleMarkAsDone() {
+    finishMutation.mutate(
+      {
+        path: { projectId: project.id, taskId: task.id },
       },
       {
         onSuccess() {
@@ -185,8 +212,8 @@ export const TaskMenu = ({
         </MenuItem>
         {task.state === 'IN_PROGRESS' ? (
           <MenuItem
-            onClick={() => handleChangeState('DONE')}
-            disabled={task.doneItems !== task.totalItems || !canEditTask}
+            onClick={() => handleMarkAsDone()}
+            disabled={task.doneItems !== task.totalItems || !canMarkAsDone}
           >
             {t('task_menu_mark_as_done')}
           </MenuItem>
