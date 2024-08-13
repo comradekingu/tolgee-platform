@@ -2,7 +2,6 @@ import { Warning } from '@mui/icons-material';
 import { Box, Skeleton, styled, Tooltip } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
 
-import { useProject } from 'tg.hooks/useProject';
 import { components } from 'tg.service/apiSchema.generated';
 import { useApiQuery } from 'tg.service/http/useQueryApi';
 import { stringHash } from 'tg.fixtures/stringHash';
@@ -14,6 +13,7 @@ import { TranslationStateType } from './TranslationStateFilter';
 
 type TaskType = components['schemas']['TaskModel']['type'];
 type LanguageModel = components['schemas']['LanguageModel'];
+type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 
 const StyledContainer = styled('div')`
   display: grid;
@@ -49,6 +49,7 @@ type Props = {
   assigness: User[];
   onUpdateAssignees: (users: User[]) => void;
   filters: TranslationStateType[];
+  project: SimpleProjectModel;
 };
 
 export const TaskPreview = ({
@@ -58,11 +59,11 @@ export const TaskPreview = ({
   assigness,
   onUpdateAssignees,
   filters,
+  project,
 }: Props) => {
   const { t } = useTranslate();
   const formatNumber = useNumberFormatter();
 
-  const project = useProject();
   const content = { keys, type, language: language.id };
   const statsLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/tasks/calculate-scope',

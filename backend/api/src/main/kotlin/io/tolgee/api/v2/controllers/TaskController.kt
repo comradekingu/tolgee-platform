@@ -148,11 +148,24 @@ class TaskController(
     return ResponseEntity(resource, headers, HttpStatus.OK)
   }
 
+  @GetMapping("/{taskId}/keys")
+  @Operation(summary = "Get task keys")
+  @UseDefaultPermissions
+  @AllowApiAccess
+  fun getTaskKeys(
+    @PathVariable
+    taskId: Long,
+  ): TaskKeysResponse {
+    return TaskKeysResponse(
+      keys = taskService.getTaskKeys(projectHolder.projectEntity, taskId)
+    )
+  }
+
   @PutMapping("/{taskId}/keys")
   @Operation(summary = "Add or remove task keys")
   @UseDefaultPermissions
   @AllowApiAccess
-  fun updateKeys(
+  fun updateTaskKeys(
     @PathVariable
     taskId: Long,
     @RequestBody @Valid

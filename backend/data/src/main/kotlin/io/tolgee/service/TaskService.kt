@@ -333,6 +333,11 @@ class TaskService(
     )
   }
 
+  @Transactional
+  fun getTaskKeys(projectEntity: Project, taskId: Long): List<Long> {
+    return taskRepository.getTaskKeys(projectEntity.id, taskId)
+  }
+
   fun getTranslationsWithTasks(
     userId: Long,
     translationIds: Collection<Long>,

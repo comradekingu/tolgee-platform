@@ -59,7 +59,7 @@ export const MyTasksView = () => {
       size: 20,
       page,
       search,
-      sort: ['createdAt'],
+      sort: ['createdAt,desc'],
       filterNotState: showClosed ? undefined : ['CLOSED', 'DONE'],
       filterProject: filter.projects,
       filterType: filter.types,

@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { Divider, Menu, MenuItem, useTheme } from '@mui/material';
 import { T, useTranslate } from '@tolgee/react';
 import { Link } from 'react-router-dom';
 
 import { confirmation } from 'tg.hooks/confirmation';
 import { components } from 'tg.service/apiSchema.generated';
-import { useApiMutation } from 'tg.service/http/useQueryApi';
+import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 import { messageService } from 'tg.service/MessageService';
 import { getLinkToTask } from './utils';
+import { InitialValues, TaskCreateDialog } from './taskCreate/TaskCreateDialog';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
@@ -26,6 +28,7 @@ export const TaskMenu = ({
   onDetailOpen,
   project,
 }: Props) => {
+  const [taskCreate, setTaskCreate] = useState<Partial<InitialValues>>();
   const updateMutation = useApiMutation({
     url: '/v2/projects/{projectId}/tasks/{taskId}',
     method: 'put',
@@ -38,6 +41,25 @@ export const TaskMenu = ({
     fetchOptions: {
       rawResponse: true,
     },
+  });
+
+  const languagesLoadable = useApiQuery({
+    url: '/v2/projects/{projectId}/languages',
+    method: 'get',
+    path: { projectId: project.id },
+    query: {
+      page: 0,
+      size: 1000,
+      sort: ['tag'],
+    },
+    options: {
+      enabled: Boolean(taskCreate),
+    },
+  });
+
+  const taskKeysMutation = useApiMutation({
+    url: '/v2/projects/{projectId}/tasks/{taskId}/keys',
+    method: 'get',
   });
 
   function handleClose() {
@@ -97,6 +119,45 @@ export const TaskMenu = ({
     );
   }
 
+  function handleCloneTask() {
+    taskKeysMutation.mutate(
+      {
+        path: { projectId: project.id, taskId: task.id },
+      },
+      {
+        onSuccess(data) {
+          setTaskCreate({
+            selection: data.keys,
+            name: task.name,
+            description: task.description,
+            type: task.type,
+          });
+          onClose();
+        },
+      }
+    );
+  }
+
+  function handleCreateReviewTask() {
+    taskKeysMutation.mutate(
+      {
+        path: { projectId: project.id, taskId: task.id },
+      },
+      {
+        onSuccess(data) {
+          setTaskCreate({
+            selection: data.keys,
+            name: task.name,
+            description: task.description,
+            languages: [task.language.id],
+            type: 'REVIEW',
+          });
+          onClose();
+        },
+      }
+    );
+  }
+
   const withClose = (func: () => void) => () => {
     func();
     onClose();
@@ -105,43 +166,61 @@ export const TaskMenu = ({
   const { t } = useTranslate();
   const theme = useTheme();
   return (
-    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
-      <MenuItem
-        component={Link}
-        to={getLinkToTask(project, task)}
-        style={{
-          textDecoration: 'none',
-          color: theme.palette.text.primary,
-          outline: 'none',
-        }}
-      >
-        {t('task_menu_open_translations')}
-      </MenuItem>
-      <MenuItem onClick={withClose(() => onDetailOpen(task))}>
-        {t('task_menu_task_detail')}
-      </MenuItem>
-      {task.state === 'IN_PROGRESS' ? (
+    <>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
         <MenuItem
-          onClick={() => handleChangeState('DONE')}
-          disabled={task.doneItems !== task.totalItems}
+          component={Link}
+          to={getLinkToTask(project, task)}
+          style={{
+            textDecoration: 'none',
+            color: theme.palette.text.primary,
+            outline: 'none',
+          }}
         >
-          {t('task_menu_mark_as_done')}
+          {t('task_menu_open_translations')}
         </MenuItem>
-      ) : (
-        <MenuItem onClick={() => handleChangeState('IN_PROGRESS')}>
-          {t('task_menu_mark_as_in_progress')}
+        <MenuItem onClick={withClose(() => onDetailOpen(task))}>
+          {t('task_menu_task_detail')}
         </MenuItem>
+        {task.state === 'IN_PROGRESS' ? (
+          <MenuItem
+            onClick={() => handleChangeState('DONE')}
+            disabled={task.doneItems !== task.totalItems}
+          >
+            {t('task_menu_mark_as_done')}
+          </MenuItem>
+        ) : (
+          <MenuItem onClick={() => handleChangeState('IN_PROGRESS')}>
+            {t('task_menu_mark_as_in_progress')}
+          </MenuItem>
+        )}
+        {task.state === 'IN_PROGRESS' && (
+          <MenuItem onClick={handleClose}>{t('task_menu_close_task')}</MenuItem>
+        )}
+        <Divider />
+        <MenuItem onClick={handleCloneTask}>
+          {t('task_menu_clone_task')}
+        </MenuItem>
+        {task.type === 'TRANSLATE' && (
+          <MenuItem onClick={handleCreateReviewTask}>
+            {t('task_menu_create_review_task')}
+          </MenuItem>
+        )}
+        <Divider />
+        <MenuItem onClick={handleGetCsvReport}>
+          {t('task_menu_generate_report')}
+        </MenuItem>
+      </Menu>
+      {taskCreate && languagesLoadable.data && (
+        <TaskCreateDialog
+          open={true}
+          onClose={() => setTaskCreate(undefined)}
+          onFinished={() => setTaskCreate(undefined)}
+          allLanguages={languagesLoadable.data._embedded?.languages ?? []}
+          project={project}
+          initialValues={taskCreate}
+        />
       )}
-      {task.state === 'IN_PROGRESS' && (
-        <MenuItem onClick={handleClose}>{t('task_menu_close_task')}</MenuItem>
-      )}
-      <Divider />
-      <MenuItem onClick={onClose}>{t('task_menu_clone_task')}</MenuItem>
-      <MenuItem onClick={onClose}>{t('task_menu_create_review_task')}</MenuItem>
-      <Divider />
-      <MenuItem onClick={handleGetCsvReport}>
-        {t('task_menu_generate_report')}
-      </MenuItem>
-    </Menu>
+    </>
   );
 };

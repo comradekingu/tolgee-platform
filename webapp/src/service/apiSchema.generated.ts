@@ -76,7 +76,8 @@ export interface paths {
     put: operations["updateTaskKey"];
   };
   "/v2/projects/{projectId}/tasks/{taskId}/keys": {
-    put: operations["updateKeys"];
+    get: operations["getTaskKeys"];
+    put: operations["updateTaskKeys"];
   };
   "/v2/projects/{projectId}/tasks/{taskId}": {
     get: operations["getTask"];
@@ -1147,14 +1148,6 @@ export interface components {
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
-      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example 200001,200004
        */
@@ -1169,6 +1162,14 @@ export interface components {
        * @example 200001,200004
        */
       stateChangeLanguageIds?: number[];
+      /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
       /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
@@ -1785,8 +1786,8 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
-      contentStorageType?: "S3" | "AZURE";
       enabled?: boolean;
+      contentStorageType?: "S3" | "AZURE";
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -2220,13 +2221,13 @@ export interface components {
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      updatedAt: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2365,15 +2366,15 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
-      projectName: string;
-      userFullName?: string;
-      /** Format: int64 */
-      projectId: number;
+      username?: string;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
+      projectId: number;
+      /** Format: int64 */
       expiresAt?: number;
-      username?: string;
+      projectName: string;
+      userFullName?: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -3522,14 +3523,14 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      basePermissions: components["schemas"]["PermissionModel"];
+      avatar?: components["schemas"]["Avatar"];
       /**
        * @description The role of currently authorized user.
        *
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      avatar?: components["schemas"]["Avatar"];
+      basePermissions: components["schemas"]["PermissionModel"];
       /** @example btforg */
       slug: string;
     };
@@ -3652,6 +3653,9 @@ export interface components {
       /** Format: int64 */
       baseWordCount: number;
     };
+    TaskKeysResponse: {
+      keys: number[];
+    };
     PagedModelTaskModel: {
       _embedded?: {
         tasks?: components["schemas"]["TaskModel"][];
@@ -3684,9 +3688,9 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
@@ -3694,9 +3698,9 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
-      baseTranslation?: string;
       namespace?: string;
+      baseTranslation?: string;
+      translation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4254,13 +4258,13 @@ export interface components {
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
       /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      updatedAt: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4380,15 +4384,15 @@ export interface components {
       description: string;
       /** Format: int64 */
       id: number;
-      projectName: string;
-      userFullName?: string;
-      /** Format: int64 */
-      projectId: number;
+      username?: string;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
+      projectId: number;
+      /** Format: int64 */
       expiresAt?: number;
-      username?: string;
+      projectName: string;
+      userFullName?: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -5649,7 +5653,55 @@ export interface operations {
       };
     };
   };
-  updateKeys: {
+  getTaskKeys: {
+    parameters: {
+      path: {
+        taskId: number;
+        projectId: number;
+      };
+    };
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": components["schemas"]["TaskKeysResponse"];
+        };
+      };
+      /** Bad Request */
+      400: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Unauthorized */
+      401: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Forbidden */
+      403: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+      /** Not Found */
+      404: {
+        content: {
+          "application/json":
+            | components["schemas"]["ErrorResponseTyped"]
+            | components["schemas"]["ErrorResponseBody"];
+        };
+      };
+    };
+  };
+  updateTaskKeys: {
     parameters: {
       path: {
         taskId: number;

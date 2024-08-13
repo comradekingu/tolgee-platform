@@ -85,7 +85,7 @@ export const ProjectTasksView = () => {
       size: 20,
       page,
       search,
-      sort: ['createdAt'],
+      sort: ['createdAt,desc'],
       filterNotState: showClosed ? undefined : ['CLOSED', 'DONE'],
       filterAssignee: filter.assignees,
       filterLanguage: filter.languages,
@@ -163,9 +163,11 @@ export const ProjectTasksView = () => {
           open={addDialog}
           onClose={() => setAddDialog(false)}
           onFinished={() => setAddDialog(false)}
-          initialLanguages={allLanguages
-            .filter((l) => !l.base && languagesPreference.includes(l.tag))
-            .map((l) => l.id)}
+          initialValues={{
+            languages: allLanguages
+              .filter((l) => !l.base && languagesPreference.includes(l.tag))
+              .map((l) => l.id),
+          }}
           project={project}
           allLanguages={allLanguages}
         />

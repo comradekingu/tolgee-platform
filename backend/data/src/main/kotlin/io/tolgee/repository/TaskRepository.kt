@@ -182,6 +182,16 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     filters: TranslationScopeFilters = TranslationScopeFilters(),
   ): List<Long>
 
+  @Query("""
+      select k.id
+      from Key k
+          left join k.translations t
+          left join t.tasks tt
+      where k.project.id = :projectId and tt.task.id = :taskId
+    """
+  )
+  fun getTaskKeys(projectId: Long, taskId: Long): List<Long>
+
   @Query(
     """
       select count(k.id) as keyCount, coalesce(sum(t.characterCount), 0) as characterCount, coalesce(sum(t.wordCount), 0) as wordCount

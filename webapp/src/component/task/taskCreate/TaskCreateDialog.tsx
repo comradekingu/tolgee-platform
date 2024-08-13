@@ -34,7 +34,7 @@ import {
 } from './TranslationStateFilter';
 
 type TaskType = components['schemas']['TaskModel']['type'];
-type ProjectModel = components['schemas']['ProjectModel'];
+type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 type LanguageModel = components['schemas']['LanguageModel'];
 
 const TASK_TYPES: TaskType[] = ['TRANSLATE', 'REVIEW'];
@@ -76,24 +76,31 @@ const StyledActions = styled('div')`
   justify-content: end;
 `;
 
+export type InitialValues = {
+  type: TaskType;
+  name: string;
+  description: string;
+  languages: number[];
+  languageAssignees: Record<number, User[]>;
+  selection: number[];
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
   onFinished: () => void;
-  selection?: number[];
-  initialLanguages: number[];
-  project: ProjectModel;
+  project: SimpleProjectModel;
   allLanguages: LanguageModel[];
+  initialValues?: Partial<InitialValues>;
 };
 
 export const TaskCreateDialog = ({
   open,
   onClose,
   onFinished,
-  selection,
-  initialLanguages,
   project,
   allLanguages,
+  initialValues,
 }: Props) => {
   const { t } = useTranslate();
 
@@ -107,7 +114,7 @@ export const TaskCreateDialog = ({
 
   const [filters, setFilters] = useState<FiltersType>({});
   const [stateFilters, setStateFilters] = useState<TranslationStateType[]>([]);
-  const [languages, setLanguages] = useState(initialLanguages);
+  const [languages, setLanguages] = useState(initialValues?.languages ?? []);
 
   const selectedLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/translations/select-all',
@@ -120,11 +127,12 @@ export const TaskCreateDialog = ({
         .map((l) => l.tag),
     },
     options: {
-      enabled: !selection,
+      enabled: !initialValues?.selection,
     },
   });
 
-  const selectedKeys = selection ?? selectedLoadable.data?.ids ?? [];
+  const selectedKeys =
+    initialValues?.selection ?? selectedLoadable.data?.ids ?? [];
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg">
@@ -140,11 +148,11 @@ export const TaskCreateDialog = ({
 
       <Formik
         initialValues={{
-          type: 'TRANSLATE' as TaskType,
-          name: '',
-          description: '',
+          type: initialValues?.type ?? 'TRANSLATE',
+          name: initialValues?.name ?? '',
+          description: initialValues?.description ?? '',
           dueDate: undefined as number | undefined,
-          assignees: {} as Record<string, User[]>,
+          assignees: initialValues?.languageAssignees ?? {},
         }}
         validationSchema={Validation.CREATE_TASK_FORM(t)}
         onSubmit={async (values) => {
@@ -249,7 +257,7 @@ export const TaskCreateDialog = ({
                 {t('create_task_tasks_and_assignees_title')}
               </Typography>
               <StyledFilters my={1}>
-                {!selection && (
+                {!initialValues?.selection && (
                   <TranslationFilters
                     value={filters}
                     onChange={setFilters}
@@ -284,6 +292,7 @@ export const TaskCreateDialog = ({
                         setFieldValue(`assignees[${language}]`, users);
                       }}
                       filters={stateFilters}
+                      project={project}
                     />
                   ))}
                 </Box>

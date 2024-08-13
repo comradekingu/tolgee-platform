@@ -7,6 +7,7 @@ import { BatchOperationsSubmit } from './components/BatchOperationsSubmit';
 import { OperationContainer } from './components/OperationContainer';
 import { useTranslationsSelector } from '../context/TranslationsContext';
 import { getPreselectedLanguagesIds } from './getPreselectedLanguages';
+import { User } from 'tg.component/UserAccount';
 
 type Props = OperationProps;
 
@@ -21,6 +22,14 @@ export const OperationTaskCreate = ({ disabled, onFinished }: Props) => {
     (c) => c.translationsLanguages
   );
 
+  const languageAssignees = {} as Record<number, User[]>;
+  getPreselectedLanguagesIds(
+    languagesWithoutBase,
+    translationsLanguages ?? []
+  ).forEach((langId) => {
+    languageAssignees[langId] = [];
+  });
+
   return (
     <OperationContainer>
       <BatchOperationsSubmit
@@ -30,11 +39,10 @@ export const OperationTaskCreate = ({ disabled, onFinished }: Props) => {
       <TaskCreateDialog
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        selection={selection}
-        initialLanguages={getPreselectedLanguagesIds(
-          languagesWithoutBase,
-          translationsLanguages ?? []
-        )}
+        initialValues={{
+          selection,
+          languageAssignees,
+        }}
         allLanguages={allLanguages}
         project={project}
         onFinished={onFinished}
