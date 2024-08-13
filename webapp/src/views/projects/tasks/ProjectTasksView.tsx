@@ -16,6 +16,7 @@ import { TaskFilterType } from 'tg.component/task/taskFilter/TaskFilterPopover';
 import { useUrlSearchState } from 'tg.hooks/useUrlSearchState';
 import { TaskCreateDialog } from 'tg.component/task/taskCreate/TaskCreateDialog';
 import { projectPreferencesService } from 'tg.service/ProjectPreferencesService';
+import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 
 type TaskModel = components['schemas']['TaskModel'];
 
@@ -31,6 +32,9 @@ export const ProjectTasksView = () => {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [showClosed, setShowClosed] = useState(false);
+  const { satisfiesPermission } = useProjectPermissions();
+
+  const canEditTasks = satisfiesPermission('tasks.edit');
 
   const languagesLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/languages',
@@ -117,7 +121,7 @@ export const ProjectTasksView = () => {
         onShowClosedChange={setShowClosed}
         filter={filter}
         onFilterChange={setFilter}
-        onAddTask={() => setAddDialog(true)}
+        onAddTask={canEditTasks ? () => setAddDialog(true) : undefined}
       />
       <PaginatedHateoasList
         loadable={tasksLoadable}
@@ -145,6 +149,7 @@ export const ProjectTasksView = () => {
             task={task}
             onDetailOpen={(task) => setDetail(task)}
             project={project}
+            projectScopes={project.computedPermission.scopes}
           />
         )}
         itemSeparator={() => <StyledSeparator />}

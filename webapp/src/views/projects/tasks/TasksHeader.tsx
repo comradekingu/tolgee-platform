@@ -31,7 +31,7 @@ type Props = {
   onShowClosedChange: (value: boolean) => void;
   filter: TaskFilterType;
   onFilterChange: (value: TaskFilterType) => void;
-  onAddTask: () => void;
+  onAddTask?: () => void;
 };
 
 export const TasksHeader = ({
@@ -81,14 +81,16 @@ export const TasksHeader = ({
           label={t('tasks_show_closed_label')}
         />
       </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<Add />}
-        onClick={onAddTask}
-      >
-        {t('tasks_add')}
-      </Button>
+      {onAddTask && (
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={onAddTask}
+        >
+          {t('tasks_add')}
+        </Button>
+      )}
     </StyledContainer>
   );
 };

@@ -28,6 +28,7 @@ import { TaskScope } from './TaskScope';
 import { UserAccount } from 'tg.component/UserAccount';
 import { TranslationIcon } from 'tg.component/CustomIcons';
 import { getLinkToTask, useTaskReport } from './utils';
+import { Scope } from 'tg.fixtures/permissions';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
@@ -67,9 +68,15 @@ type Props = {
   task: TaskModel;
   onClose: () => void;
   project: SimpleProjectModel;
+  projectScopes?: Scope[];
 };
 
-export const TaskDetail = ({ task, onClose, project }: Props) => {
+export const TaskDetail = ({
+  task,
+  onClose,
+  project,
+  projectScopes,
+}: Props) => {
   const { t } = useTranslate();
   const formatDate = useDateFormatter();
 
@@ -90,6 +97,20 @@ export const TaskDetail = ({ task, onClose, project }: Props) => {
     method: 'put',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
+
+  const projectLoadable = useApiQuery({
+    url: '/v2/projects/{projectId}',
+    method: 'get',
+    path: { projectId: project.id },
+    options: {
+      enabled: Boolean(projectScopes),
+    },
+  });
+
+  const scopes =
+    projectScopes ?? projectLoadable.data?.computedPermission.scopes ?? [];
+
+  const canEditTask = scopes.includes('tasks.edit');
 
   const { downloadReport } = useTaskReport();
 
@@ -147,17 +168,20 @@ export const TaskDetail = ({ task, onClose, project }: Props) => {
                 name="name"
                 label={t('task_detail_field_name')}
                 fullWidth
+                disabled={!canEditTask}
               />
               <AssigneeSearchSelect
                 label={t('task_detail_field_assignees')}
                 value={values.assignees}
                 onChange={(value) => setFieldValue('assignees', value)}
                 project={project}
+                disabled={!canEditTask}
               />
               <TaskDatePicker
                 value={values.dueDate ?? null}
                 onChange={(value) => setFieldValue('dueDate', value)}
                 label={t('task_detail_field_due_date')}
+                disabled={!canEditTask}
               />
             </StyledTopPart>
             <TextField
@@ -165,6 +189,7 @@ export const TaskDetail = ({ task, onClose, project }: Props) => {
               name="description"
               multiline
               minRows={3}
+              disabled={!canEditTask}
             />
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

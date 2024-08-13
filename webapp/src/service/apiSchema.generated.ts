@@ -1201,6 +1201,8 @@ export interface components {
         | "content-delivery.manage"
         | "content-delivery.publish"
         | "webhooks.manage"
+        | "tasks.view"
+        | "tasks.edit"
       )[];
     };
     LanguageModel: {
@@ -1275,6 +1277,8 @@ export interface components {
         | "content-delivery.manage"
         | "content-delivery.publish"
         | "webhooks.manage"
+        | "tasks.view"
+        | "tasks.edit"
       )[];
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
@@ -1786,8 +1790,8 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
-      enabled?: boolean;
       contentStorageType?: "S3" | "AZURE";
+      enabled?: boolean;
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -2223,11 +2227,11 @@ export interface components {
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
-      lastUsedAt?: number;
+      updatedAt: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2368,11 +2372,11 @@ export interface components {
       id: number;
       username?: string;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
       scopes: string[];
@@ -3436,7 +3440,9 @@ export interface components {
         | "translations.batch-machine"
         | "content-delivery.manage"
         | "content-delivery.publish"
-        | "webhooks.manage";
+        | "webhooks.manage"
+        | "tasks.view"
+        | "tasks.edit";
       requires: components["schemas"]["HierarchyItem"][];
     };
     MachineTranslationProviderModel: {
@@ -3523,7 +3529,6 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      avatar?: components["schemas"]["Avatar"];
       /**
        * @description The role of currently authorized user.
        *
@@ -3531,6 +3536,7 @@ export interface components {
        */
       currentUserRole?: "MEMBER" | "OWNER";
       basePermissions: components["schemas"]["PermissionModel"];
+      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
     };
@@ -3689,8 +3695,8 @@ export interface components {
       /** Format: int64 */
       id: number;
       namespace?: string;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
@@ -3699,8 +3705,8 @@ export interface components {
       /** Format: int64 */
       id: number;
       namespace?: string;
-      baseTranslation?: string;
       translation?: string;
+      baseTranslation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4260,11 +4266,11 @@ export interface components {
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
-      lastUsedAt?: number;
+      updatedAt: number;
       /** Format: int64 */
       expiresAt?: number;
       /** Format: int64 */
-      updatedAt: number;
+      lastUsedAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4386,11 +4392,11 @@ export interface components {
       id: number;
       username?: string;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       projectName: string;
       userFullName?: string;
       scopes: string[];
@@ -13916,6 +13922,8 @@ export interface operations {
               | "content-delivery.manage"
               | "content-delivery.publish"
               | "webhooks.manage"
+              | "tasks.view"
+              | "tasks.edit"
             )[];
           };
         };

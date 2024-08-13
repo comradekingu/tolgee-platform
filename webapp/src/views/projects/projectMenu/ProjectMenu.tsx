@@ -38,6 +38,7 @@ export const ProjectMenu = ({ id }) => {
   const canPublishCd = satisfiesPermission('content-delivery.publish');
   const canManageWebhooks = satisfiesPermission('webhooks.manage');
   const canViewDeveloper = canPublishCd || canManageWebhooks;
+  const canViewTasks = satisfiesPermission('tasks.view');
 
   const { t } = useTranslate();
 
@@ -70,15 +71,17 @@ export const ProjectMenu = ({ id }) => {
           quickStart={{ itemKey: 'menu_translations' }}
         />
       )}
-      <SideMenuItem
-        linkTo={LINKS.PROJECT_TASKS.build({
-          [PARAMS.PROJECT_ID]: id,
-        })}
-        icon={<AssignmentTurnedIn />}
-        text={t('project_menu_tasks')}
-        data-cy="project-menu-item-tasks"
-        matchAsPrefix
-      />
+      {canViewTasks && (
+        <SideMenuItem
+          linkTo={LINKS.PROJECT_TASKS.build({
+            [PARAMS.PROJECT_ID]: id,
+          })}
+          icon={<AssignmentTurnedIn />}
+          text={t('project_menu_tasks')}
+          data-cy="project-menu-item-tasks"
+          matchAsPrefix
+        />
+      )}
       {canEditProject && (
         <SideMenuItem
           linkTo={LINKS.PROJECT_EDIT.build({

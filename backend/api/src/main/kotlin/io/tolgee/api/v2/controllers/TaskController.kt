@@ -9,12 +9,14 @@ import io.tolgee.hateoas.task.TaskPerUserReportModel
 import io.tolgee.hateoas.task.TaskPerUserReportModelAssembler
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModel
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModelAssembler
+import io.tolgee.model.enums.Scope
 import io.tolgee.model.views.ExtendedUserAccountInProject
 import io.tolgee.model.views.KeysScopeView
 import io.tolgee.model.views.TaskWithScopeView
 import io.tolgee.openApiDocs.OpenApiOrderExtension
 import io.tolgee.security.ProjectHolder
 import io.tolgee.security.authentication.AllowApiAccess
+import io.tolgee.security.authorization.RequiresProjectPermissions
 import io.tolgee.security.authorization.UseDefaultPermissions
 import io.tolgee.service.TaskService
 import io.tolgee.service.security.UserAccountService
@@ -52,7 +54,7 @@ class TaskController(
 ) {
   @GetMapping("")
   @Operation(summary = "Get tasks")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun getTasks(
     @ParameterObject
@@ -68,7 +70,7 @@ class TaskController(
 
   @PostMapping("")
   @Operation(summary = "Create task")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun createTask(
     @RequestBody @Valid
@@ -82,7 +84,7 @@ class TaskController(
 
   @GetMapping("/{taskId}")
   @Operation(summary = "Get task")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun getTask(
     @PathVariable
@@ -94,7 +96,7 @@ class TaskController(
 
   @PutMapping("/{taskId}")
   @Operation(summary = "Update task")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun updateTask(
     @PathVariable
@@ -108,7 +110,7 @@ class TaskController(
 
   @DeleteMapping("/{taskId}")
   @Operation(summary = "Delete task")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun deleteTask(
     @PathVariable
@@ -119,7 +121,7 @@ class TaskController(
 
   @GetMapping("/{taskId}/per-user-report")
   @Operation(summary = "Report who did what")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun getPerUserReport(
     @PathVariable
@@ -131,7 +133,7 @@ class TaskController(
 
   @GetMapping("/{taskId}/csv-report")
   @Operation(summary = "Report who did what")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun getCsvReport(
     @PathVariable
@@ -150,20 +152,20 @@ class TaskController(
 
   @GetMapping("/{taskId}/keys")
   @Operation(summary = "Get task keys")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun getTaskKeys(
     @PathVariable
     taskId: Long,
   ): TaskKeysResponse {
     return TaskKeysResponse(
-      keys = taskService.getTaskKeys(projectHolder.projectEntity, taskId)
+      keys = taskService.getTaskKeys(projectHolder.projectEntity, taskId),
     )
   }
 
   @PutMapping("/{taskId}/keys")
   @Operation(summary = "Add or remove task keys")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun updateTaskKeys(
     @PathVariable
@@ -176,7 +178,7 @@ class TaskController(
 
   @PutMapping("/{taskId}/keys/{keyId}")
   @Operation(summary = "Update task key")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun updateTaskKey(
     @PathVariable
@@ -191,7 +193,7 @@ class TaskController(
 
   @PostMapping("/create-multiple")
   @Operation(summary = "Create multiple tasks")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun createTasks(
     @RequestBody @Valid
@@ -204,7 +206,7 @@ class TaskController(
 
   @PostMapping("/calculate-scope")
   @Operation(summary = "Calculate scope")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_VIEW])
   @AllowApiAccess
   fun calculateScope(
     @RequestBody @Valid
@@ -216,7 +218,7 @@ class TaskController(
   }
 
   @GetMapping("/possible-assignees")
-  @UseDefaultPermissions
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun getPossibleAssignees(
     @ParameterObject

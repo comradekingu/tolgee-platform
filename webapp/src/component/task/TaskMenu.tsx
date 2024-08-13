@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom';
 
 import { confirmation } from 'tg.hooks/confirmation';
 import { components } from 'tg.service/apiSchema.generated';
-import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
+import { Scope } from 'tg.fixtures/permissions';
 import { messageService } from 'tg.service/MessageService';
+import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
+
 import { getLinkToTask, useTaskReport } from './utils';
 import { InitialValues, TaskCreateDialog } from './taskCreate/TaskCreateDialog';
 
@@ -19,6 +21,7 @@ type Props = {
   onDetailOpen: (task: TaskModel) => void;
   task: TaskModel;
   project: SimpleProjectModel;
+  projectScopes?: Scope[];
 };
 
 export const TaskMenu = ({
@@ -27,7 +30,9 @@ export const TaskMenu = ({
   task,
   onDetailOpen,
   project,
+  projectScopes,
 }: Props) => {
+  const isOpen = Boolean(anchorEl);
   const [taskCreate, setTaskCreate] = useState<Partial<InitialValues>>();
   const updateMutation = useApiMutation({
     url: '/v2/projects/{projectId}/tasks/{taskId}',
@@ -36,6 +41,23 @@ export const TaskMenu = ({
   });
 
   const { downloadReport } = useTaskReport();
+
+  const projectLoadable = useApiQuery({
+    url: '/v2/projects/{projectId}',
+    method: 'get',
+    path: { projectId: project.id },
+    options: {
+      enabled: !projectScopes && isOpen,
+      refetchOnMount: false,
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    },
+  });
+
+  const scopes =
+    projectScopes ?? projectLoadable.data?.computedPermission.scopes ?? [];
+
+  const canEditTask = scopes?.includes('tasks.edit');
 
   const languagesLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/languages',
@@ -146,7 +168,7 @@ export const TaskMenu = ({
   const theme = useTheme();
   return (
     <>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={onClose}>
+      <Menu anchorEl={anchorEl} open={isOpen} onClose={onClose}>
         <MenuItem
           component={Link}
           to={getLinkToTask(project, task)}
@@ -164,27 +186,33 @@ export const TaskMenu = ({
         {task.state === 'IN_PROGRESS' ? (
           <MenuItem
             onClick={() => handleChangeState('DONE')}
-            disabled={task.doneItems !== task.totalItems}
+            disabled={task.doneItems !== task.totalItems || !canEditTask}
           >
             {t('task_menu_mark_as_done')}
           </MenuItem>
         ) : (
-          <MenuItem onClick={() => handleChangeState('IN_PROGRESS')}>
+          <MenuItem
+            onClick={() => handleChangeState('IN_PROGRESS')}
+            disabled={!canEditTask}
+          >
             {t('task_menu_mark_as_in_progress')}
           </MenuItem>
         )}
         {task.state === 'IN_PROGRESS' && (
-          <MenuItem onClick={handleClose}>{t('task_menu_close_task')}</MenuItem>
+          <MenuItem disabled={!canEditTask} onClick={handleClose}>
+            {t('task_menu_close_task')}
+          </MenuItem>
         )}
         <Divider />
-        <MenuItem onClick={handleCloneTask}>
+        <MenuItem onClick={handleCloneTask} disabled={!canEditTask}>
           {t('task_menu_clone_task')}
         </MenuItem>
         {task.type === 'TRANSLATE' && (
-          <MenuItem onClick={handleCreateReviewTask}>
+          <MenuItem onClick={handleCreateReviewTask} disabled={!canEditTask}>
             {t('task_menu_create_review_task')}
           </MenuItem>
         )}
+
         <Divider />
         <MenuItem onClick={handleGetExcelReport}>
           {t('task_menu_generate_report')}

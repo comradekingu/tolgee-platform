@@ -96,7 +96,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     """
      select tk
      from Task tk
-        right join tk.assignees u on u.id = :userId
+        join tk.assignees u on u.id = :userId
      where $TASK_SEARCH
         and $TASK_FILTERS
     """,
@@ -117,7 +117,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         CASE WHEN u.id IS NULL THEN FALSE ELSE TRUE END as taskAssigned,
         t.type as taskType
      from Task t
-        right join t.translations tt on tt.translation.id in :translationIds
+        join t.translations tt on tt.translation.id in :translationIds
         left join t.assignees u on u.id = :currentUserId
      where t.state = 'IN_PROGRESS'
      order by t.type desc, t.id desc
@@ -182,15 +182,19 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     filters: TranslationScopeFilters = TranslationScopeFilters(),
   ): List<Long>
 
-  @Query("""
+  @Query(
+    """
       select k.id
       from Key k
           left join k.translations t
           left join t.tasks tt
       where k.project.id = :projectId and tt.task.id = :taskId
-    """
+    """,
   )
-  fun getTaskKeys(projectId: Long, taskId: Long): List<Long>
+  fun getTaskKeys(
+    projectId: Long,
+    taskId: Long,
+  ): List<Long>
 
   @Query(
     """

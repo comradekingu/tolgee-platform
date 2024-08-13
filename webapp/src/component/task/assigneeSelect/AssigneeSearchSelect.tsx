@@ -22,6 +22,7 @@ type Props = {
   sx?: SxProps;
   className?: string;
   project: SimpleProjectModel;
+  disabled?: boolean;
 };
 
 export const AssigneeSearchSelect: React.FC<Props> = ({
@@ -31,6 +32,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
   sx,
   className,
   project,
+  disabled,
 }) => {
   const anchorEl = useRef<HTMLAnchorElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +42,9 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
   };
 
   const handleClick = () => {
-    setIsOpen(true);
+    if (!disabled) {
+      setIsOpen(true);
+    }
   };
 
   const handleSelectOrganization = async (users: User[]) => {
@@ -61,8 +65,10 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
           data-cy="assignee-select"
           minHeight={false}
           label={label}
+          disabled={disabled}
           InputProps={{
             onClick: handleClick,
+            disabled: disabled,
             ref: anchorEl,
             fullWidth: true,
             sx: {
@@ -73,7 +79,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
             margin: 'dense',
             endAdornment: (
               <Box sx={{ display: 'flex', marginRight: -0.5 }}>
-                {Boolean(value.length) && (
+                {Boolean(value.length && !disabled) && (
                   <StyledClearButton
                     size="small"
                     onClick={stopAndPrevent(handleClearAssignees)}
@@ -87,6 +93,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
                   onClick={handleClick}
                   tabIndex={-1}
                   sx={{ pointerEvents: 'none' }}
+                  disabled={disabled}
                 >
                   <ArrowDropDown />
                 </StyledClearButton>

@@ -11,12 +11,14 @@ type Props = {
   value: number | null;
   onChange: (value: number | null) => void;
   label: React.ReactNode;
+  disabled?: boolean;
 };
 
-export const TaskDatePicker = ({ value, onChange, label }: Props) => {
+export const TaskDatePicker = ({ value, onChange, label, disabled }: Props) => {
   return (
     <DatePicker
       value={value ? new Date(value) : null}
+      disabled={disabled}
       onChange={(value) => {
         if (value) {
           const year = value.getFullYear();

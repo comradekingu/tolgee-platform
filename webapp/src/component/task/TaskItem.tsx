@@ -9,6 +9,7 @@ import { components } from 'tg.service/apiSchema.generated';
 import { BatchProgress } from 'tg.views/projects/translations/BatchOperations/OperationsSummary/BatchProgress';
 import { useDateFormatter } from 'tg.hooks/useLocale';
 import { AvatarImg } from 'tg.component/common/avatar/AvatarImg';
+import { Scope } from 'tg.fixtures/permissions';
 import { TaskMenu } from './TaskMenu';
 import { TaskLabel } from './TaskLabel';
 import { getLinkToTask } from './utils';
@@ -49,6 +50,7 @@ type Props = {
   task: TaskModel;
   onDetailOpen: (task: TaskModel) => void;
   project: SimpleProjectModel;
+  projectScopes?: Scope[];
   showProject?: boolean;
 };
 
@@ -57,6 +59,7 @@ export const TaskItem = ({
   onDetailOpen,
   project,
   showProject,
+  projectScopes,
 }: Props) => {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -149,6 +152,7 @@ export const TaskItem = ({
         task={task}
         onDetailOpen={onDetailOpen}
         project={project}
+        projectScopes={projectScopes}
       />
     </StyledContainer>
   );

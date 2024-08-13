@@ -334,7 +334,10 @@ class TaskService(
   }
 
   @Transactional
-  fun getTaskKeys(projectEntity: Project, taskId: Long): List<Long> {
+  fun getTaskKeys(
+    projectEntity: Project,
+    taskId: Long,
+  ): List<Long> {
     return taskRepository.getTaskKeys(projectEntity.id, taskId)
   }
 

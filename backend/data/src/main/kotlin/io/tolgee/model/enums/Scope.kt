@@ -35,6 +35,8 @@ enum class Scope(
   CONTENT_DELIVERY_MANAGE("content-delivery.manage"),
   CONTENT_DELIVERY_PUBLISH("content-delivery.publish"),
   WEBHOOKS_MANAGE("webhooks.manage"),
+  TASKS_VIEW("tasks.view"),
+  TASKS_EDIT("tasks.edit"),
   ;
 
   fun expand() = Scope.expand(this)
@@ -43,11 +45,8 @@ enum class Scope(
     private val keysView = HierarchyItem(KEYS_VIEW)
     private val translationsView = HierarchyItem(TRANSLATIONS_VIEW, listOf(keysView))
     private val screenshotsView = HierarchyItem(SCREENSHOTS_VIEW, listOf(keysView))
-    private val translationsEdit =
-      HierarchyItem(
-        TRANSLATIONS_EDIT,
-        listOf(translationsView),
-      )
+    private val translationsEdit = HierarchyItem(TRANSLATIONS_EDIT, listOf(translationsView))
+    private val tasksView = HierarchyItem(TASKS_VIEW)
 
     val hierarchy =
       HierarchyItem(
@@ -82,6 +81,7 @@ enum class Scope(
               screenshotsView,
             ),
           ),
+          HierarchyItem(TASKS_EDIT, listOf(tasksView)),
           HierarchyItem(ACTIVITY_VIEW),
           HierarchyItem(LANGUAGES_EDIT),
           HierarchyItem(PROJECT_EDIT),

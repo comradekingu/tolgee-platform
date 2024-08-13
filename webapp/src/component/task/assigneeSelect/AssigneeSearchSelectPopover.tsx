@@ -106,6 +106,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
     path: { projectId: project.id },
     query,
     options: {
+      enabled: open,
       keepPreviousData: true,
       getNextPageParam: (lastPage) => {
         if (
