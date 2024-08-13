@@ -1,6 +1,16 @@
 import { Formik } from 'formik';
 import { T, useTranslate } from '@tolgee/react';
-import { Box, Button, DialogTitle, styled, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  DialogTitle,
+  IconButton,
+  styled,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { Link } from 'react-router-dom';
+import { InsertDriveFile } from '@mui/icons-material';
 
 import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 import { TextField } from 'tg.component/common/form/fields/TextField';
@@ -16,6 +26,8 @@ import { TaskInfoItem } from './TaskInfoItem';
 import { useDateFormatter } from 'tg.hooks/useLocale';
 import { TaskScope } from './TaskScope';
 import { UserAccount } from 'tg.component/UserAccount';
+import { TranslationIcon } from 'tg.component/CustomIcons';
+import { getLinkToTask, useTaskReport } from './utils';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
@@ -78,6 +90,8 @@ export const TaskDetail = ({ task, onClose, project }: Props) => {
     method: 'put',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
+
+  const { downloadReport } = useTaskReport();
 
   const data = taskLoadable.data ?? task;
 
@@ -153,9 +167,33 @@ export const TaskDetail = ({ task, onClose, project }: Props) => {
               minRows={3}
             />
 
-            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-              {t('task_detail_scope_title')}
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                {t('task_detail_scope_title')}
+              </Typography>
+              <Box display="flex" alignItems="center">
+                <Tooltip
+                  title={t('task_detail_link_translations_tooltip')}
+                  disableInteractive
+                >
+                  <IconButton
+                    component={Link}
+                    to={getLinkToTask(project, task)}
+                    target="_blank"
+                  >
+                    <TranslationIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip
+                  title={t('task_detail_summarize_tooltip')}
+                  disableInteractive
+                >
+                  <IconButton onClick={() => downloadReport(project, task)}>
+                    <InsertDriveFile fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
 
             <TaskScope task={task} perUserData={perUserReportLoadable.data} />
 

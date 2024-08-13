@@ -7,7 +7,7 @@ import { confirmation } from 'tg.hooks/confirmation';
 import { components } from 'tg.service/apiSchema.generated';
 import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 import { messageService } from 'tg.service/MessageService';
-import { getLinkToTask } from './utils';
+import { getLinkToTask, useTaskReport } from './utils';
 import { InitialValues, TaskCreateDialog } from './taskCreate/TaskCreateDialog';
 
 type TaskModel = components['schemas']['TaskModel'];
@@ -35,13 +35,7 @@ export const TaskMenu = ({
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
-  const reportMutation = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/csv-report',
-    method: 'get',
-    fetchOptions: {
-      rawResponse: true,
-    },
-  });
+  const { downloadReport } = useTaskReport();
 
   const languagesLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/languages',
@@ -99,24 +93,9 @@ export const TaskMenu = ({
     );
   }
 
-  function handleGetCsvReport() {
-    reportMutation.mutate(
-      {
-        path: { projectId: project.id, taskId: task.id },
-      },
-      {
-        async onSuccess(result) {
-          onClose();
-          const res = result as unknown as Response;
-          const data = await res.blob();
-          const url = URL.createObjectURL(data);
-          const a = document.createElement('a');
-          a.download = `report.xlsx`;
-          a.href = url;
-          a.click();
-        },
-      }
-    );
+  function handleGetExcelReport() {
+    onClose();
+    downloadReport(project, task);
   }
 
   function handleCloneTask() {
@@ -207,7 +186,7 @@ export const TaskMenu = ({
           </MenuItem>
         )}
         <Divider />
-        <MenuItem onClick={handleGetCsvReport}>
+        <MenuItem onClick={handleGetExcelReport}>
           {t('task_menu_generate_report')}
         </MenuItem>
       </Menu>
