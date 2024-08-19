@@ -3,6 +3,7 @@ package io.tolgee.repository
 import io.tolgee.dtos.queryResults.UserAccountView
 import io.tolgee.dtos.request.task.UserAccountFilters
 import io.tolgee.model.UserAccount
+import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.views.UserAccountInProjectView
 import io.tolgee.model.views.UserAccountWithOrganizationRoleView
 import org.springframework.data.domain.Page
@@ -223,4 +224,79 @@ interface UserAccountRepository : JpaRepository<UserAccount, Long> {
   """,
   )
   fun findDemoByUsernames(usernames: List<String>): List<UserAccount>
+
+  @Query(
+    nativeQuery = true,
+    value = """
+    with projectPermissions as (
+    select
+        pe.id,
+        pe.user_id,
+        pe.scopes,
+        pe.project_id,
+        pe.type,
+        array_agg(pe_view.view_languages_id) as view_languages,
+        array_agg(pe_edit.languages_id) as edit_languages,
+        array_agg(pe_state.state_change_languages_id) as state_languages
+    from permission pe
+             left join permission_view_languages pe_view on pe.id = pe_view.permission_id
+             left join permission_languages pe_edit on pe.id = pe_edit.permission_id
+             left join permission_state_change_languages pe_state on pe.id = pe_state.permission_id
+    where pe.project_id = :projectId
+    group by pe.id, pe.user_id, pe.scopes, pe.project_id, pe.type
+)
+select ua.id
+from user_account ua
+    left join projectPermissions pe on pe.user_id = ua.id
+    left join project p on p.id = :projectId
+    left join organization o on p.organization_owner_id = o.id
+    left join organization_role o_r on o_r.user_id = ua.id and o_r.organization_id = o.id
+    left join permission ope on ope.organization_id = o.id
+where (
+    pe.project_id= :projectId
+    or o_r.user_id is not null
+) and (
+    :filterId is null
+    or ua.id in :filterId
+) and (
+    (:scopes is null and :projectRoles is null) or
+    (
+        (
+            cast(:scopes as character varying[]) && pe.scopes
+            or pe.type in :projectRoles
+        ) and (
+            :viewLanguageId is null or
+            pe.view_languages is null or
+            :viewLanguageId = any(pe.view_languages)
+        ) and (
+            :editLanguageId is null or
+            pe.edit_languages is null or
+            :editLanguageId = any(pe.edit_languages)
+        ) and (
+            :stateLanguageId is null or
+            pe.state_languages is null or
+            :stateLanguageId = any(pe.state_languages)
+        )
+    )
+    or o_r.type = 1
+) and (
+    cast(:search as text) is null
+    or (
+        lower(ua.name) like lower(concat('%', cast(:search as text),'%'))
+        or lower(ua.username) like lower(concat('%', cast(:search as text),'%'))
+    )
+)
+    """
+  )
+  fun findUsersWithMinimalPermissions(
+    filterId: Collection<Long>,
+    scopes: String?,
+    projectRoles: Collection<String>,
+    projectId: Long,
+    viewLanguageId: Long?,
+    editLanguageId: Long?,
+    stateLanguageId: Long?,
+    search: String?,
+    pageable: Pageable
+  ): Page<Long>
 }

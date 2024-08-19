@@ -47,16 +47,19 @@ class Permission(
       Parameter(
         name = EnumArrayType.SQL_ARRAY_TYPE,
         value = "varchar",
-      ),
+      )
     ],
   )
   @Column(name = "scopes", columnDefinition = "varchar[]")
-  private var _scopes: Array<Scope>? = null
+  var _scopes: Array<Scope>? = null
     set(value) {
       field = value
       if (!value.isNullOrEmpty()) {
         this.type = null
       }
+    }
+    get() {
+      return field
     }
 
   override var scopes: Array<Scope>

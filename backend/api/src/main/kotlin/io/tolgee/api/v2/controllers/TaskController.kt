@@ -3,12 +3,17 @@ package io.tolgee.api.v2.controllers
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.tolgee.dtos.request.task.*
+import io.tolgee.dtos.request.userAccount.UserAccountPermissionsFilters
 import io.tolgee.hateoas.task.TaskModel
 import io.tolgee.hateoas.task.TaskModelAssembler
 import io.tolgee.hateoas.task.TaskPerUserReportModel
 import io.tolgee.hateoas.task.TaskPerUserReportModelAssembler
+import io.tolgee.hateoas.userAccount.SimpleUserAccountModel
+import io.tolgee.hateoas.userAccount.SimpleUserAccountModelAssembler
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModel
 import io.tolgee.hateoas.userAccount.UserAccountInProjectModelAssembler
+import io.tolgee.model.UserAccount
+import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.enums.Scope
 import io.tolgee.model.enums.TaskState
 import io.tolgee.model.views.ExtendedUserAccountInProject
@@ -27,6 +32,7 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
+import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -50,8 +56,8 @@ class TaskController(
   private val pagedTaskResourcesAssembler: PagedResourcesAssembler<TaskWithScopeView>,
   private val projectHolder: ProjectHolder,
   private val userAccountService: UserAccountService,
-  private val userAccountInProjectModelAssembler: UserAccountInProjectModelAssembler,
-  private val pagedUserResourcesAssembler: PagedResourcesAssembler<ExtendedUserAccountInProject>,
+  private val userAccountModelAssembler: SimpleUserAccountModelAssembler,
+  private val pagedUserResourcesAssembler: PagedResourcesAssembler<UserAccount>,
   private val taskPerUserReportModelAssembler: TaskPerUserReportModelAssembler,
   private val securityService: SecurityService
 ) {
@@ -245,20 +251,18 @@ class TaskController(
   @AllowApiAccess
   fun getPossibleAssignees(
     @ParameterObject
-    filters: UserAccountFilters,
+    filters: UserAccountPermissionsFilters,
     @ParameterObject
     pageable: Pageable,
     @RequestParam("search", required = false)
     search: String?,
-  ): PagedModel<UserAccountInProjectModel> {
-    val users =
-      userAccountService.getAllInProjectWithPermittedLanguages(
-        projectHolder.projectEntity.id,
-        pageable,
-        search,
-        null,
-        filters,
-      )
-    return pagedUserResourcesAssembler.toModel(users, userAccountInProjectModelAssembler)
+  ): PagedModel<SimpleUserAccountModel> {
+    val users = userAccountService.findWithMinimalPermissions(
+      filters,
+      projectHolder.projectEntity.id,
+      search,
+      pageable
+    )
+    return pagedUserResourcesAssembler.toModel(users, userAccountModelAssembler)
   }
 }

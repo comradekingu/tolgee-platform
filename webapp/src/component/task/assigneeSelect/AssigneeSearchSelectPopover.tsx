@@ -13,12 +13,14 @@ import {
 import { useTranslate } from '@tolgee/react';
 import { useDebounce } from 'use-debounce';
 
-import { components } from 'tg.service/apiSchema.generated';
+import { components, operations } from 'tg.service/apiSchema.generated';
 import { useApiInfiniteQuery } from 'tg.service/http/useQueryApi';
 import { SpinnerProgress } from 'tg.component/SpinnerProgress';
 import { User, UserAccount } from 'tg.component/UserAccount';
 
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
+export type AssigneeFilters =
+  operations['getPossibleAssignees']['parameters']['query'];
 
 const USERS_SEARCH_TRESHOLD = 5;
 
@@ -67,6 +69,7 @@ type Props = {
   project: SimpleProjectModel;
   anchorOrigin?: PopoverOrigin;
   transformOrigin?: PopoverOrigin;
+  filters?: AssigneeFilters;
 };
 
 export const AssigneeSearchSelectPopover: React.FC<Props> = ({
@@ -76,10 +79,10 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   onSelectImmediate,
   anchorEl,
   selected,
-  ownedOnly,
   project,
   anchorOrigin,
   transformOrigin,
+  filters,
 }) => {
   const [inputValue, setInputValue] = useState('');
   const { t } = useTranslate();
@@ -93,7 +96,6 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
 
   const query = {
     params: {
-      filterCurrentUserOwner: Boolean(ownedOnly),
       search: search || undefined,
     },
     size: 20,
@@ -104,7 +106,12 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
     url: '/v2/projects/{projectId}/tasks/possible-assignees',
     method: 'get',
     path: { projectId: project.id },
-    query,
+    query: {
+      search: search,
+      size: 20,
+      sort: ['name'],
+      ...filters,
+    },
     options: {
       enabled: open,
       keepPreviousData: true,
@@ -127,7 +134,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   });
 
   const items: User[] = usersLoadable.data?.pages
-    .flatMap((page) => page._embedded?.users)
+    .flatMap((page) => page._embedded?.simpleUserAccountModelList)
     .filter(Boolean) as User[];
 
   const [displaySearch, setDisplaySearch] = useState<boolean | undefined>(

@@ -138,6 +138,10 @@ export const TaskPreview = ({
             {t('create_task_preview_assignee')}
           </StyledSmallCaption>
         }
+        filters={{
+          filterMinimalScope: 'TRANSLATIONS_VIEW',
+          filterViewLanguageId: language.id,
+        }}
       />
     </StyledContainer>
   );

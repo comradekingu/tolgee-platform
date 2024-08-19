@@ -161,6 +161,23 @@ enum class Scope(
       return expand(permittedScopes.toTypedArray())
     }
 
+    /**
+     * Returns all possible scopes that contain required scope
+     *
+     * Example: When permittedScope === KEYS_VIEW, it returns [KEYS_VIEW, KEYS_EDIT, ADMIN]
+     * when user has any of these scopes, he effectively has KEYS_VIEW
+     */
+    fun outer(permittedScope: Scope, root: HierarchyItem = hierarchy): List<Scope> {
+      val result = mutableSetOf<Scope>()
+      root.requires.forEach {
+        result.addAll(outer(permittedScope, it))
+      }
+      if (result.isNotEmpty() || root.scope === permittedScope) {
+        result.add(root.scope)
+      }
+      return result.toList()
+    }
+
     fun fromValue(value: String): Scope {
       for (scope in values()) {
         if (scope.value == value) {

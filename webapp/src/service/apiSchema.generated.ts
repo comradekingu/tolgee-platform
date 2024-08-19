@@ -1151,14 +1151,6 @@ export interface components {
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
-      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example 200001,200004
        */
@@ -1173,6 +1165,14 @@ export interface components {
        * @example 200001,200004
        */
       stateChangeLanguageIds?: number[];
+      /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
       /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
@@ -2228,13 +2228,13 @@ export interface components {
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2379,9 +2379,9 @@ export interface components {
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -3539,9 +3539,9 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
+      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3664,6 +3664,12 @@ export interface components {
     };
     TaskKeysResponse: {
       keys: number[];
+    };
+    PagedModelSimpleUserAccountModel: {
+      _embedded?: {
+        simpleUserAccountModelList?: components["schemas"]["SimpleUserAccountModel"][];
+      };
+      page?: components["schemas"]["PageMetadata"];
     };
     PagedModelTaskModel: {
       _embedded?: {
@@ -4267,13 +4273,13 @@ export interface components {
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4399,9 +4405,9 @@ export interface components {
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -14441,8 +14447,14 @@ export interface operations {
       query: {
         /** Filter users by id */
         filterId?: number[];
-        /** Filter users without id */
-        filterNotId?: number[];
+        /** Filter only users that have at least following scopes */
+        filterMinimalScope?: string;
+        /** Filter only users that can view language */
+        filterViewLanguageId?: number;
+        /** Filter only users that can edit language */
+        filterEditLanguageId?: number;
+        /** Filter only users that can edit state of language */
+        filterStateLanguageId?: number;
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */
@@ -14459,7 +14471,7 @@ export interface operations {
       /** OK */
       200: {
         content: {
-          "application/json": components["schemas"]["PagedModelUserAccountInProjectModel"];
+          "application/json": components["schemas"]["PagedModelSimpleUserAccountModel"];
         };
       };
       /** Bad Request */

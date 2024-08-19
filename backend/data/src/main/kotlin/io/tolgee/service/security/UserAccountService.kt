@@ -10,6 +10,7 @@ import io.tolgee.dtos.queryResults.UserAccountView
 import io.tolgee.dtos.request.UserUpdatePasswordRequestDto
 import io.tolgee.dtos.request.UserUpdateRequestDto
 import io.tolgee.dtos.request.task.UserAccountFilters
+import io.tolgee.dtos.request.userAccount.UserAccountPermissionsFilters
 import io.tolgee.dtos.request.validators.exceptions.ValidationException
 import io.tolgee.events.OnUserCountChanged
 import io.tolgee.events.user.OnUserCreated
@@ -19,6 +20,7 @@ import io.tolgee.exceptions.BadRequestException
 import io.tolgee.exceptions.NotFoundException
 import io.tolgee.exceptions.PermissionException
 import io.tolgee.model.UserAccount
+import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.views.ExtendedUserAccountInProject
 import io.tolgee.model.views.UserAccountInProjectView
 import io.tolgee.model.views.UserAccountWithOrganizationRoleView
@@ -38,6 +40,7 @@ import org.springframework.cache.annotation.Cacheable
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -556,4 +559,24 @@ class UserAccountService(
   }
 
   fun findActiveView(id: Long): UserAccountView? = userAccountRepository.findActiveView(id)
+
+  fun findWithMinimalPermissions(
+    filters: UserAccountPermissionsFilters,
+    projectId: Long,
+    search: String?,
+    pageable: Pageable
+  ): PageImpl<UserAccount> {
+    val ids = userAccountRepository.findUsersWithMinimalPermissions(
+      filters.filterId ?: listOf(),
+      filters.filterMinimalScopeExtended,
+      filters.filterMinimalRole,
+      projectId,
+      filters.filterViewLanguageId,
+      filters.filterEditLanguageId,
+      filters.filterStateLanguageId,
+      search,
+      pageable
+    )
+    return PageImpl(userAccountRepository.findAllById(ids.content), pageable, ids.totalElements)
+  }
 }

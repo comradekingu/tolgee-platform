@@ -5,7 +5,10 @@ import { Box, styled, IconButton, SxProps } from '@mui/material';
 import { stopAndPrevent } from 'tg.fixtures/eventHandler';
 import { components } from 'tg.service/apiSchema.generated';
 import { TextField } from 'tg.component/common/TextField';
-import { AssigneeSearchSelectPopover } from './AssigneeSearchSelectPopover';
+import {
+  AssigneeFilters,
+  AssigneeSearchSelectPopover,
+} from './AssigneeSearchSelectPopover';
 import { FakeInput } from 'tg.component/FakeInput';
 import { User } from 'tg.component/UserAccount';
 
@@ -23,6 +26,7 @@ type Props = {
   className?: string;
   project: SimpleProjectModel;
   disabled?: boolean;
+  filters?: AssigneeFilters;
 };
 
 export const AssigneeSearchSelect: React.FC<Props> = ({
@@ -33,6 +37,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
   className,
   project,
   disabled,
+  filters,
 }) => {
   const anchorEl = useRef<HTMLAnchorElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -109,6 +114,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
           onSelect={handleSelectOrganization}
           anchorEl={anchorEl.current!}
           project={project}
+          filters={filters}
         />
       </Box>
     </>
