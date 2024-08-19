@@ -278,6 +278,10 @@ where (
             :stateLanguageId = any(pe.state_languages)
         )
     )
+    or (
+        cast(:scopes as character varying[]) && ope.scopes
+        or ope.type in :projectRoles
+    )
     or o_r.type = 1
 ) and (
     cast(:search as text) is null

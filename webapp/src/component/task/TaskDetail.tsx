@@ -176,6 +176,10 @@ export const TaskDetail = ({
                 onChange={(value) => setFieldValue('assignees', value)}
                 project={project}
                 disabled={!canEditTask}
+                filters={{
+                  filterMinimalScope: 'TRANSLATIONS_VIEW',
+                  filterViewLanguageId: task.language.id,
+                }}
               />
               <TaskDatePicker
                 value={values.dueDate ?? null}
