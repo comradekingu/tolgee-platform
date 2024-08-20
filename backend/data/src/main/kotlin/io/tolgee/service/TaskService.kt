@@ -324,7 +324,7 @@ class TaskService(
     keyId: Long,
     languageId: Long,
     userId: Long,
-    type: TaskType
+    type: TaskType,
   ): List<UserAccount> {
     return taskRepository.findAssigneeByKey(keyId, languageId, userId, type)
   }
@@ -332,7 +332,7 @@ class TaskService(
   fun findAssigneeByTranslation(
     translationId: Long,
     userId: Long,
-    type: TaskType
+    type: TaskType,
   ): List<UserAccount> {
     return taskRepository.findAssigneeByTranslation(translationId, userId, type)
   }

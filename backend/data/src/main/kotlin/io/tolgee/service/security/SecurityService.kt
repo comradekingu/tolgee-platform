@@ -112,15 +112,33 @@ class SecurityService(
     }
   }
 
-  fun checkTranslationInTask(keyId: Long, languageId: Long, taskType: TaskType) {
-    val assignees = taskService.findAssigneeByKey(keyId, languageId, authenticationFacade.authenticatedUser.id, taskType)
+  fun checkTranslationInTask(
+    keyId: Long,
+    languageId: Long,
+    taskType: TaskType,
+  ) {
+    val assignees =
+      taskService.findAssigneeByKey(
+        keyId,
+        languageId,
+        authenticationFacade.authenticatedUser.id,
+        taskType,
+      )
     if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
       throw PermissionException()
     }
   }
 
-  fun checkTranslationItTask(translationId: Long, taskType: TaskType) {
-    val assignees = taskService.findAssigneeByTranslation(translationId, authenticationFacade.authenticatedUser.id, taskType)
+  fun checkTranslationItTask(
+    translationId: Long,
+    taskType: TaskType,
+  ) {
+    val assignees =
+      taskService.findAssigneeByTranslation(
+        translationId,
+        authenticationFacade.authenticatedUser.id,
+        taskType,
+      )
     if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
       throw PermissionException()
     }
@@ -241,7 +259,7 @@ class SecurityService(
   fun checkLanguageStateChangePermission(
     projectId: Long,
     languageIds: Collection<Long>,
-    keyId: Long? = null
+    keyId: Long? = null,
   ) {
     try {
       checkProjectPermission(projectId, Scope.TRANSLATIONS_STATE_EDIT)
@@ -325,7 +343,7 @@ class SecurityService(
   fun checkLanguageTranslatePermissionsByTag(
     tags: Set<String>,
     projectId: Long,
-    keyId: Long?
+    keyId: Long?,
   ) {
     val languages = languageService.findByTags(tags, projectId)
     this.checkLanguageTranslatePermission(projectId, languages.map { it.id }, keyId)
@@ -350,7 +368,7 @@ class SecurityService(
   fun checkLanguageChangeStatePermissionsByLanguageId(
     languageIds: Collection<Long>,
     projectId: Long,
-    keyId: Long? = null
+    keyId: Long? = null,
   ) {
     this.checkLanguageStateChangePermission(projectId, languageIds, keyId)
   }

@@ -285,9 +285,14 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         and tk.state = 'IN_PROGRESS'
         and u.id = :userId
         and t.key.id = :keyId
-    """
+    """,
   )
-  fun findAssigneeByKey(keyId: Long, languageId: Long, userId: Long, type: TaskType): List<UserAccount>
+  fun findAssigneeByKey(
+    keyId: Long,
+    languageId: Long,
+    userId: Long,
+    type: TaskType,
+  ): List<UserAccount>
 
   @Query(
     """
@@ -299,7 +304,11 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         and tk.state = 'IN_PROGRESS'
         and u.id = :userId
         and tt.translation.id = :translationId
-    """
+    """,
   )
-  fun findAssigneeByTranslation(translationId: Long, userId: Long, type: TaskType): List<UserAccount>
+  fun findAssigneeByTranslation(
+    translationId: Long,
+    userId: Long,
+    type: TaskType,
+  ): List<UserAccount>
 }

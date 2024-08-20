@@ -173,7 +173,7 @@ class KeyComplexEditHelper(
       securityService.checkLanguageChangeStatePermissionsByLanguageId(
         modifiedStates!!.keys,
         projectHolder.project.id,
-        key.id
+        key.id,
       )
       translationService.setStateBatch(
         states =
@@ -194,7 +194,7 @@ class KeyComplexEditHelper(
       securityService.checkLanguageTranslatePermissionsByLanguageId(
         modifiedTranslations!!.keys,
         projectHolder.project.id,
-        keyId
+        keyId,
       )
 
       val modifiedTranslations = getModifiedTranslationsByTag()
