@@ -60,6 +60,8 @@ export const PANELS = [
     name: <T keyName="translation_tools_tasks" />,
     component: Tasks,
     itemsCountFunction: tasksCount,
+    displayPanel: ({ projectPermissions }) =>
+      projectPermissions.satisfiesPermission('tasks.view'),
     hideWhenCountZero: true,
   },
 ] satisfies PanelConfig[];

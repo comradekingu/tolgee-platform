@@ -4,6 +4,7 @@ import io.tolgee.dtos.request.task.TaskFilters
 import io.tolgee.dtos.request.task.TranslationScopeFilters
 import io.tolgee.model.Project
 import io.tolgee.model.UserAccount
+import io.tolgee.model.enums.TaskType
 import io.tolgee.model.task.Task
 import io.tolgee.model.task.TaskId
 import io.tolgee.model.views.KeysScopeView
@@ -271,4 +272,34 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     taskId: Long,
     userId: Long,
   ): List<UserAccount>
+
+  @Query(
+    """
+      select u
+      from UserAccount u
+        join u.tasks tk
+        join tk.translations tt
+        join tt.translation t
+      where tk.type = :type
+        and tk.language.id = :languageId
+        and tk.state = 'IN_PROGRESS'
+        and u.id = :userId
+        and t.key.id = :keyId
+    """
+  )
+  fun findAssigneeByKey(keyId: Long, languageId: Long, userId: Long, type: TaskType): List<UserAccount>
+
+  @Query(
+    """
+      select u
+      from UserAccount u
+        join u.tasks tk
+        join tk.translations tt
+      where tk.type = :type
+        and tk.state = 'IN_PROGRESS'
+        and u.id = :userId
+        and tt.translation.id = :translationId
+    """
+  )
+  fun findAssigneeByTranslation(translationId: Long, userId: Long, type: TaskType): List<UserAccount>
 }

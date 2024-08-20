@@ -88,12 +88,14 @@ class TaskController(
 
   @GetMapping("/{taskId}")
   @Operation(summary = "Get task")
-  @RequiresProjectPermissions([Scope.TASKS_VIEW])
+  @UseDefaultPermissions
   @AllowApiAccess
   fun getTask(
     @PathVariable
     taskId: Long,
   ): TaskModel {
+    // user can view tasks assigned to him
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
     val task = taskService.getTask(projectHolder.projectEntity, taskId)
     return taskModelAssembler.toModel(task)
   }
@@ -125,24 +127,27 @@ class TaskController(
 
   @GetMapping("/{taskId}/per-user-report")
   @Operation(summary = "Report who did what")
-  @RequiresProjectPermissions([Scope.TASKS_VIEW])
+  @UseDefaultPermissions
   @AllowApiAccess
   fun getPerUserReport(
     @PathVariable
     taskId: Long,
   ): List<TaskPerUserReportModel> {
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
+
     val result = taskService.getReport(projectHolder.projectEntity, taskId)
     return result.map { taskPerUserReportModelAssembler.toModel(it) }
   }
 
   @GetMapping("/{taskId}/csv-report")
   @Operation(summary = "Report who did what")
-  @RequiresProjectPermissions([Scope.TASKS_VIEW])
+  @UseDefaultPermissions
   @AllowApiAccess
   fun getCsvReport(
     @PathVariable
     taskId: Long,
   ): ResponseEntity<ByteArrayResource> {
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
     val byteArray = taskService.getExcelFile(projectHolder.projectEntity, taskId)
     val resource = ByteArrayResource(byteArray)
 
@@ -156,12 +161,13 @@ class TaskController(
 
   @GetMapping("/{taskId}/keys")
   @Operation(summary = "Get task keys")
-  @RequiresProjectPermissions([Scope.TASKS_VIEW])
+  @UseDefaultPermissions
   @AllowApiAccess
   fun getTaskKeys(
     @PathVariable
     taskId: Long,
   ): TaskKeysResponse {
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
     return TaskKeysResponse(
       keys = taskService.getTaskKeys(projectHolder.projectEntity, taskId),
     )

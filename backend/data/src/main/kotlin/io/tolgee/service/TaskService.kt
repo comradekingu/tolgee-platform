@@ -320,6 +320,23 @@ class TaskService(
     return taskRepository.findAssigneeById(projectId, taskId, userId)
   }
 
+  fun findAssigneeByKey(
+    keyId: Long,
+    languageId: Long,
+    userId: Long,
+    type: TaskType
+  ): List<UserAccount> {
+    return taskRepository.findAssigneeByKey(keyId, languageId, userId, type)
+  }
+
+  fun findAssigneeByTranslation(
+    translationId: Long,
+    userId: Long,
+    type: TaskType
+  ): List<UserAccount> {
+    return taskRepository.findAssigneeByTranslation(translationId, userId, type)
+  }
+
   @Transactional
   fun calculateScope(
     projectEntity: Project,

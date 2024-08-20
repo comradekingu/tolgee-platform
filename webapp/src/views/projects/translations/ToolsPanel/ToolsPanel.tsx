@@ -63,7 +63,7 @@ export const ToolsPanel = () => {
     : undefined;
 
   const displayPanels = keyData && language && baseLanguage;
-  const { satisfiesLanguageAccess } = useProjectPermissions();
+  const projectPermissions = useProjectPermissions();
 
   const dataProps = {
     project,
@@ -73,9 +73,12 @@ export const ToolsPanel = () => {
     activeVariant: keyData?.keyIsPlural ? activeVariant! : undefined,
     setValue: setEditValueString,
     editEnabled: language
-      ? satisfiesLanguageAccess('translations.edit', language.id) &&
-        translation?.state !== 'DISABLED'
+      ? projectPermissions.satisfiesLanguageAccess(
+          'translations.edit',
+          language.id
+        ) && translation?.state !== 'DISABLED'
       : false,
+    projectPermissions,
   };
 
   return (

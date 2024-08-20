@@ -179,7 +179,7 @@ When null, resulting file will be a flat key-value object.
   @PutMapping("")
   @Operation(summary = "Update translations for existing key", description = "Sets translations for existing key")
   @RequestActivity(ActivityType.SET_TRANSLATIONS)
-  @RequiresProjectPermissions([Scope.TRANSLATIONS_EDIT])
+  @UseDefaultPermissions
   @AllowApiAccess
   @OpenApiOrderExtension(2)
   fun setTranslations(
@@ -209,7 +209,7 @@ When null, resulting file will be a flat key-value object.
   @PutMapping("/{translationId}/set-state/{state}")
   @Operation(summary = "Set translation state")
   @RequestActivity(ActivityType.SET_TRANSLATION_STATE)
-  @RequiresProjectPermissions([Scope.TRANSLATIONS_STATE_EDIT])
+  @UseDefaultPermissions
   @AllowApiAccess
   fun setTranslationState(
     @PathVariable translationId: Long,

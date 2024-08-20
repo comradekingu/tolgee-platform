@@ -156,14 +156,17 @@ export const useTranslationCell = ({
     updateEdit({ activeVariant });
   }
 
-  const canChangeState = satisfiesLanguageAccess(
-    'translations.state-edit',
-    language.id
-  );
+  const firstTask = translation?.tasks?.[0];
+
+  const canChangeState =
+    (firstTask?.userAssigned && firstTask.type === 'REVIEW') ||
+    satisfiesLanguageAccess('translations.state-edit', language.id);
 
   const disabled = translation?.state === 'DISABLED';
   const editEnabled =
-    satisfiesLanguageAccess('translations.edit', language.id) && !disabled;
+    ((firstTask?.userAssigned && firstTask.type === 'TRANSLATE') ||
+      satisfiesLanguageAccess('translations.edit', language.id)) &&
+    !disabled;
 
   return {
     keyId,

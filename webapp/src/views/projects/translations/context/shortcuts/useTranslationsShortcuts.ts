@@ -93,15 +93,18 @@ export const useTranslationsShortcuts = () => {
   const getEnterHandler = () => {
     const focused = getCurrentlyFocused(elementsRef.current);
     if (focused) {
-      const canTranslate = satisfiesLanguageAccess(
-        'translations.edit',
-        getLanguageId(focused.language)
-      );
+      const translation = getCurrentTranslation();
+      const firstTask = translation?.tasks?.[0];
+      const canTranslate =
+        satisfiesLanguageAccess(
+          'translations.edit',
+          getLanguageId(focused.language)
+        ) ||
+        (firstTask?.userAssigned && firstTask.type === 'TRANSLATE');
       if (
         (isTranslation(focused) && canTranslate) ||
         (!isTranslation(focused) && canEditKey)
       ) {
-        const translation = getCurrentTranslation();
         if (translation?.state === 'DISABLED') {
           return;
         }
@@ -126,16 +129,18 @@ export const useTranslationsShortcuts = () => {
 
   const getChangeStateHandler = () => {
     const focused = getCurrentlyFocused(elementsRef.current);
-    const canTranslate = satisfiesLanguageAccess(
-      'translations.state-edit',
-      getLanguageId(focused?.language)
-    );
+    const translation = fixedTranslations?.find(
+      (t) => t.keyId === focused?.keyId
+    )?.translations[focused?.language || ''];
+    const firstTask = translation?.tasks?.[0];
+    const canTranslate =
+      satisfiesLanguageAccess(
+        'translations.state-edit',
+        getLanguageId(focused?.language)
+      ) ||
+      (firstTask?.userAssigned && firstTask.type === 'REVIEW');
 
     if (focused?.language && canTranslate) {
-      const translation = fixedTranslations?.find(
-        (t) => t.keyId === focused.keyId
-      )?.translations[focused.language];
-
       const newState =
         translation?.state && TRANSLATION_STATES[translation.state]?.next;
 
