@@ -256,7 +256,6 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     baseLangId: Long,
   ): List<TaskPerUserReportView>
 
-
   @Query(
     """
       select u
@@ -265,11 +264,11 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       where tk.id = :taskId
         and tk.project.id = :projectId
         and u.id = :userId
-    """
+    """,
   )
   fun findAssigneeById(
     projectId: Long,
     taskId: Long,
-    userId: Long
+    userId: Long,
   ): List<UserAccount>
 }

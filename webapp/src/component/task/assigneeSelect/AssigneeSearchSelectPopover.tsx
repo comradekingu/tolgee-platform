@@ -95,23 +95,17 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   }, [open]);
 
   const query = {
-    params: {
-      search: search || undefined,
-    },
+    search,
     size: 20,
     sort: ['name'],
+    ...filters,
   };
 
   const usersLoadable = useApiInfiniteQuery({
     url: '/v2/projects/{projectId}/tasks/possible-assignees',
     method: 'get',
     path: { projectId: project.id },
-    query: {
-      search: search,
-      size: 20,
-      sort: ['name'],
-      ...filters,
-    },
+    query,
     options: {
       enabled: open,
       keepPreviousData: true,
@@ -121,6 +115,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
           lastPage.page.number! < lastPage.page.totalPages! - 1
         ) {
           return {
+            path: { projectId: project.id },
             query: {
               ...query,
               page: lastPage.page!.number! + 1,

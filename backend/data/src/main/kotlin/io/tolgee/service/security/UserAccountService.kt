@@ -20,7 +20,6 @@ import io.tolgee.exceptions.BadRequestException
 import io.tolgee.exceptions.NotFoundException
 import io.tolgee.exceptions.PermissionException
 import io.tolgee.model.UserAccount
-import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.views.ExtendedUserAccountInProject
 import io.tolgee.model.views.UserAccountInProjectView
 import io.tolgee.model.views.UserAccountWithOrganizationRoleView
@@ -564,19 +563,20 @@ class UserAccountService(
     filters: UserAccountPermissionsFilters,
     projectId: Long,
     search: String?,
-    pageable: Pageable
+    pageable: Pageable,
   ): PageImpl<UserAccount> {
-    val ids = userAccountRepository.findUsersWithMinimalPermissions(
-      filters.filterId ?: listOf(),
-      filters.filterMinimalScopeExtended,
-      filters.filterMinimalRole,
-      projectId,
-      filters.filterViewLanguageId,
-      filters.filterEditLanguageId,
-      filters.filterStateLanguageId,
-      search,
-      pageable
-    )
+    val ids =
+      userAccountRepository.findUsersWithMinimalPermissions(
+        filters.filterId ?: listOf(),
+        filters.filterMinimalScopeExtended,
+        filters.filterMinimalRole,
+        projectId,
+        filters.filterViewLanguageId,
+        filters.filterEditLanguageId,
+        filters.filterStateLanguageId,
+        search,
+        pageable,
+      )
     return PageImpl(userAccountRepository.findAllById(ids.content), pageable, ids.totalElements)
   }
 }

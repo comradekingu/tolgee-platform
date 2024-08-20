@@ -47,7 +47,7 @@ class Permission(
       Parameter(
         name = EnumArrayType.SQL_ARRAY_TYPE,
         value = "varchar",
-      )
+      ),
     ],
   )
   @Column(name = "scopes", columnDefinition = "varchar[]")

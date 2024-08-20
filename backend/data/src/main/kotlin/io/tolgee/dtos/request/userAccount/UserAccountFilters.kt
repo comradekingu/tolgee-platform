@@ -1,7 +1,6 @@
 package io.tolgee.dtos.request.task
 
 import io.swagger.v3.oas.annotations.Parameter
-import io.tolgee.model.enums.Scope
 
 open class UserAccountFilters {
   @field:Parameter(

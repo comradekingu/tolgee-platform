@@ -167,7 +167,10 @@ enum class Scope(
      * Example: When permittedScope === KEYS_VIEW, it returns [KEYS_VIEW, KEYS_EDIT, ADMIN]
      * when user has any of these scopes, he effectively has KEYS_VIEW
      */
-    fun outer(permittedScope: Scope, root: HierarchyItem = hierarchy): List<Scope> {
+    fun outer(
+      permittedScope: Scope,
+      root: HierarchyItem = hierarchy,
+    ): List<Scope> {
       val result = mutableSetOf<Scope>()
       root.requires.forEach {
         result.addAll(outer(permittedScope, it))

@@ -11,22 +11,22 @@ open class UserAccountPermissionsFilters {
   var filterId: List<Long>? = null
 
   @field:Parameter(
-    description = """Filter only users that have at least following scopes"""
+    description = """Filter only users that have at least following scopes""",
   )
   var filterMinimalScope: String? = null
 
   @field:Parameter(
-    description = """Filter only users that can view language"""
+    description = """Filter only users that can view language""",
   )
   var filterViewLanguageId: Long? = null
 
   @field:Parameter(
-    description = """Filter only users that can edit language"""
+    description = """Filter only users that can edit language""",
   )
   var filterEditLanguageId: Long? = null
 
   @field:Parameter(
-    description = """Filter only users that can edit state of language"""
+    description = """Filter only users that can edit state of language""",
   )
   var filterStateLanguageId: Long? = null
 
@@ -37,6 +37,8 @@ open class UserAccountPermissionsFilters {
   }
 
   val filterMinimalRole get(): List<String> {
-    return filterMinimalScope?.let { ProjectPermissionType.findByScope(Scope.valueOf(it)).map { it.toString() } } ?: listOf()
+    return filterMinimalScope?.let {
+      ProjectPermissionType.findByScope(Scope.valueOf(it)).map { it.toString() }
+    } ?: listOf()
   }
 }

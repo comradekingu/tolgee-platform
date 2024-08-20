@@ -5,7 +5,6 @@ import io.tolgee.constants.Message
 import io.tolgee.dtos.request.task.*
 import io.tolgee.exceptions.BadRequestException
 import io.tolgee.exceptions.NotFoundException
-import io.tolgee.exceptions.PermissionException
 import io.tolgee.model.Language
 import io.tolgee.model.Project
 import io.tolgee.model.UserAccount
@@ -23,7 +22,6 @@ import io.tolgee.repository.TaskTranslationRepository
 import io.tolgee.repository.TranslationRepository
 import io.tolgee.security.authentication.AuthenticationFacade
 import io.tolgee.service.language.LanguageService
-import io.tolgee.service.security.PermissionService
 import io.tolgee.service.security.SecurityService
 import io.tolgee.service.translation.TranslationService
 import jakarta.persistence.EntityManager
@@ -314,7 +312,11 @@ class TaskService(
     }
   }
 
-  fun findAssigneeById(projectId: Long, taskId: Long, userId: Long): List<UserAccount> {
+  fun findAssigneeById(
+    projectId: Long,
+    taskId: Long,
+    userId: Long,
+  ): List<UserAccount> {
     return taskRepository.findAssigneeById(projectId, taskId, userId)
   }
 

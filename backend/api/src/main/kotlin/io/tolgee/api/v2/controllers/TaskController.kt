@@ -10,13 +10,9 @@ import io.tolgee.hateoas.task.TaskPerUserReportModel
 import io.tolgee.hateoas.task.TaskPerUserReportModelAssembler
 import io.tolgee.hateoas.userAccount.SimpleUserAccountModel
 import io.tolgee.hateoas.userAccount.SimpleUserAccountModelAssembler
-import io.tolgee.hateoas.userAccount.UserAccountInProjectModel
-import io.tolgee.hateoas.userAccount.UserAccountInProjectModelAssembler
 import io.tolgee.model.UserAccount
-import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.enums.Scope
 import io.tolgee.model.enums.TaskState
-import io.tolgee.model.views.ExtendedUserAccountInProject
 import io.tolgee.model.views.KeysScopeView
 import io.tolgee.model.views.TaskWithScopeView
 import io.tolgee.openApiDocs.OpenApiOrderExtension
@@ -32,7 +28,6 @@ import org.springdoc.core.annotations.ParameterObject
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PagedResourcesAssembler
-import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.PagedModel
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -59,7 +54,7 @@ class TaskController(
   private val userAccountModelAssembler: SimpleUserAccountModelAssembler,
   private val pagedUserResourcesAssembler: PagedResourcesAssembler<UserAccount>,
   private val taskPerUserReportModelAssembler: TaskPerUserReportModelAssembler,
-  private val securityService: SecurityService
+  private val securityService: SecurityService,
 ) {
   @GetMapping("")
   @Operation(summary = "Get tasks")
@@ -196,9 +191,14 @@ class TaskController(
   ): TaskModel {
     // user can only finish tasks assigned to him
     securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
-    val task = taskService.updateTask(projectHolder.projectEntity, taskId, UpdateTaskRequest(
-      state = TaskState.DONE
-    ))
+    val task =
+      taskService.updateTask(
+        projectHolder.projectEntity,
+        taskId,
+        UpdateTaskRequest(
+          state = TaskState.DONE,
+        ),
+      )
     return taskModelAssembler.toModel(task)
   }
 
@@ -257,12 +257,13 @@ class TaskController(
     @RequestParam("search", required = false)
     search: String?,
   ): PagedModel<SimpleUserAccountModel> {
-    val users = userAccountService.findWithMinimalPermissions(
-      filters,
-      projectHolder.projectEntity.id,
-      search,
-      pageable
-    )
+    val users =
+      userAccountService.findWithMinimalPermissions(
+        filters,
+        projectHolder.projectEntity.id,
+        search,
+        pageable,
+      )
     return pagedUserResourcesAssembler.toModel(users, userAccountModelAssembler)
   }
 }
