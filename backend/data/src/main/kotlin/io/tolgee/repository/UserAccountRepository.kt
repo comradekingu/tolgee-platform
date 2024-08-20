@@ -32,9 +32,9 @@ const val PROJECT_PERMISSIONS_CTE = """
             pe.scopes,
             pe.project_id,
             pe.type,
-            array_agg(pe_view.view_languages_id) as view_languages,
-            array_agg(pe_edit.languages_id) as edit_languages,
-            array_agg(pe_state.state_change_languages_id) as state_languages
+            array_remove(array_agg(pe_view.view_languages_id), null)          as view_languages,
+            array_remove(array_agg(pe_edit.languages_id), null)               as edit_languages,
+            array_remove(array_agg(pe_state.state_change_languages_id), null) as state_languages
         from permission pe
                  left join permission_view_languages pe_view on pe.id = pe_view.permission_id
                  left join permission_languages pe_edit on pe.id = pe_edit.permission_id
@@ -56,28 +56,31 @@ const val PROJECT_PERMISSIONS_MAIN = """
         :filterId is null
         or ua.id in :filterId
     ) and (
-        (:scopes is null and :projectRoles is null) or
-        (
+        (:scopes is null and :projectRoles is null)
+        or (
             (
                 cast(:scopes as character varying[]) && pe.scopes
                 or pe.type in :projectRoles
             ) and (
                 :viewLanguageId is null or
-                pe.view_languages is null or
+                cardinality(pe.view_languages) = 0 or
                 :viewLanguageId = any(pe.view_languages)
             ) and (
                 :editLanguageId is null or
-                pe.edit_languages is null or
+                cardinality(pe.edit_languages) = 0 or
                 :editLanguageId = any(pe.edit_languages)
             ) and (
                 :stateLanguageId is null or
-                pe.state_languages is null or
+                cardinality(pe.state_languages) = 0 or
                 :stateLanguageId = any(pe.state_languages)
             )
         )
         or (
-            cast(:scopes as character varying[]) && ope.scopes
-            or ope.type in :projectRoles
+            pe.id is null 
+            and (
+              cast(:scopes as character varying[]) && ope.scopes
+              or ope.type in :projectRoles
+            )
         )
         or o_r.type = 1
     ) and (
