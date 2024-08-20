@@ -42,6 +42,7 @@ export const OperationTaskCreate = ({ disabled, onFinished }: Props) => {
         initialValues={{
           selection,
           languageAssignees,
+          languages: languagesWithoutBase.map((l) => l.id),
         }}
         allLanguages={allLanguages}
         project={project}
