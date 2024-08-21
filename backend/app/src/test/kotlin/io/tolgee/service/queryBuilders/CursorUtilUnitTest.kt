@@ -3,7 +3,6 @@ package io.tolgee.service.queryBuilders
 import io.tolgee.fixtures.node
 import io.tolgee.model.enums.TranslationState
 import io.tolgee.model.views.KeyWithTranslationsView
-import io.tolgee.model.views.TranslationTaskView
 import io.tolgee.model.views.TranslationView
 import io.tolgee.testing.assertions.Assertions.assertThat
 import net.javacrumbs.jsonunit.assertj.assertThatJson

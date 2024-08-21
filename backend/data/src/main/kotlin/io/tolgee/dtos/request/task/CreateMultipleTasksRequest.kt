@@ -1,5 +1,5 @@
 package io.tolgee.dtos.request.task
 
-class CreateMultipleTasksRequest (
-  var tasks: MutableSet<CreateTaskRequest> = mutableSetOf()
+class CreateMultipleTasksRequest(
+  var tasks: MutableSet<CreateTaskRequest> = mutableSetOf(),
 )

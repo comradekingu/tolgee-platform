@@ -82,7 +82,6 @@ export interface paths {
   "/v2/projects/{projectId}/tasks/{taskId}": {
     get: operations["getTask"];
     put: operations["updateTask"];
-    delete: operations["deleteTask"];
   };
   "/v2/projects/{projectId}/per-language-auto-translation-settings": {
     get: operations["getPerLanguageAutoTranslationSettings"];
@@ -1151,6 +1150,14 @@ export interface components {
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
+      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example 200001,200004
        */
@@ -1165,14 +1172,6 @@ export interface components {
        * @example 200001,200004
        */
       stateChangeLanguageIds?: number[];
-      /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
       /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
@@ -2232,9 +2231,9 @@ export interface components {
       /** Format: int64 */
       updatedAt: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2375,13 +2374,13 @@ export interface components {
       id: number;
       projectName: string;
       userFullName?: string;
-      username?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      username?: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -3364,7 +3363,7 @@ export interface components {
     };
     PagedModelTaskWithProjectModel: {
       _embedded?: {
-        taskWithProjectModelList?: components["schemas"]["TaskWithProjectModel"][];
+        tasks?: components["schemas"]["TaskWithProjectModel"][];
       };
       page?: components["schemas"]["PageMetadata"];
     };
@@ -3539,9 +3538,9 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
+      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
-      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3667,7 +3666,7 @@ export interface components {
     };
     PagedModelSimpleUserAccountModel: {
       _embedded?: {
-        simpleUserAccountModelList?: components["schemas"]["SimpleUserAccountModel"][];
+        users?: components["schemas"]["SimpleUserAccountModel"][];
       };
       page?: components["schemas"]["PageMetadata"];
     };
@@ -3703,9 +3702,9 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      namespace?: string;
       translation?: string;
       baseTranslation?: string;
+      namespace?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
@@ -3713,9 +3712,9 @@ export interface components {
       name: string;
       /** Format: int64 */
       id: number;
-      namespace?: string;
       translation?: string;
       baseTranslation?: string;
+      namespace?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4277,9 +4276,9 @@ export interface components {
       /** Format: int64 */
       updatedAt: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4401,13 +4400,13 @@ export interface components {
       id: number;
       projectName: string;
       userFullName?: string;
-      username?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      username?: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -5863,50 +5862,6 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["UpdateTaskRequest"];
-      };
-    };
-  };
-  deleteTask: {
-    parameters: {
-      path: {
-        taskId: number;
-        projectId: number;
-      };
-    };
-    responses: {
-      /** OK */
-      200: unknown;
-      /** Bad Request */
-      400: {
-        content: {
-          "application/json":
-            | components["schemas"]["ErrorResponseTyped"]
-            | components["schemas"]["ErrorResponseBody"];
-        };
-      };
-      /** Unauthorized */
-      401: {
-        content: {
-          "application/json":
-            | components["schemas"]["ErrorResponseTyped"]
-            | components["schemas"]["ErrorResponseBody"];
-        };
-      };
-      /** Forbidden */
-      403: {
-        content: {
-          "application/json":
-            | components["schemas"]["ErrorResponseTyped"]
-            | components["schemas"]["ErrorResponseBody"];
-        };
-      };
-      /** Not Found */
-      404: {
-        content: {
-          "application/json":
-            | components["schemas"]["ErrorResponseTyped"]
-            | components["schemas"]["ErrorResponseBody"];
-        };
       };
     };
   };

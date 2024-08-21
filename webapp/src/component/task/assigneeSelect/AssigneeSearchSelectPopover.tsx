@@ -129,7 +129,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   });
 
   const items: User[] = usersLoadable.data?.pages
-    .flatMap((page) => page._embedded?.simpleUserAccountModelList)
+    .flatMap((page) => page._embedded?.users)
     .filter(Boolean) as User[];
 
   const [displaySearch, setDisplaySearch] = useState<boolean | undefined>(

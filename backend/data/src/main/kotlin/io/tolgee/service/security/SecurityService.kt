@@ -93,7 +93,7 @@ class SecurityService(
     } catch (err: PermissionException) {
       val assignees = taskService.findAssigneeById(projectId, taskId, activeUser.id)
       if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
-        throw PermissionException()
+        throw err
       }
     }
   }
@@ -107,16 +107,16 @@ class SecurityService(
     } catch (err: PermissionException) {
       val assignees = taskService.findAssigneeById(projectId, taskId, activeUser.id)
       if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
-        throw PermissionException()
+        throw err
       }
     }
   }
 
-  fun checkTranslationInTask(
+  fun translationInTask(
     keyId: Long,
     languageId: Long,
     taskType: TaskType,
-  ) {
+  ): Boolean {
     val assignees =
       taskService.findAssigneeByKey(
         keyId,
@@ -124,24 +124,7 @@ class SecurityService(
         authenticationFacade.authenticatedUser.id,
         taskType,
       )
-    if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
-      throw PermissionException()
-    }
-  }
-
-  fun checkTranslationItTask(
-    translationId: Long,
-    taskType: TaskType,
-  ) {
-    val assignees =
-      taskService.findAssigneeByTranslation(
-        translationId,
-        authenticationFacade.authenticatedUser.id,
-        taskType,
-      )
-    if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
-      throw PermissionException()
-    }
+    return assignees.isEmpty() || assignees[0].id != activeUser.id
   }
 
   fun checkProjectPermission(
@@ -248,10 +231,12 @@ class SecurityService(
 
       if (keyId != null) {
         languageIds.forEach {
-          checkTranslationInTask(keyId, it, TaskType.TRANSLATE)
+          if (!translationInTask(keyId, it, TaskType.TRANSLATE)) {
+            throw e
+          }
         }
       } else {
-        throw PermissionException()
+        throw e
       }
     }
   }
@@ -274,10 +259,12 @@ class SecurityService(
 
       if (keyId != null) {
         languageIds.forEach {
-          checkTranslationInTask(keyId, it, TaskType.REVIEW)
+          if (!translationInTask(keyId, it, TaskType.REVIEW)) {
+            throw e
+          }
         }
       } else {
-        throw PermissionException()
+        throw e
       }
     }
   }

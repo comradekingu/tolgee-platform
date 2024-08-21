@@ -12,7 +12,7 @@ import io.tolgee.testing.annotations.ProjectJWTAuthTestMethod
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class TaskControllerPermissionsTest: ProjectAuthControllerTest("/v2/projects/") {
+class TaskControllerPermissionsTest : ProjectAuthControllerTest("/v2/projects/") {
   lateinit var testData: TaskTestData
 
   @BeforeEach
@@ -55,7 +55,7 @@ class TaskControllerPermissionsTest: ProjectAuthControllerTest("/v2/projects/") 
 
     performProjectAuthPut(
       "tasks/${testData.translateTask.self.id}/keys/${testData.keysInTask.first().self.id}",
-      UpdateTaskKeyRequest(done = true)
+      UpdateTaskKeyRequest(done = true),
     ).andIsOk
     performProjectAuthPost("tasks/${testData.translateTask.self.id}/finish").andIsOk
   }
@@ -67,11 +67,11 @@ class TaskControllerPermissionsTest: ProjectAuthControllerTest("/v2/projects/") 
 
     performProjectAuthPut(
       "tasks/${testData.translateTask.self.id}/keys",
-      UpdateTaskKeysRequest(addKeys = mutableSetOf(testData.keysOutOfTask.first().self.id))
+      UpdateTaskKeysRequest(addKeys = mutableSetOf(testData.keysOutOfTask.first().self.id)),
     ).andIsForbidden
     performProjectAuthPut(
       "tasks/${testData.translateTask.self.id}",
-      UpdateTaskRequest(name = "Test")
+      UpdateTaskRequest(name = "Test"),
     ).andIsForbidden
   }
 
@@ -86,17 +86,16 @@ class TaskControllerPermissionsTest: ProjectAuthControllerTest("/v2/projects/") 
     performProjectAuthGet("tasks/${testData.reviewTask.self.id}/keys").andIsForbidden
     performProjectAuthPut(
       "tasks/${testData.reviewTask.self.id}/keys/${testData.keysInTask.first().self.id}",
-      UpdateTaskKeyRequest(done = true)
+      UpdateTaskKeyRequest(done = true),
     ).andIsForbidden
     performProjectAuthPost("tasks/${testData.reviewTask.self.id}/finish").andIsForbidden
     performProjectAuthPut(
       "tasks/${testData.reviewTask.self.id}/keys",
-      UpdateTaskKeysRequest(addKeys = mutableSetOf(testData.keysOutOfTask.first().self.id))
+      UpdateTaskKeysRequest(addKeys = mutableSetOf(testData.keysOutOfTask.first().self.id)),
     ).andIsForbidden
     performProjectAuthPut(
       "tasks/${testData.reviewTask.self.id}",
-      UpdateTaskRequest(name = "Test")
+      UpdateTaskRequest(name = "Test"),
     ).andIsForbidden
-
   }
 }

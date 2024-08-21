@@ -34,7 +34,6 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
         node("[0].name").isEqualTo("Translate task")
         node("[1].id").isEqualTo(2)
         node("[1].name").isEqualTo("Review task")
-
       }
       node("page.totalElements").isNumber.isEqualTo(BigDecimal(2))
     }
@@ -44,7 +43,7 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   @ProjectJWTAuthTestMethod
   fun `gets task detail`() {
     performProjectAuthGet(
-      "tasks/${testData.translateTask.self.id}"
+      "tasks/${testData.translateTask.self.id}",
     ).andAssertThatJson {
       node("name").isEqualTo("Translate task")
     }
@@ -94,9 +93,9 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
             type = TaskType.TRANSLATE,
             languageId = testData.englishLanguage.id,
             assignees =
-            mutableSetOf(
-              testData.orgMember.self.id,
-            ),
+              mutableSetOf(
+                testData.orgMember.self.id,
+              ),
             keys = keys,
           ),
           CreateTaskRequest(
@@ -105,12 +104,12 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
             type = TaskType.TRANSLATE,
             languageId = testData.czechLanguage.id,
             assignees =
-            mutableSetOf(
-              testData.orgMember.self.id,
-            ),
+              mutableSetOf(
+                testData.orgMember.self.id,
+              ),
             keys = keys,
-          )
-        )
+          ),
+        ),
       ),
     ).andIsOk
 
@@ -124,18 +123,18 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   fun `calculates stats for task`() {
     performProjectAuthPut(
       "tasks/${testData.translateTask.self.id}/keys/${testData.translationsInTranslateTask.first().self.key.id}",
-      UpdateTaskKeyRequest(done = true)
+      UpdateTaskKeyRequest(done = true),
     ).andIsOk
 
     performProjectAuthGet(
-      "tasks/${testData.translateTask.self.id}"
+      "tasks/${testData.translateTask.self.id}",
     ).andIsOk.andAssertThatJson {
       node("totalItems").isEqualTo(2)
       node("doneItems").isEqualTo(1)
     }
 
     performProjectAuthGet(
-      "tasks/${testData.translateTask.self.id}/per-user-report"
+      "tasks/${testData.translateTask.self.id}/per-user-report",
     ).andIsOk.andAssertThatJson {
       node("[0]").node("doneItems").isEqualTo(1)
     }

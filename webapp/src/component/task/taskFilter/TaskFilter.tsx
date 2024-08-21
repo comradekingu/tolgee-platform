@@ -105,7 +105,7 @@ export const TaskFilter = ({
 
     return (
       <StyledContent>
-        {usersLoadable.data?._embedded?.simpleUserAccountModelList
+        {usersLoadable.data?._embedded?.users
           ?.filter((u) => value.assignees?.includes(u.id))
           ?.map((user) => (
             <FilterTooltip title={user.name} key={user.id}>

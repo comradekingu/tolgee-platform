@@ -2,7 +2,6 @@ package io.tolgee.development.testDataBuilder.data
 
 import io.tolgee.development.testDataBuilder.builders.*
 import io.tolgee.model.Language
-import io.tolgee.model.UserAccount
 import io.tolgee.model.enums.OrganizationRoleType
 import io.tolgee.model.enums.ProjectPermissionType
 import io.tolgee.model.enums.Scope
@@ -128,7 +127,7 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
           assignees =
             mutableSetOf(
               projectUser.self,
-              user
+              user,
             )
           project = projectBuilder.self
           language = englishLanguage
@@ -150,7 +149,7 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
           assignees =
             mutableSetOf(
               orgMember.self,
-              user
+              user,
             )
           project = projectBuilder.self
           language = czechLanguage

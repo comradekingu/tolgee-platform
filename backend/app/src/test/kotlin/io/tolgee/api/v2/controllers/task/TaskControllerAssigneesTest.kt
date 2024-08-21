@@ -11,7 +11,7 @@ import net.javacrumbs.jsonunit.core.internal.Node.JsonMap
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class TaskControllerAssigneesTest: ProjectAuthControllerTest("/v2/projects/") {
+class TaskControllerAssigneesTest : ProjectAuthControllerTest("/v2/projects/") {
   lateinit var testData: TaskTestData
 
   @BeforeEach
@@ -21,7 +21,6 @@ class TaskControllerAssigneesTest: ProjectAuthControllerTest("/v2/projects/") {
     testDataService.saveTestData(testData.root)
     userAccount = testData.user
   }
-
 
   @Test
   @ProjectJWTAuthTestMethod
