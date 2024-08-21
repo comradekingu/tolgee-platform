@@ -1,18 +1,27 @@
 package io.tolgee.development.testDataBuilder.data
 
 import io.tolgee.development.testDataBuilder.builders.*
+import io.tolgee.model.Language
+import io.tolgee.model.UserAccount
 import io.tolgee.model.enums.OrganizationRoleType
 import io.tolgee.model.enums.ProjectPermissionType
+import io.tolgee.model.enums.Scope
 import io.tolgee.model.enums.TaskType
 
 class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
   var projectUser: UserAccountBuilder
+  var orgAdmin: UserAccountBuilder
   var orgMember: UserAccountBuilder
-  var createdTask: TaskBuilder
+  var projectViewScopeUser: UserAccountBuilder
+  var projectViewRoleUser: UserAccountBuilder
+  var translateTask: TaskBuilder
+  var reviewTask: TaskBuilder
   var relatedProject: ProjectBuilder
   var keysInTask: MutableSet<KeyBuilder> = mutableSetOf()
-  var translationsInTask: MutableSet<TranslationBuilder> = mutableSetOf()
+  var translationsInTranslateTask: MutableSet<TranslationBuilder> = mutableSetOf()
+  var translationsInReviewTask: MutableSet<TranslationBuilder> = mutableSetOf()
   var keysOutOfTask: MutableSet<KeyBuilder> = mutableSetOf()
+  lateinit var czechLanguage: Language
 
   var unrelatedOrg = OrganizationBuilder(root)
   var unrelatedProject: ProjectBuilder
@@ -32,28 +41,72 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
     orgMember.self.apply {
       username = "Organization member"
     }
-    root.data.userAccounts.add(orgMember)
+
+    orgAdmin = UserAccountBuilder(root)
+
+    orgAdmin.self.apply {
+      username = "Organization owner"
+    }
+
+    projectViewScopeUser = UserAccountBuilder(root)
+
+    projectViewScopeUser.self.apply {
+      username = "Project view scope user (en)"
+    }
+
+    projectViewRoleUser = UserAccountBuilder(root)
+
+    projectViewRoleUser.self.apply {
+      username = "Project view role user (en)"
+    }
 
     userAccountBuilder.defaultOrganizationBuilder.apply {
       addRole {
         user = orgMember.self
         type = OrganizationRoleType.MEMBER
       }
+
+      addRole {
+        user = orgAdmin.self
+        type = OrganizationRoleType.OWNER
+      }
     }
 
     projectBuilder.apply {
       relatedProject = this
+
+      addLanguage {
+        name = "Czech"
+        tag = "cs"
+        originalName = "Čeština"
+        czechLanguage = this
+      }
 
       addPermission {
         user = projectUser.self
         type = ProjectPermissionType.EDIT
       }
 
+      addPermission {
+        user = projectViewScopeUser.self
+        scopes = arrayOf(Scope.TRANSLATIONS_VIEW)
+        viewLanguages = mutableSetOf(englishLanguage)
+      }
+
+      addPermission {
+        user = projectViewRoleUser.self
+        type = ProjectPermissionType.VIEW
+        viewLanguages = mutableSetOf(englishLanguage)
+      }
+
       (0 until 2).forEach {
         keysInTask.add(
           addKey(null, "key $it").apply {
-            translationsInTask.add(
+            translationsInTranslateTask.add(
               addTranslation("en", "Translation $it"),
+            )
+            translationsInReviewTask.add(
+              addTranslation("cs", "Překlad $it"),
             )
           },
         )
@@ -67,22 +120,46 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
         )
       }
 
-      createdTask =
+      translateTask =
         addTask {
-          name = "New task"
+          id = 1
+          name = "Translate task"
           type = TaskType.TRANSLATE
           assignees =
             mutableSetOf(
               projectUser.self,
+              user
             )
           project = projectBuilder.self
           language = englishLanguage
           author = projectUser.self
         }
 
-      translationsInTask.forEach { it ->
+      translationsInTranslateTask.forEach { it ->
         addTaskKey {
-          task = createdTask.self
+          task = translateTask.self
+          translation = it.self
+        }
+      }
+
+      reviewTask =
+        addTask {
+          id = 2
+          name = "Review task"
+          type = TaskType.REVIEW
+          assignees =
+            mutableSetOf(
+              orgMember.self,
+              user
+            )
+          project = projectBuilder.self
+          language = czechLanguage
+          author = projectUser.self
+        }
+
+      translationsInReviewTask.forEach { it ->
+        addTaskKey {
+          task = reviewTask.self
           translation = it.self
         }
       }
@@ -117,8 +194,12 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
       }
     }
 
+    root.data.userAccounts.add(orgMember)
+    root.data.userAccounts.add(orgAdmin)
     root.data.organizations.add(unrelatedOrg)
     root.data.projects.add(unrelatedProject)
     root.data.userAccounts.add(unrelatedUser)
+    root.data.userAccounts.add(projectViewScopeUser)
+    root.data.userAccounts.add(projectViewRoleUser)
   }
 }

@@ -30,10 +30,23 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   fun `task exists`() {
     performProjectAuthGet("tasks").andAssertThatJson {
       node("_embedded.tasks") {
-        node("[0].id").isNumber
-        node("[0].name").isEqualTo("New task")
+        node("[0].id").isEqualTo(1)
+        node("[0].name").isEqualTo("Translate task")
+        node("[1].id").isEqualTo(2)
+        node("[1].name").isEqualTo("Review task")
+
       }
-      node("page.totalElements").isNumber.isEqualTo(BigDecimal(1))
+      node("page.totalElements").isNumber.isEqualTo(BigDecimal(2))
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `gets task detail`() {
+    performProjectAuthGet(
+      "tasks/${testData.translateTask.self.id}"
+    ).andAssertThatJson {
+      node("name").isEqualTo("Translate task")
     }
   }
 
@@ -63,7 +76,68 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
     }
 
     performProjectAuthGet("tasks").andAssertThatJson {
-      node("page.totalElements").isNumber.isEqualTo(BigDecimal(2))
+      node("page.totalElements").isNumber.isEqualTo(BigDecimal(3))
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `creates multiple new tasks`() {
+    val keys = testData.keysOutOfTask.map { it.self.id }.toMutableSet()
+    performProjectAuthPost(
+      "tasks/create-multiple",
+      CreateMultipleTasksRequest(
+        mutableSetOf(
+          CreateTaskRequest(
+            name = "Another task",
+            description = "...",
+            type = TaskType.TRANSLATE,
+            languageId = testData.englishLanguage.id,
+            assignees =
+            mutableSetOf(
+              testData.orgMember.self.id,
+            ),
+            keys = keys,
+          ),
+          CreateTaskRequest(
+            name = "Another task",
+            description = "...",
+            type = TaskType.TRANSLATE,
+            languageId = testData.czechLanguage.id,
+            assignees =
+            mutableSetOf(
+              testData.orgMember.self.id,
+            ),
+            keys = keys,
+          )
+        )
+      ),
+    ).andIsOk
+
+    performProjectAuthGet("tasks").andAssertThatJson {
+      node("page.totalElements").isNumber.isEqualTo(BigDecimal(4))
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `calculates stats for task`() {
+    performProjectAuthPut(
+      "tasks/${testData.translateTask.self.id}/keys/${testData.translationsInTranslateTask.first().self.key.id}",
+      UpdateTaskKeyRequest(done = true)
+    ).andIsOk
+
+    performProjectAuthGet(
+      "tasks/${testData.translateTask.self.id}"
+    ).andIsOk.andAssertThatJson {
+      node("totalItems").isEqualTo(2)
+      node("doneItems").isEqualTo(1)
+    }
+
+    performProjectAuthGet(
+      "tasks/${testData.translateTask.self.id}/per-user-report"
+    ).andIsOk.andAssertThatJson {
+      node("[0]").node("doneItems").isEqualTo(1)
     }
   }
 
@@ -110,14 +184,14 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   @ProjectJWTAuthTestMethod
   fun `updates existing task`() {
     performProjectAuthPut(
-      "tasks/${testData.createdTask.self.id}",
+      "tasks/${testData.translateTask.self.id}",
       UpdateTaskRequest(
         name = "Updated task",
         description = "updated description",
         assignees = mutableSetOf(),
       ),
     ).andIsOk.andAssertThatJson {
-      node("id").isEqualTo(testData.createdTask.self.id)
+      node("id").isEqualTo(testData.translateTask.self.id)
       node("name").isEqualTo("Updated task")
       node("description").isEqualTo("updated description")
       node("assignees").isEqualTo(mutableListOf<Any>())
@@ -128,7 +202,7 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   @ProjectJWTAuthTestMethod
   fun `fails when updating assignees to non-members`() {
     performProjectAuthPut(
-      "tasks/${testData.createdTask.self.id}",
+      "tasks/${testData.translateTask.self.id}",
       UpdateTaskRequest(
         assignees = mutableSetOf(testData.unrelatedUser.self.id),
       ),
@@ -141,14 +215,14 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   @ProjectJWTAuthTestMethod
   fun `can add keys`() {
     performProjectAuthPut(
-      "tasks/${testData.createdTask.self.id}/keys",
+      "tasks/${testData.translateTask.self.id}/keys",
       UpdateTaskKeysRequest(
         addKeys = testData.keysOutOfTask.map { it.self.id }.toMutableSet(),
       ),
     ).andIsOk
 
     performProjectAuthGet(
-      "tasks/${testData.createdTask.self.id}",
+      "tasks/${testData.translateTask.self.id}",
     ).andIsOk.andAssertThatJson {
       // Calculate expected keys set
       val expectedItems = (testData.keysInTask union testData.keysOutOfTask).size
@@ -164,14 +238,14 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
     val keysToRemove = mutableSetOf(allKeys.first())
     val remainingKeys = allKeys.subtract(keysToRemove)
     performProjectAuthPut(
-      "tasks/${testData.createdTask.self.id}/keys",
+      "tasks/${testData.translateTask.self.id}/keys",
       UpdateTaskKeysRequest(
         removeKeys = keysToRemove,
       ),
     ).andIsOk
 
     performProjectAuthGet(
-      "tasks/${testData.createdTask.self.id}",
+      "tasks/${testData.translateTask.self.id}",
     ).andIsOk.andAssertThatJson {
       node("totalItems").isEqualTo(remainingKeys.size)
     }
@@ -215,7 +289,7 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
 
   @Test
   @ProjectJWTAuthTestMethod
-  fun `includes keys in included in task of different type`() {
+  fun `includes keys included in task of different type`() {
     val allKeys = testData.keysInTask.map { it.self.id }.toMutableSet()
     performProjectAuthPost(
       "tasks/calculate-scope",
@@ -228,6 +302,38 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
       node("keyCount").isEqualTo(allKeys.size)
       node("wordCount").isEqualTo(4)
       node("characterCount").isEqualTo(26)
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `project tasks`() {
+    performProjectAuthGet(
+      "tasks",
+    ).andIsOk.andAssertThatJson {
+      node("page").node("totalElements").isEqualTo(2)
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `project tasks filter by assignee`() {
+    performProjectAuthGet(
+      "tasks?filterAssignee=${testData.orgMember.self.id}",
+    ).andIsOk.andAssertThatJson {
+      node("page").node("totalElements").isEqualTo(1)
+      node("_embedded.tasks[0].name").isEqualTo("Review task")
+    }
+  }
+
+  @Test
+  @ProjectJWTAuthTestMethod
+  fun `project tasks filter by type`() {
+    performProjectAuthGet(
+      "tasks?filterType=${TaskType.TRANSLATE}",
+    ).andIsOk.andAssertThatJson {
+      node("page").node("totalElements").isEqualTo(1)
+      node("_embedded.tasks[0].name").isEqualTo("Translate task")
     }
   }
 }

@@ -6,7 +6,9 @@ import io.tolgee.hateoas.userAccount.SimpleUserAccountModel
 import io.tolgee.model.enums.TaskState
 import io.tolgee.model.enums.TaskType
 import org.springframework.hateoas.RepresentationModel
+import org.springframework.hateoas.server.core.Relation
 
+@Relation(collectionRelation = "tasks", itemRelation = "task")
 data class TaskWithProjectModel(
   var id: Long = 0L,
   var name: String = "",

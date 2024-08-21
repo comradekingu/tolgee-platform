@@ -114,17 +114,6 @@ class TaskController(
     return taskModelAssembler.toModel(task)
   }
 
-  @DeleteMapping("/{taskId}")
-  @Operation(summary = "Delete task")
-  @RequiresProjectPermissions([Scope.TASKS_EDIT])
-  @AllowApiAccess
-  fun deleteTask(
-    @PathVariable
-    taskId: Long,
-  ) {
-    taskService.deleteTask(projectHolder.projectEntity, taskId)
-  }
-
   @GetMapping("/{taskId}/per-user-report")
   @Operation(summary = "Report who did what")
   @UseDefaultPermissions
