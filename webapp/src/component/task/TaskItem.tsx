@@ -17,6 +17,9 @@ import { TaskState } from './TaskState';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
+type SimpleUserAccountModel = components['schemas']['SimpleUserAccountModel'];
+
+const ASSIGNEES_LIMIT = 2;
 
 const StyledContainer = styled('div')`
   display: contents;
@@ -44,6 +47,15 @@ const StyledAssignees = styled(StyledItem)`
   justify-content: start;
   display: flex;
   flex-wrap: wrap;
+  padding: 8px 0px;
+`;
+
+const StyledMoreAssignees = styled(Box)`
+  width: 24px;
+  height: 24px;
+  display: flex;
+  text-align: center;
+  cursor: default;
 `;
 
 type Props = {
@@ -69,6 +81,32 @@ export const TaskItem = ({
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const renderAssignees = (assignees: SimpleUserAccountModel[]) => {
+    return (
+      <>
+        {assignees.map((user) => (
+          <Tooltip
+            key={user.id}
+            title={<div>{user.username}</div>}
+            disableInteractive
+          >
+            <div>
+              <AvatarImg
+                owner={{
+                  name: user.name,
+                  avatar: user.avatar,
+                  type: 'USER',
+                  id: user.id,
+                }}
+                size={24}
+              />
+            </div>
+          </Tooltip>
+        ))}
+      </>
+    );
   };
 
   return (
@@ -113,26 +151,21 @@ export const TaskItem = ({
           </Tooltip>
         </StyledItem>
       )}
-      <StyledAssignees>
-        {task.assignees.map((user) => (
+      <StyledAssignees sx={{ paddingRight: '10px' }}>
+        {renderAssignees(task.assignees.slice(0, ASSIGNEES_LIMIT))}
+        {task.assignees.length > ASSIGNEES_LIMIT && (
           <Tooltip
-            key={user.id}
-            title={<div>{user.username}</div>}
-            disableInteractive
+            title={
+              <StyledAssignees>
+                {renderAssignees(task.assignees.slice(ASSIGNEES_LIMIT))}
+              </StyledAssignees>
+            }
           >
-            <div>
-              <AvatarImg
-                owner={{
-                  name: user.name,
-                  avatar: user.avatar,
-                  type: 'USER',
-                  id: user.id,
-                }}
-                size={24}
-              />
-            </div>
+            <StyledMoreAssignees>
+              +{task.assignees.length - ASSIGNEES_LIMIT}
+            </StyledMoreAssignees>
           </Tooltip>
-        ))}
+        )}
       </StyledAssignees>
       <StyledItem sx={{ pr: 1, gap: 0.5 }}>
         <IconButton
