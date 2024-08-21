@@ -1792,8 +1792,8 @@ export interface components {
       secretKey?: string;
       endpoint: string;
       signingRegion: string;
-      enabled?: boolean;
       contentStorageType?: "S3" | "AZURE";
+      enabled?: boolean;
     };
     AzureContentStorageConfigModel: {
       containerName?: string;
@@ -2057,13 +2057,13 @@ export interface components {
       overrideKeyDescriptions: boolean;
       /** @description If true, placeholders from other formats will be converted to ICU when possible */
       convertPlaceholdersToIcu: boolean;
-      /** @description If true, only updates keys, skipping the creation of new keys */
+      /** @description If false, only updates keys, skipping the creation of new keys */
       createNewKeys: boolean;
     };
     ImportSettingsModel: {
       /** @description If true, key descriptions will be overridden by the import */
       overrideKeyDescriptions: boolean;
-      /** @description If true, only updates keys, skipping the creation of new keys */
+      /** @description If false, only updates keys, skipping the creation of new keys */
       createNewKeys: boolean;
       /** @description If true, placeholders from other formats will be converted to ICU when possible */
       convertPlaceholdersToIcu: boolean;
@@ -2223,17 +2223,17 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
-      description: string;
       /** Format: int64 */
       id: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
+      description: string;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2369,18 +2369,18 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
-      description: string;
       /** Format: int64 */
       id: number;
       projectName: string;
       userFullName?: string;
       /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       username?: string;
+      description: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -3004,7 +3004,7 @@ export interface components {
       overrideKeyDescriptions: boolean;
       /** @description If true, placeholders from other formats will be converted to ICU when possible */
       convertPlaceholdersToIcu: boolean;
-      /** @description If true, only updates keys, skipping the creation of new keys */
+      /** @description If false, only updates keys, skipping the creation of new keys */
       createNewKeys: boolean;
       /** @description Definition of mapping for each file to import. */
       fileMappings: components["schemas"]["ImportFileMapping"][];
@@ -3525,8 +3525,6 @@ export interface components {
         | "SLACK_INTEGRATION"
       )[];
       quickStart?: components["schemas"]["QuickStartModel"];
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
@@ -3538,9 +3536,11 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      avatar?: components["schemas"]["Avatar"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example btforg */
       slug: string;
+      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3601,9 +3601,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
-      description?: string;
       name: string;
       displayName?: string;
+      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3698,23 +3698,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
-      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
       baseTranslation?: string;
+      translation?: string;
       namespace?: string;
+      description?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
-      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      translation?: string;
       baseTranslation?: string;
+      translation?: string;
       namespace?: string;
+      description?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4268,17 +4268,17 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
-      description: string;
       /** Format: int64 */
       id: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
+      description: string;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4395,18 +4395,18 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
-      description: string;
       /** Format: int64 */
       id: number;
       projectName: string;
       userFullName?: string;
       /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
       projectId: number;
       /** Format: int64 */
       expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       username?: string;
+      description: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
