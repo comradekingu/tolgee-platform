@@ -14,6 +14,7 @@ describe('Server admin 3', () => {
       checkPermissions(projectInfo, {
         'project-menu-item-dashboard': SKIP,
         'project-menu-item-translations': SKIP,
+        'project-menu-item-tasks': RUN,
         'project-menu-item-settings': RUN,
         'project-menu-item-languages': RUN,
         'project-menu-item-members': RUN,
