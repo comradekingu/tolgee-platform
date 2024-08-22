@@ -81,8 +81,10 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     """
      select tk
      from Task tk
+        left join tk.language l
      where
-        tk.project.id = :projectId
+        l.deletedAt is null
+        and tk.project.id = :projectId
         and $TASK_SEARCH
         and $TASK_FILTERS
     """,
@@ -121,7 +123,10 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
      from Task t
         join t.translations tt on tt.translation.id in :translationIds
         left join t.assignees u on u.id = :currentUserId
-     where t.state = 'IN_PROGRESS'
+        left join t.language l
+     where
+        l.deletedAt is null
+        and t.state = 'IN_PROGRESS'
      order by t.type desc, t.id desc
     """,
   )
@@ -143,6 +148,17 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
   )
   fun getByIdsWithAllPrefetched(tasks: Collection<Task>): List<Task>
 
+  @Query(
+    """
+      select t
+      from Task t
+        left join t.language l
+      where
+        t.project = :project
+        and l.deletedAt is null
+        
+    """,
+  )
   fun findByProjectOrderByIdDesc(project: Project): List<Task>
 
   @Query(
@@ -154,9 +170,11 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
             select translation.key_id as key_id from translation
                 join task_translation on (translation.id = task_translation.translation_id)
                 join task on (task_translation.task_id = task.id and task_translation.task_project_id = :projectId)
+                left join language l on (task.language_id = l.id)
             where task.type = :taskType
                 and task.language_id = :languageId
                 and task.state = 'IN_PROGRESS'
+                and l.deleted_at is null
           ) as task on task.key_id = key.id
           left join translation t on t.key_id = key.id and t.language_id = :languageId
       where key.project_id = :projectId
