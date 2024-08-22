@@ -51,15 +51,12 @@ class Permission(
     ],
   )
   @Column(name = "scopes", columnDefinition = "varchar[]")
-  var _scopes: Array<Scope>? = null
+  private var _scopes: Array<Scope>? = null
     set(value) {
       field = value
       if (!value.isNullOrEmpty()) {
         this.type = null
       }
-    }
-    get() {
-      return field
     }
 
   override var scopes: Array<Scope>

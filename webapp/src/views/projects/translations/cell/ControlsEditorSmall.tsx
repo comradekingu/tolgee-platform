@@ -111,7 +111,6 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
           <ControlsButton
             style={{ gridArea: 'task' }}
             data-cy="translations-cell-task-button"
-            tooltip={t('translation_cell_task')}
             onClick={() => onTaskStateChange(!task?.done)}
             color={
               task?.userAssigned

@@ -182,7 +182,6 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
           style={{ gridArea: 'task' }}
           onClick={() => onTaskStateChange(!task?.done)}
           data-cy="translations-cell-task-button"
-          tooltip={<T keyName="translation_cell_task" />}
           color={
             task?.userAssigned
               ? task?.done
