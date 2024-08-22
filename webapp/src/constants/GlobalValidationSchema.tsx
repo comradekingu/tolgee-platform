@@ -375,7 +375,7 @@ export class Validation {
     url: Yup.string().required().max(255),
   });
 
-  static readonly NEW_KEY_FORM = (t: TFnType) =>
+  static readonly NEW_KEY_FORM = (t: TFunType) =>
     Yup.object().shape({
       name: Yup.string().required(),
       pluralParameter: Yup.string().when('isPlural', {
@@ -388,7 +388,7 @@ export class Validation {
       }),
     });
 
-  static readonly KEY_SETTINGS_FORM = (t: TFnType) =>
+  static readonly KEY_SETTINGS_FORM = (t: TFunType) =>
     Yup.object().shape({
       custom: Yup.string().test(
         'invalid-custom-values',
@@ -397,7 +397,7 @@ export class Validation {
       ),
     });
 
-  static readonly CREATE_TASK_FORM = (t: TFnType) =>
+  static readonly CREATE_TASK_FORM = (t: TFunType) =>
     Yup.object().shape({
       name: Yup.string().min(3).required(),
       languages: Yup.array(Yup.number()).min(
@@ -406,7 +406,7 @@ export class Validation {
       ),
     });
 
-  static readonly UPDATE_TASK_FORM = (t: TFnType) =>
+  static readonly UPDATE_TASK_FORM = (t: TFunType) =>
     Yup.object().shape({
       name: Yup.string().min(3).required(),
     });
