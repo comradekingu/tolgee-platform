@@ -260,8 +260,13 @@ class ProjectService(
   @CacheEvict(cacheNames = [Caches.PROJECTS], key = "#id")
   fun deleteProject(id: Long) {
     val project = get(id)
-    languageService.evictCacheForProject(project.id)
-    project.deletedAt = currentDateProvider.date
+    val languages = project.languages
+    val currentDate = currentDateProvider.date
+    languages.forEach {
+      it.deletedAt = currentDate
+    }
+    languageService.saveAll(languages)
+    project.deletedAt = currentDate
     save(project)
   }
 

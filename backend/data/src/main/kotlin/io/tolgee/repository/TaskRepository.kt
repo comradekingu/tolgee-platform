@@ -101,7 +101,9 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
      select tk
      from Task tk
         join tk.assignees u on u.id = :userId
-     where $TASK_SEARCH
+        left join tk.language l
+     where l.deletedAt is null
+        and $TASK_SEARCH
         and $TASK_FILTERS
     """,
   )
