@@ -129,9 +129,10 @@ export const register = () => {
     });
   });
 
-  Cypress.Commands.add('chooseDatePicker', (selector, value) => {
-    cy.get('body').then(($body) => {
+  Cypress.Commands.add(
+    'chooseDatePicker',
+    (selector: string, value: string) => {
       cy.get(selector).find('input').clear().type(value);
-    });
-  });
+    }
+  );
 };

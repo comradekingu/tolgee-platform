@@ -73,7 +73,7 @@ describe('API keys', () => {
     assertMessage('API key successfully created');
   });
 
-  it('Regenerates key', () => {
+  it.only('Regenerates key', () => {
     const description = 'Oh I am expired';
     cy.contains(description)
       .closestDcy('api-key-list-item')
