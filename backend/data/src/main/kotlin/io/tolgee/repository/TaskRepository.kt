@@ -156,7 +156,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       where
         t.project = :project
         and l.deletedAt is null
-        
+      order by t.id desc
     """,
   )
   fun findByProjectOrderByIdDesc(project: Project): List<Task>
