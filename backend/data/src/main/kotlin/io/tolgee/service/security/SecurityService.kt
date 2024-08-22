@@ -124,7 +124,7 @@ class SecurityService(
         authenticationFacade.authenticatedUser.id,
         taskType,
       )
-    return assignees.isEmpty() || assignees[0].id != activeUser.id
+    return assignees.isNotEmpty() && assignees[0].id == activeUser.id
   }
 
   fun checkProjectPermission(
@@ -229,7 +229,7 @@ class SecurityService(
         projectId,
       ) { data -> data.checkViewPermitted(*languageIds.toLongArray()) }
 
-      if (keyId != null) {
+      if (keyId != null && languageIds.isNotEmpty()) {
         languageIds.forEach {
           if (!translationInTask(keyId, it, TaskType.TRANSLATE)) {
             throw e
@@ -257,7 +257,7 @@ class SecurityService(
         projectId,
       ) { data -> data.checkViewPermitted(*languageIds.toLongArray()) }
 
-      if (keyId != null) {
+      if (keyId != null && languageIds.isNotEmpty()) {
         languageIds.forEach {
           if (!translationInTask(keyId, it, TaskType.REVIEW)) {
             throw e
