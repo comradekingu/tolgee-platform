@@ -104,56 +104,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         left join tk.language l
      where l.deletedAt is null
         and $TASK_SEARCH
-        and (
-        :#{#filters.filterNotState} is null
-        or tk.state not in :#{#filters.filterNotState}
-    )
-    and (
-        :#{#filters.filterState} is null
-        or tk.state in :#{#filters.filterState}
-    )
-    and (
-        :#{#filters.filterType} is null
-        or tk.type in :#{#filters.filterType}
-    )
-    and (
-        :#{#filters.filterId} is null
-        or tk.id in :#{#filters.filterId}
-    )
-    and (
-        :#{#filters.filterNotId} is null
-        or tk.id not in :#{#filters.filterNotId}
-    )
-    and (
-        :#{#filters.filterProject} is null
-        or tk.project.id in :#{#filters.filterProject}
-    )
-    and (
-        :#{#filters.filterNotProject} is null
-        or tk.project.id not in :#{#filters.filterNotProject}
-    )
-    and (
-        :#{#filters.filterLanguage} is null
-        or tk.language.id in :#{#filters.filterLanguage}
-    )
-    and (
-        :#{#filters.filterAssignee} is null
-        or exists (
-            select 1
-            from tk.assignees u
-            where u.id in :#{#filters.filterAssignee}
-        )
-    )
-    and (
-        :#{#filters.filterKey} is null
-        or exists (
-            select 1
-            from TaskKey tt
-            where 
-                tt.key.id in :#{#filters.filterKey}
-                and tt.task.id = tk.id
-        )
-    )
+        and $TASK_FILTERS
     """,
   )
   fun getAllByAssignee(
@@ -296,7 +247,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       from Task tk
           left join tk.project p
           left join tk.keys tt
-          left join tt.key k
+          left join Key k on element(tt).key.id = k.id
           left join k.translations bt on (bt.language.id = p.baseLanguage.id)
       where tk in :tasks
       group by tk.id, tk.project.id
@@ -310,7 +261,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       from Task tk
         left join tk.keys as tt
         left join tt.author as u
-        left join tt.key as k
+        left join Key k on element(tt).key.id = k.id
         left join k.translations as btr on btr.language.id = :baseLangId 
       where tk.project.id = :projectId
         and tk.id = :taskId
@@ -351,7 +302,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         and tk.language.id = :languageId
         and tk.state = 'IN_PROGRESS'
         and u.id = :userId
-        and tt.key.id = :keyId
+        and element(tt).key.id = :keyId
     """,
   )
   fun findAssigneeByKey(

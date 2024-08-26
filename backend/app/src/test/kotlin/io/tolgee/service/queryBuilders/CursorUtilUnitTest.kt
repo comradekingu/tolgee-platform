@@ -38,7 +38,6 @@ class CursorUtilUnitTest {
                 mtProvider = null,
                 commentCount = 0,
                 unresolvedCommentCount = 1,
-                tasks = listOf(),
               ),
           ),
         contextPresent = false,

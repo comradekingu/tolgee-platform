@@ -96,6 +96,15 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
         viewLanguages = mutableSetOf(englishLanguage)
       }
 
+      (0 until 2).forEach {
+        keysInTask.add(
+          addKey(null, "key $it").apply {
+            addTranslation("en", "Translation $it")
+            addTranslation("cs", "Překlad $it")
+          },
+        )
+      }
+
       (2 until 4).forEach {
         keysOutOfTask.add(
           addKey(null, "key $it").apply {

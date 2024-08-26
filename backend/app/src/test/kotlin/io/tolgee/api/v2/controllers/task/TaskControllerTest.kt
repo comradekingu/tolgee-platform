@@ -122,7 +122,7 @@ class TaskControllerTest : ProjectAuthControllerTest("/v2/projects/") {
   @ProjectJWTAuthTestMethod
   fun `calculates stats for task`() {
     performProjectAuthPut(
-      "tasks/${testData.translateTask.self.id}/keys/${testData.translationsInTranslateTask.first().self.key.id}",
+      "tasks/${testData.translateTask.self.id}/keys/${testData.keysInTask.first().self.id}",
       UpdateTaskKeyRequest(done = true),
     ).andIsOk
 

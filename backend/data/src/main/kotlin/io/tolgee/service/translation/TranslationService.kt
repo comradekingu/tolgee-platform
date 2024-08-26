@@ -583,11 +583,4 @@ class TranslationService(
       throw BadRequestException(Message.INVALID_PLURAL_FORM, listOf(e.invalidStrings) as List<Serializable?>)
     }
   }
-
-  fun getLanguageTrasnlationsByIds(
-    languageId: Long,
-    keyIds: Collection<Long>,
-  ): List<Translation> {
-    return translationRepository.findAllByLanguageIdAndKeyIdIn(languageId, keyIds)
-  }
 }

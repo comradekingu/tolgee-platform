@@ -15,11 +15,11 @@ import io.tolgee.model.task.Task
 import io.tolgee.model.task.TaskId
 import io.tolgee.model.task.TaskKey
 import io.tolgee.model.task.TaskKeyId
-import io.tolgee.model.translation.Translation
 import io.tolgee.model.views.*
 import io.tolgee.repository.TaskKeyRepository
 import io.tolgee.repository.TaskRepository
 import io.tolgee.security.authentication.AuthenticationFacade
+import io.tolgee.service.key.KeyService
 import io.tolgee.service.language.LanguageService
 import io.tolgee.service.security.SecurityService
 import io.tolgee.service.translation.TranslationService
@@ -44,6 +44,7 @@ class TaskService(
   private val securityService: SecurityService,
   private val taskKeyRepository: TaskKeyRepository,
   private val translationService: TranslationService,
+  private val keyService: KeyService,
   private val authenticationFacade: AuthenticationFacade,
   @Lazy
   @Autowired
@@ -227,13 +228,9 @@ class TaskService(
       }.get()
 
     dto.removeKeys?.let { toRemove ->
-      val translationsToRemove =
-        translationService
-          .getLanguageTrasnlationsByIds(task.language.id, toRemove)
-          .map { it.id }
       val taskKeysToRemove =
         task.keys.filter {
-          translationsToRemove.contains(
+          toRemove.contains(
             it.key.id,
           )
         }.toMutableSet()
@@ -409,35 +406,6 @@ class TaskService(
     } else {
       return entityManager.getReference(Language::class.java, language)
     }
-  }
-
-  private fun getOrCreateTranslations(
-    languageId: Long,
-    keyIds: Collection<Long>,
-  ): MutableList<Translation> {
-    val translations = translationService.getLanguageTrasnlationsByIds(languageId, keyIds)
-    val translationsHashMap = translations.associateBy({ it.key.id }, { it })
-
-    val allTranslations = mutableListOf<Translation>()
-    val newTranslations = mutableListOf<Translation>()
-
-    keyIds.forEach {
-      var translation = translationsHashMap.get(it)
-      if (translation == null) {
-        translation =
-          Translation(
-            text = null,
-            key = entityManager.getReference(Key::class.java, it),
-            language = entityManager.getReference(Language::class.java, languageId),
-          )
-        newTranslations.add(translation)
-      }
-      allTranslations.add(translation)
-    }
-
-    translationService.saveAll(newTranslations)
-    entityManager.flush()
-    return allTranslations
   }
 
   private fun getTasksWithScope(tasks: Collection<Task>): List<TaskWithScopeView> {
