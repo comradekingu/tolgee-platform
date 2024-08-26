@@ -13,13 +13,12 @@ import io.tolgee.model.enums.TaskType
 import io.tolgee.model.key.Key
 import io.tolgee.model.task.Task
 import io.tolgee.model.task.TaskId
-import io.tolgee.model.task.TaskTranslation
-import io.tolgee.model.task.TaskTranslationId
+import io.tolgee.model.task.TaskKey
+import io.tolgee.model.task.TaskKeyId
 import io.tolgee.model.translation.Translation
 import io.tolgee.model.views.*
+import io.tolgee.repository.TaskKeyRepository
 import io.tolgee.repository.TaskRepository
-import io.tolgee.repository.TaskTranslationRepository
-import io.tolgee.repository.TranslationRepository
 import io.tolgee.security.authentication.AuthenticationFacade
 import io.tolgee.service.language.LanguageService
 import io.tolgee.service.security.SecurityService
@@ -43,10 +42,9 @@ class TaskService(
   private val languageService: LanguageService,
   @Lazy
   private val securityService: SecurityService,
-  private val taskTranslationRepository: TaskTranslationRepository,
+  private val taskKeyRepository: TaskKeyRepository,
   private val translationService: TranslationService,
   private val authenticationFacade: AuthenticationFacade,
-  private val translationRepository: TranslationRepository,
   @Lazy
   @Autowired
   private val taskService: TaskService,
@@ -132,8 +130,6 @@ class TaskService(
         filters,
       )
 
-    val translations = getOrCreateTranslations(language.id, keys)
-
     val task = Task()
 
     task.id = newId
@@ -149,9 +145,9 @@ class TaskService(
     task.state = dto.state ?: TaskState.IN_PROGRESS
     taskRepository.saveAndFlush(task)
 
-    val taskTranslations = translations.map { TaskTranslation(task, it) }.toMutableSet()
-    task.translations = taskTranslations
-    taskTranslationRepository.saveAll(taskTranslations)
+    val taskKeys = keys.map { TaskKey(task, entityManager.getReference(Key::class.java, it)) }.toMutableSet()
+    task.keys = taskKeys
+    taskKeyRepository.saveAll(taskKeys)
 
     return task
   }
@@ -205,7 +201,7 @@ class TaskService(
     taskId: Long,
   ) {
     val taskComposedId = TaskId(projectEntity, taskId)
-    taskTranslationRepository.deleteByTask(entityManager.getReference(Task::class.java, taskComposedId))
+    taskKeyRepository.deleteByTask(entityManager.getReference(Task::class.java, taskComposedId))
     taskRepository.deleteById(taskComposedId)
   }
 
@@ -236,26 +232,24 @@ class TaskService(
           .getLanguageTrasnlationsByIds(task.language.id, toRemove)
           .map { it.id }
       val taskKeysToRemove =
-        task.translations.filter {
+        task.keys.filter {
           translationsToRemove.contains(
-            it.translation.id,
+            it.key.id,
           )
         }.toMutableSet()
-      task.translations = task.translations.subtract(taskKeysToRemove).toMutableSet()
-      taskTranslationRepository.deleteAll(taskKeysToRemove)
+      task.keys = task.keys.subtract(taskKeysToRemove).toMutableSet()
+      taskKeyRepository.deleteAll(taskKeysToRemove)
     }
 
     dto.addKeys?.let { toAdd ->
-      val translationsToAdd = getOrCreateTranslations(task.language.id, toAdd)
-      val translationIdsToAdd = translationsToAdd.map { it.id }.toMutableSet()
-      val existingTranslations = task.translations.map { it.translation.id }.toMutableSet()
-      val nonExistingTranslationIds = translationIdsToAdd.subtract(existingTranslations).toMutableSet()
-      val taskTranslationsToAdd =
-        translationsToAdd
-          .filter { nonExistingTranslationIds.contains(it.id) }
-          .map { TaskTranslation(task, it) }
-      task.translations = task.translations.union(taskTranslationsToAdd).toMutableSet()
-      taskTranslationRepository.saveAll(taskTranslationsToAdd)
+      val existingKeys = task.keys.map { it.key.id }.toMutableSet()
+      val nonExistingKeyIds = toAdd.subtract(existingKeys).toMutableSet()
+      val taskKeysToAdd =
+        toAdd
+          .filter { nonExistingKeyIds.contains(it) }
+          .map { TaskKey(task, entityManager.getReference(Key::class.java, it)) }
+      task.keys = task.keys.union(taskKeysToAdd).toMutableSet()
+      taskKeyRepository.saveAll(taskKeysToAdd)
     }
   }
 
@@ -266,47 +260,39 @@ class TaskService(
     keyId: Long,
     dto: UpdateTaskKeyRequest,
   ): UpdateTaskKeyResponse {
-    val task =
-      taskRepository.findById(TaskId(projectEntity, taskId)).or {
-        throw NotFoundException(Message.TASK_NOT_FOUND)
-      }.get()
-
-    val translation =
-      translationRepository.findOneByKeyAndLanguageId(
-        entityManager.getReference(Key::class.java, keyId),
-        task.language.id,
+    val taskKey =
+      taskKeyRepository.findById(
+        TaskKeyId(
+          task = entityManager.getReference(Task::class.java, TaskId(projectEntity, taskId)),
+          key = entityManager.getReference(Key::class.java, keyId),
+        ),
       ).or {
-        throw NotFoundException(Message.TRANSLATION_NOT_FOUND)
-      }.get()
-
-    val taskTranslation =
-      taskTranslationRepository.findById(TaskTranslationId(task, translation)).or {
         throw NotFoundException(Message.TASK_NOT_FOUND)
       }.get()
 
-    val previousValue = taskTranslation.done
+    val previousValue = taskKey.done
 
     if (dto.done == true) {
-      taskTranslation.author =
+      taskKey.author =
         entityManager.getReference(
           UserAccount::class.java,
           authenticationFacade.authenticatedUser.id,
         )
     } else {
-      taskTranslation.author = null
+      taskKey.author = null
     }
-    taskTranslation.done = dto.done ?: false
-    taskTranslationRepository.saveAndFlush(taskTranslation)
+    taskKey.done = dto.done ?: false
+    taskKeyRepository.saveAndFlush(taskKey)
 
-    if (!previousValue && taskTranslation.done) {
+    if (!previousValue && taskKey.done) {
       val taskItem = getTask(projectEntity, taskId)
       return UpdateTaskKeyResponse(
-        done = taskTranslation.done,
+        done = taskKey.done,
         taskFinished = taskItem.doneItems == taskItem.totalItems,
       )
     } else {
       return UpdateTaskKeyResponse(
-        done = taskTranslation.done,
+        done = taskKey.done,
         taskFinished = false,
       )
     }
@@ -327,14 +313,6 @@ class TaskService(
     type: TaskType,
   ): List<UserAccount> {
     return taskRepository.findAssigneeByKey(keyId, languageId, userId, type)
-  }
-
-  fun findAssigneeByTranslation(
-    translationId: Long,
-    userId: Long,
-    type: TaskType,
-  ): List<UserAccount> {
-    return taskRepository.findAssigneeByTranslation(translationId, userId, type)
   }
 
   @Transactional
@@ -367,16 +345,16 @@ class TaskService(
     return taskRepository.getTaskKeys(projectEntity.id, taskId)
   }
 
-  fun getTranslationsWithTasks(
+  fun getKeysWithTasks(
     userId: Long,
-    translationIds: Collection<Long>,
+    keyIds: Collection<Long>,
   ): Map<Long, List<TranslationToTaskView>> {
-    val data = taskRepository.getByTranslationId(userId, translationIds)
+    val data = taskRepository.getByKeyId(userId, keyIds)
     val result = mutableMapOf<Long, MutableList<TranslationToTaskView>>()
     data.forEach {
-      val existing = result[it.translationId] ?: mutableListOf()
+      val existing = result[it.keyId] ?: mutableListOf()
       existing.add(it)
-      result.set(it.translationId, existing)
+      result.set(it.keyId, existing)
     }
     return result
   }
@@ -475,7 +453,7 @@ class TaskService(
         language = task.language,
         dueDate = task.dueDate,
         assignees = task.assignees,
-        translations = task.translations,
+        keys = task.keys,
         author = task.author!!,
         createdAt = task.createdAt,
         state = task.state,

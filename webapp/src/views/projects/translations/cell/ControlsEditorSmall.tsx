@@ -12,7 +12,7 @@ import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 import { useProject } from 'tg.hooks/useProject';
 
 type State = components['schemas']['TranslationViewModel']['state'];
-type TaskModel = components['schemas']['TranslationTaskViewModel'];
+type TaskModel = components['schemas']['KeyTaskViewModel'];
 
 const StyledContainer = styled(Box)`
   display: flex;

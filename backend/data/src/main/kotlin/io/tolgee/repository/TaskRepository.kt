@@ -66,11 +66,11 @@ const val TASK_FILTERS = """
         )
     )
     and (
-        :#{#filters.filterTranslation} is null
+        :#{#filters.filterKey} is null
         or exists (
             select 1
-            from tk.translations tt
-            where tt.translation.id in :#{#filters.filterTranslation}
+            from tk.keys tt
+            where element(tt).key.id in :#{#filters.filterKey}
         )
     )
 """
@@ -104,7 +104,56 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         left join tk.language l
      where l.deletedAt is null
         and $TASK_SEARCH
-        and $TASK_FILTERS
+        and (
+        :#{#filters.filterNotState} is null
+        or tk.state not in :#{#filters.filterNotState}
+    )
+    and (
+        :#{#filters.filterState} is null
+        or tk.state in :#{#filters.filterState}
+    )
+    and (
+        :#{#filters.filterType} is null
+        or tk.type in :#{#filters.filterType}
+    )
+    and (
+        :#{#filters.filterId} is null
+        or tk.id in :#{#filters.filterId}
+    )
+    and (
+        :#{#filters.filterNotId} is null
+        or tk.id not in :#{#filters.filterNotId}
+    )
+    and (
+        :#{#filters.filterProject} is null
+        or tk.project.id in :#{#filters.filterProject}
+    )
+    and (
+        :#{#filters.filterNotProject} is null
+        or tk.project.id not in :#{#filters.filterNotProject}
+    )
+    and (
+        :#{#filters.filterLanguage} is null
+        or tk.language.id in :#{#filters.filterLanguage}
+    )
+    and (
+        :#{#filters.filterAssignee} is null
+        or exists (
+            select 1
+            from tk.assignees u
+            where u.id in :#{#filters.filterAssignee}
+        )
+    )
+    and (
+        :#{#filters.filterKey} is null
+        or exists (
+            select 1
+            from TaskKey tt
+            where 
+                tt.key.id in :#{#filters.filterKey}
+                and tt.task.id = tk.id
+        )
+    )
     """,
   )
   fun getAllByAssignee(
@@ -117,13 +166,15 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
   @Query(
     """
      select 
-        tt.translation.id as translationId,
+        tt.key.id as keyId,
+        l.id as languageId,
+        l.tag as languageTag,
         t.id as taskId,
         tt.done as taskDone,
         CASE WHEN u.id IS NULL THEN FALSE ELSE TRUE END as taskAssigned,
         t.type as taskType
      from Task t
-        join t.translations tt on tt.translation.id in :translationIds
+        join t.keys tt on element(tt).key.id in :keyIds
         left join t.assignees u on u.id = :currentUserId
         left join t.language l
      where
@@ -132,9 +183,9 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
      order by t.type desc, t.id desc
     """,
   )
-  fun getByTranslationId(
+  fun getByKeyId(
     currentUserId: Long,
-    translationIds: Collection<Long>,
+    keyIds: Collection<Long>,
   ): List<TranslationToTaskView>
 
   @Query(
@@ -169,9 +220,9 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       select key.id
       from key
           left join (
-            select translation.key_id as key_id from translation
-                join task_translation on (translation.id = task_translation.translation_id)
-                join task on (task_translation.task_id = task.id and task_translation.task_project_id = :projectId)
+            select key.id as key_id from key
+                join task_key on (key.id = task_key.key_id)
+                join task on (task_key.task_id = task.id and task_key.task_project_id = :projectId)
                 left join language l on (task.language_id = l.id)
             where task.type = :taskType
                 and task.language_id = :languageId
@@ -208,8 +259,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     """
       select k.id
       from Key k
-          left join k.translations t
-          left join t.tasks tt
+          left join k.tasks tt
       where k.project.id = :projectId and tt.task.id = :taskId
     """,
   )
@@ -239,15 +289,14 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       select
           tk.id as taskId,
           tk.project.id as projectId,
-          count(t.id) as totalItems,
+          count(k.id) as totalItems,
           coalesce(sum(case when tt.done then 1 else 0 end), 0) as doneItems,
           coalesce(sum(bt.characterCount), 0) as baseCharacterCount,
           coalesce(sum(bt.wordCount), 0) as baseWordCount
       from Task tk
           left join tk.project p
-          left join tk.translations tt
-          left join tt.translation t
-          left join t.key k
+          left join tk.keys tt
+          left join tt.key k
           left join k.translations bt on (bt.language.id = p.baseLanguage.id)
       where tk in :tasks
       group by tk.id, tk.project.id
@@ -257,12 +306,11 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
 
   @Query(
     """
-      select u as user, count(t.id) as doneItems, coalesce(sum(btr.characterCount), 0) as baseCharacterCount, coalesce(sum(btr.wordCount), 0) as baseWordCount
+      select u as user, count(k.id) as doneItems, coalesce(sum(btr.characterCount), 0) as baseCharacterCount, coalesce(sum(btr.wordCount), 0) as baseWordCount
       from Task tk
-        left join tk.translations as tt
+        left join tk.keys as tt
         left join tt.author as u
-        left join tt.translation as t
-        left join t.key as k
+        left join tt.key as k
         left join k.translations as btr on btr.language.id = :baseLangId 
       where tk.project.id = :projectId
         and tk.id = :taskId
@@ -298,36 +346,17 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       select u
       from UserAccount u
         join u.tasks tk
-        join tk.translations tt
-        join tt.translation t
+        join tk.keys tt
       where tk.type = :type
         and tk.language.id = :languageId
         and tk.state = 'IN_PROGRESS'
         and u.id = :userId
-        and t.key.id = :keyId
+        and tt.key.id = :keyId
     """,
   )
   fun findAssigneeByKey(
     keyId: Long,
     languageId: Long,
-    userId: Long,
-    type: TaskType,
-  ): List<UserAccount>
-
-  @Query(
-    """
-      select u
-      from UserAccount u
-        join u.tasks tk
-        join tk.translations tt
-      where tk.type = :type
-        and tk.state = 'IN_PROGRESS'
-        and u.id = :userId
-        and tt.translation.id = :translationId
-    """,
-  )
-  fun findAssigneeByTranslation(
-    translationId: Long,
     userId: Long,
     type: TaskType,
   ): List<UserAccount>

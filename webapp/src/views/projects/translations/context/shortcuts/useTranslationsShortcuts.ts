@@ -57,6 +57,13 @@ export const useTranslationsShortcuts = () => {
     return allLanguages?.find((l) => l.tag === langTag)?.id;
   };
 
+  const getCurrentKey = () => {
+    const focused = getCurrentlyFocused(elementsRef.current);
+    if (focused?.language && focused.keyId) {
+      return fixedTranslations?.find((t) => t.keyId === focused.keyId);
+    }
+  };
+
   const getCurrentTranslation = () => {
     const focused = getCurrentlyFocused(elementsRef.current);
     if (focused?.language && focused.keyId) {
@@ -94,7 +101,10 @@ export const useTranslationsShortcuts = () => {
     const focused = getCurrentlyFocused(elementsRef.current);
     if (focused) {
       const translation = getCurrentTranslation();
-      const firstTask = translation?.tasks?.[0];
+      const keyData = getCurrentKey();
+      const firstTask = keyData?.tasks?.find(
+        (t) => t.languageTag === focused.language
+      );
       const canTranslate =
         satisfiesLanguageAccess(
           'translations.edit',
@@ -132,7 +142,10 @@ export const useTranslationsShortcuts = () => {
     const translation = fixedTranslations?.find(
       (t) => t.keyId === focused?.keyId
     )?.translations[focused?.language || ''];
-    const firstTask = translation?.tasks?.[0];
+    const keyData = getCurrentKey();
+    const firstTask = keyData?.tasks?.find(
+      (t) => t.languageTag === focused?.language
+    );
     const canTranslate =
       satisfiesLanguageAccess(
         'translations.state-edit',

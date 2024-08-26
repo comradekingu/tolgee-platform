@@ -11,7 +11,7 @@ import { StateTransitionButtons } from './StateTransitionButtons';
 import { CELL_HIGHLIGHT_ON_HOVER, CELL_SHOW_ON_HOVER } from './styles';
 
 type State = components['schemas']['TranslationViewModel']['state'];
-type TaskModel = components['schemas']['TranslationTaskViewModel'];
+type TaskModel = components['schemas']['KeyTaskViewModel'];
 
 const StyledControlsWrapper = styled(Box)`
   display: grid;

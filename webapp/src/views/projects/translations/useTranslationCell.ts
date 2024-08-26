@@ -129,12 +129,16 @@ export const useTranslationCell = ({
 
   const translation = langTag ? keyData?.translations[langTag] : undefined;
 
+  const firstTask = keyData.tasks?.find((t) => t.languageTag === language.tag);
+
   const setAssignedTaskState = (done: boolean) => {
-    setTaskState({
-      keyId: keyData.keyId,
-      taskId: translation!.tasks![0].id!,
-      done,
-    });
+    if (firstTask) {
+      setTaskState({
+        keyId: keyData.keyId,
+        taskId: firstTask.id,
+        done,
+      });
+    }
   };
 
   const setState = () => {
@@ -155,8 +159,6 @@ export const useTranslationCell = ({
   function setVariant(activeVariant: string | undefined) {
     updateEdit({ activeVariant });
   }
-
-  const firstTask = translation?.tasks?.[0];
 
   const canChangeState =
     (firstTask?.userAssigned && firstTask.type === 'REVIEW') ||

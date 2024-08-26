@@ -1150,14 +1150,6 @@ export interface components {
       /** @description The user's permission type. This field is null if uses granular permissions */
       type?: "NONE" | "VIEW" | "TRANSLATE" | "REVIEW" | "EDIT" | "MANAGE";
       /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
-      /**
        * @description List of languages user can translate to. If null, all languages editing is permitted.
        * @example 200001,200004
        */
@@ -1172,6 +1164,14 @@ export interface components {
        * @example 200001,200004
        */
       stateChangeLanguageIds?: number[];
+      /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
       /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
@@ -2061,12 +2061,12 @@ export interface components {
       createNewKeys: boolean;
     };
     ImportSettingsModel: {
+      /** @description If true, placeholders from other formats will be converted to ICU when possible */
+      convertPlaceholdersToIcu: boolean;
       /** @description If true, key descriptions will be overridden by the import */
       overrideKeyDescriptions: boolean;
       /** @description If false, only updates keys, skipping the creation of new keys */
       createNewKeys: boolean;
-      /** @description If true, placeholders from other formats will be converted to ICU when possible */
-      convertPlaceholdersToIcu: boolean;
     };
     TranslationCommentModel: {
       /**
@@ -2223,17 +2223,17 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
+      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2369,18 +2369,18 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
+      description: string;
       /** Format: int64 */
       id: number;
-      projectName: string;
-      userFullName?: string;
+      username?: string;
+      /** Format: int64 */
+      expiresAt?: number;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
       projectId: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      username?: string;
-      description: string;
+      projectName: string;
+      userFullName?: string;
       scopes: string[];
     };
     SuperTokenRequest: {
@@ -2466,11 +2466,11 @@ export interface components {
     };
     KeysScopeView: {
       /** Format: int64 */
+      keyCount: number;
+      /** Format: int64 */
       wordCount: number;
       /** Format: int64 */
       characterCount: number;
-      /** Format: int64 */
-      keyCount: number;
     };
     GetKeysRequestDto: {
       keys: components["schemas"]["KeyDefinitionDto"][];
@@ -3525,22 +3525,22 @@ export interface components {
         | "SLACK_INTEGRATION"
       )[];
       quickStart?: components["schemas"]["QuickStartModel"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
       id: number;
-      basePermissions: components["schemas"]["PermissionModel"];
       /**
        * @description The role of currently authorized user.
        *
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
+      basePermissions: components["schemas"]["PermissionModel"];
+      avatar?: components["schemas"]["Avatar"];
       /** @example btforg */
       slug: string;
-      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3601,9 +3601,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
+      description?: string;
       name: string;
       displayName?: string;
-      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3698,23 +3698,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      baseTranslation?: string;
-      translation?: string;
       namespace?: string;
-      description?: string;
+      translation?: string;
+      baseTranslation?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
-      baseTranslation?: string;
-      translation?: string;
       namespace?: string;
-      description?: string;
+      translation?: string;
+      baseTranslation?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -4009,6 +4009,17 @@ export interface components {
     SelectAllResponse: {
       ids: number[];
     };
+    /** @description Tasks related to this key */
+    KeyTaskViewModel: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int64 */
+      languageId: number;
+      languageTag: string;
+      done: boolean;
+      userAssigned: boolean;
+      type: "TRANSLATE" | "REVIEW";
+    };
     KeyWithTranslationsModel: {
       /**
        * Format: int64
@@ -4073,6 +4084,8 @@ export interface components {
       translations: {
         [key: string]: components["schemas"]["TranslationViewModel"];
       };
+      /** @description Tasks related to this key */
+      tasks?: components["schemas"]["KeyTaskViewModel"][];
     };
     KeysWithTranslationsPageModel: {
       _embedded?: {
@@ -4086,14 +4099,6 @@ export interface components {
        * @example eyJrZXlJZCI6eyJkaXJlY3Rpb24iOiJBU0MiLCJ2YWx1ZSI6IjEwMDAwMDAxMjAifX0=
        */
       nextCursor?: string;
-    };
-    /** @description Tasks related to this translation */
-    TranslationTaskViewModel: {
-      /** Format: int64 */
-      id: number;
-      done: boolean;
-      userAssigned: boolean;
-      type: "TRANSLATE" | "REVIEW";
     };
     /**
      * @description Translations object
@@ -4133,8 +4138,6 @@ export interface components {
        * @description Count of unresolved translation comments
        */
       unresolvedCommentCount: number;
-      /** @description Tasks related to this translation */
-      tasks?: components["schemas"]["TranslationTaskViewModel"][];
       /** @description Was translation memory used to translate this? */
       fromTranslationMemory: boolean;
     };
@@ -4268,17 +4271,17 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
+      description: string;
       /** Format: int64 */
       id: number;
       /** Format: int64 */
-      lastUsedAt?: number;
-      /** Format: int64 */
       expiresAt?: number;
+      /** Format: int64 */
+      lastUsedAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4395,18 +4398,18 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
+      description: string;
       /** Format: int64 */
       id: number;
-      projectName: string;
-      userFullName?: string;
+      username?: string;
+      /** Format: int64 */
+      expiresAt?: number;
       /** Format: int64 */
       lastUsedAt?: number;
       /** Format: int64 */
       projectId: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      username?: string;
-      description: string;
+      projectName: string;
+      userFullName?: string;
       scopes: string[];
     };
     PagedModelUserAccountModel: {
@@ -10660,8 +10663,8 @@ export interface operations {
         filterNotProject?: number[];
         /** Filter tasks by language */
         filterLanguage?: number[];
-        /** Filter tasks by translation */
-        filterTranslation?: number[];
+        /** Filter tasks by key */
+        filterKey?: number[];
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */
@@ -13658,8 +13661,8 @@ export interface operations {
         filterNotProject?: number[];
         /** Filter tasks by language */
         filterLanguage?: number[];
-        /** Filter tasks by translation */
-        filterTranslation?: number[];
+        /** Filter tasks by key */
+        filterKey?: number[];
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */

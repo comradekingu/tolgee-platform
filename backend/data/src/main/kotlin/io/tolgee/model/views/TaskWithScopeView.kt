@@ -5,7 +5,7 @@ import io.tolgee.model.Project
 import io.tolgee.model.UserAccount
 import io.tolgee.model.enums.TaskState
 import io.tolgee.model.enums.TaskType
-import io.tolgee.model.task.TaskTranslation
+import io.tolgee.model.task.TaskKey
 import java.util.*
 
 data class TaskWithScopeView(
@@ -17,7 +17,7 @@ data class TaskWithScopeView(
   val language: Language,
   val dueDate: Date?,
   val assignees: MutableSet<UserAccount>,
-  val translations: MutableSet<TaskTranslation>,
+  val keys: MutableSet<TaskKey>,
   val author: UserAccount,
   val createdAt: Date,
   val state: TaskState,

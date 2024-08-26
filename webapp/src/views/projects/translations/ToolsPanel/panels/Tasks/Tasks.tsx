@@ -2,11 +2,7 @@ import React, { useEffect } from 'react';
 import { styled } from '@mui/material';
 import { LoadingSkeletonFadingIn } from 'tg.component/LoadingSkeleton';
 
-import {
-  PanelContentData,
-  PanelContentProps,
-  TranslationViewModel,
-} from '../../common/types';
+import { PanelContentData, PanelContentProps } from '../../common/types';
 import { TabMessage } from '../../common/TabMessage';
 import { useApiQuery } from 'tg.service/http/useQueryApi';
 import { TaskLabel } from 'tg.component/task/TaskLabel';
@@ -25,13 +21,14 @@ export const Tasks: React.FC<PanelContentProps> = ({
   project,
 }) => {
   const translation = keyData.translations[language.tag];
-  const firstTask = translation.tasks?.[0];
+  const firstTask = keyData.tasks?.find((t) => t.languageId === language.id);
   const tasksLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/tasks',
     method: 'get',
     path: { projectId: project.id },
     query: {
-      filterTranslation: [translation.id],
+      filterKey: [keyData.keyId],
+      filterLanguage: [language.id],
       filterState: ['IN_PROGRESS'],
       sort: ['type,desc', 'id,desc'],
     },
@@ -64,8 +61,7 @@ export const Tasks: React.FC<PanelContentProps> = ({
 };
 
 export const tasksCount = ({ keyData, language }: PanelContentData) => {
-  const translation = keyData.translations[language.tag] as
-    | TranslationViewModel
-    | undefined;
-  return translation?.tasks?.length ?? 0;
+  return (
+    keyData.tasks?.filter((t) => t.languageId === language.id)?.length ?? 0
+  );
 };

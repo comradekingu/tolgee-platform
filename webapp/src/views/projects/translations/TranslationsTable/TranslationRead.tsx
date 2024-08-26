@@ -111,7 +111,7 @@ export const TranslationRead: React.FC<Props> = ({
         active={active}
         lastFocusable={lastFocusable}
         className="controls"
-        tasks={translation?.tasks}
+        tasks={keyData.tasks?.filter((t) => t.languageTag === language.tag)}
         onTaskStateChange={setAssignedTaskState}
       />
     </StyledContainer>

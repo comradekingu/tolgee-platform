@@ -378,8 +378,7 @@ export const useEditService = ({
       const key = translations.fixedTranslations?.find(
         (k) => k.keyId === keyId
       );
-      const translation = key?.translations[language];
-      const task = translation?.tasks?.[0];
+      const task = key?.tasks?.find((t) => t.languageTag === language);
 
       if (
         task &&

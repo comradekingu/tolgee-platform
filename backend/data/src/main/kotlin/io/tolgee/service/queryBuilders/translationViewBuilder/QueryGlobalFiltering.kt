@@ -9,11 +9,10 @@ import io.tolgee.model.activity.ActivityRevision_
 import io.tolgee.model.key.KeyMeta_
 import io.tolgee.model.key.Key_
 import io.tolgee.model.key.Tag_
-import io.tolgee.model.task.TaskTranslation_
+import io.tolgee.model.task.TaskKey_
 import io.tolgee.model.task.Task_
 import io.tolgee.model.temp.UnsuccessfulJobKey
 import io.tolgee.model.temp.UnsuccessfulJobKey_
-import io.tolgee.model.translation.Translation_
 import jakarta.persistence.EntityManager
 import jakarta.persistence.criteria.CriteriaBuilder
 import jakarta.persistence.criteria.JoinType
@@ -148,9 +147,8 @@ class QueryGlobalFiltering(
     if (params.filterTaskId != null) {
       val translationTaskJoin =
         queryBase.root
-          .join(Key_.translations, JoinType.LEFT)
-          .join(Translation_.tasks, JoinType.LEFT)
-          .join(TaskTranslation_.task, JoinType.LEFT)
+          .join(Key_.tasks, JoinType.LEFT)
+          .join(TaskKey_.task, JoinType.LEFT)
 
       queryBase.whereConditions.add(translationTaskJoin.get(Task_.id).`in`(params.filterTaskId))
     }

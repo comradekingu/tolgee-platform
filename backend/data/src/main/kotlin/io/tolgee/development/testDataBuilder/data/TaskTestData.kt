@@ -17,8 +17,6 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
   var reviewTask: TaskBuilder
   var relatedProject: ProjectBuilder
   var keysInTask: MutableSet<KeyBuilder> = mutableSetOf()
-  var translationsInTranslateTask: MutableSet<TranslationBuilder> = mutableSetOf()
-  var translationsInReviewTask: MutableSet<TranslationBuilder> = mutableSetOf()
   var keysOutOfTask: MutableSet<KeyBuilder> = mutableSetOf()
   lateinit var czechLanguage: Language
 
@@ -98,19 +96,6 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
         viewLanguages = mutableSetOf(englishLanguage)
       }
 
-      (0 until 2).forEach {
-        keysInTask.add(
-          addKey(null, "key $it").apply {
-            translationsInTranslateTask.add(
-              addTranslation("en", "Translation $it"),
-            )
-            translationsInReviewTask.add(
-              addTranslation("cs", "Překlad $it"),
-            )
-          },
-        )
-      }
-
       (2 until 4).forEach {
         keysOutOfTask.add(
           addKey(null, "key $it").apply {
@@ -134,10 +119,10 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
           author = projectUser.self
         }
 
-      translationsInTranslateTask.forEach { it ->
+      keysInTask.forEach { it ->
         addTaskKey {
           task = translateTask.self
-          translation = it.self
+          key = it.self
         }
       }
 
@@ -156,10 +141,10 @@ class TaskTestData : BaseTestData("tagsTestUser", "tagsTestProject") {
           author = projectUser.self
         }
 
-      translationsInReviewTask.forEach { it ->
+      keysInTask.forEach { it ->
         addTaskKey {
           task = reviewTask.self
-          translation = it.self
+          key = it.self
         }
       }
     }

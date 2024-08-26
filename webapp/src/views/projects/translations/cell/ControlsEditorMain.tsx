@@ -9,7 +9,7 @@ import { components } from 'tg.service/apiSchema.generated';
 import { useTranslationsSelector } from '../context/TranslationsContext';
 import { SaveProps } from '../useTranslationCell';
 
-type TaskModel = components['schemas']['TranslationTaskViewModel'];
+type TaskModel = components['schemas']['KeyTaskViewModel'];
 
 const StyledContainer = styled('div')`
   display: flex;

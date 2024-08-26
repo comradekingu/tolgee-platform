@@ -1,19 +1,21 @@
 package io.tolgee.hateoas.translations
 
 import io.tolgee.api.v2.controllers.translation.TranslationsController
-import io.tolgee.model.views.TranslationTaskView
+import io.tolgee.model.views.KeyTaskView
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport
 import org.springframework.stereotype.Component
 
 @Component
-class TranslationTaskViewModelAssembler :
-  RepresentationModelAssemblerSupport<TranslationTaskView, TranslationTaskViewModel>(
+class KeyTaskViewModelAssembler :
+  RepresentationModelAssemblerSupport<KeyTaskView, KeyTaskViewModel>(
     TranslationsController::class.java,
-    TranslationTaskViewModel::class.java,
+    KeyTaskViewModel::class.java,
   ) {
-  override fun toModel(view: TranslationTaskView): TranslationTaskViewModel {
-    return TranslationTaskViewModel(
+  override fun toModel(view: KeyTaskView): KeyTaskViewModel {
+    return KeyTaskViewModel(
       id = view.id,
+      languageId = view.languageId,
+      languageTag = view.languageTag,
       done = view.done,
       userAssigned = view.userAssigned,
       type = view.type,

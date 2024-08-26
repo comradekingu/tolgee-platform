@@ -43,21 +43,16 @@ export const useTaskService = ({ translations }: Props) => {
           const key = translations.fixedTranslations?.find(
             (t) => t.keyId === data.keyId
           );
-          const translation = Object.entries(key?.translations ?? {}).find(
-            ([_, t]) => t.tasks?.find((tk) => tk.id === data.taskId)
-          );
-          if (translation) {
-            translations.updateTranslation({
+          translations.updateTranslationKeys([
+            {
               keyId: data.keyId,
-              lang: translation[0],
-              data: {
-                tasks: translation[1].tasks?.map((t) => ({
-                  ...t,
-                  done: data.done,
-                })),
+              value: {
+                tasks: key?.tasks?.map((t) =>
+                  t.id === data.taskId ? { ...t, done: response.done } : t
+                ),
               },
-            });
-          }
+            },
+          ]);
           if (response.taskFinished) {
             confirmation({
               title: <T keyName="task_finished_confirmation_title" />,

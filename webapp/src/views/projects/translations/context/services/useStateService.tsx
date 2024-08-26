@@ -31,8 +31,7 @@ export const useStateService = ({ translations, taskService }: Props) => {
           const key = translations.fixedTranslations?.find(
             (k) => k.keyId === data.keyId
           );
-          const translation = key?.translations[data.language];
-          const task = translation?.tasks?.[0];
+          const task = key?.tasks?.find((t) => t.languageTag === data.language);
           if (
             data.state === 'REVIEWED' &&
             task?.userAssigned &&

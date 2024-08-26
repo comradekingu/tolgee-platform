@@ -3,9 +3,11 @@ package io.tolgee.hateoas.translations
 import io.tolgee.model.enums.TaskType
 import org.springframework.hateoas.RepresentationModel
 
-open class TranslationTaskViewModel(
+open class KeyTaskViewModel(
   val id: Long,
+  val languageId: Long,
+  val languageTag: String,
   val done: Boolean,
   val userAssigned: Boolean,
   val type: TaskType,
-) : RepresentationModel<TranslationTaskViewModel>()
+) : RepresentationModel<KeyTaskViewModel>()

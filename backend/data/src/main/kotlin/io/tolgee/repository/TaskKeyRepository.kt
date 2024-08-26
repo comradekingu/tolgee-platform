@@ -1,12 +1,12 @@
 package io.tolgee.repository
 
 import io.tolgee.model.task.Task
-import io.tolgee.model.task.TaskTranslation
-import io.tolgee.model.task.TaskTranslationId
+import io.tolgee.model.task.TaskKey
+import io.tolgee.model.task.TaskKeyId
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface TaskTranslationRepository : JpaRepository<TaskTranslation, TaskTranslationId> {
+interface TaskKeyRepository : JpaRepository<TaskKey, TaskKeyId> {
   fun deleteByTask(task: Task)
 }

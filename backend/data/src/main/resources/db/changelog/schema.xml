@@ -3516,4 +3516,42 @@
     <changeSet author="stepangranat (generated)" id="1724249935659-12">
         <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="task_translation" constraintName="FKn169bxkcft6xn3f9ddcq88jh3" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user_account" validate="true"/>
     </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-5">
+        <dropForeignKeyConstraint baseTableName="task_translation" constraintName="FKh2c8a1pgbpoqnydm34e9amn23"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-6">
+        <dropForeignKeyConstraint baseTableName="task_translation" constraintName="FKkkfwk1a05408n8kn0pdf8erbp"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-7">
+        <dropForeignKeyConstraint baseTableName="task_translation" constraintName="FKn169bxkcft6xn3f9ddcq88jh3"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-1">
+        <createTable tableName="task_key">
+            <column name="done" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="key_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="task_keyPK"/>
+            </column>
+            <column name="task_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="task_keyPK"/>
+            </column>
+            <column name="task_project_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="task_keyPK"/>
+            </column>
+            <column name="author_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-2">
+        <addForeignKeyConstraint baseColumnNames="author_id" baseTableName="task_key" constraintName="FKeastey70m3vpk2vbh23kt01xl" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="user_account" validate="true"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-3">
+        <addForeignKeyConstraint baseColumnNames="task_id,task_project_id" baseTableName="task_key" constraintName="FKg08gos5m1kq4qjtyd79sjmv52" deferrable="false" initiallyDeferred="false" referencedColumnNames="id,project_id" referencedTableName="task" validate="true"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-4">
+        <addForeignKeyConstraint baseColumnNames="key_id" baseTableName="task_key" constraintName="FKm50a9numg7m79ind8mraymtg9" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="key" validate="true"/>
+    </changeSet>
+    <changeSet author="stepangranat (generated)" id="1724661640702-8">
+        <dropTable tableName="task_translation"/>
+    </changeSet>
 </databaseChangeLog>

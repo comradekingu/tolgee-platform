@@ -12,5 +12,4 @@ data class TranslationView(
   val commentCount: Long,
   val unresolvedCommentCount: Long,
   val outdated: Boolean,
-  var tasks: List<TranslationTaskView>? = null,
 )

@@ -39,7 +39,7 @@ class Task {
   var assignees: MutableSet<UserAccount> = mutableSetOf()
 
   @OneToMany(mappedBy = "task", fetch = FetchType.LAZY)
-  var translations: MutableSet<TaskTranslation> = mutableSetOf()
+  var keys: MutableSet<TaskKey> = mutableSetOf()
 
   @ManyToOne(fetch = FetchType.LAZY, optional = true)
   var author: UserAccount? = null

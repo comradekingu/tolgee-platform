@@ -31,8 +31,8 @@ import io.tolgee.hateoas.translations.TranslationModelAssembler
 import io.tolgee.model.enums.AssignableTranslationState
 import io.tolgee.model.enums.Scope
 import io.tolgee.model.translation.Translation
+import io.tolgee.model.views.KeyTaskView
 import io.tolgee.model.views.KeyWithTranslationsView
-import io.tolgee.model.views.TranslationTaskView
 import io.tolgee.openApiDocs.OpenApiOrderExtension
 import io.tolgee.security.ProjectHolder
 import io.tolgee.security.authentication.AllowApiAccess
@@ -276,27 +276,22 @@ When null, resulting file will be a flat key-value object.
 
   private fun addTasksToResponse(data: Page<KeyWithTranslationsView>) {
     val user = authenticationFacade.authenticatedUser
-    val translationIds =
-      data.content.flatMap { key ->
-        key.translations.map { translation ->
-          translation.value.id
-        }
-      }
+    val keyIds = data.content.map { key -> key.keyId }
 
-    val translationsWithTasks = taskService.getTranslationsWithTasks(user.id, translationIds)
+    val translationsWithTasks = taskService.getKeysWithTasks(user.id, keyIds)
 
     data.content.forEach { key ->
-      key.translations.forEach { translation ->
-        translation.value.tasks =
-          translationsWithTasks[translation.value.id]?.map {
-            TranslationTaskView(
-              it.taskId,
-              it.taskDone,
-              it.taskAssigned,
-              it.taskType,
-            )
-          }
-      }
+      key.tasks =
+        translationsWithTasks[key.keyId]?.map {
+          KeyTaskView(
+            it.taskId,
+            it.languageId,
+            it.languageTag,
+            it.taskDone,
+            it.taskAssigned,
+            it.taskType,
+          )
+        }
     }
   }
 
