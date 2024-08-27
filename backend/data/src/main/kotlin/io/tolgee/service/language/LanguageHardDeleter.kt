@@ -1,8 +1,10 @@
 package io.tolgee.service.language
 
 import io.tolgee.model.Language
+import io.tolgee.model.task.Task
 import io.tolgee.model.translation.Translation
 import io.tolgee.repository.LanguageRepository
+import io.tolgee.repository.TaskRepository
 import io.tolgee.repository.TranslationRepository
 import jakarta.persistence.EntityManager
 import org.springframework.context.ApplicationContext
@@ -22,7 +24,9 @@ class LanguageHardDeleter(
   fun delete() {
     val languageWithData = getWithFetchedTranslations(language)
     val allTranslations = getAllTranslations(languageWithData)
+    val tasks = getAllTasks(languageWithData)
     translationRepository.deleteAll(allTranslations)
+    taskRepository.deleteAll(tasks)
     languageRepository.delete(languageWithData)
     entityManager.flush()
   }
@@ -42,20 +46,22 @@ class LanguageHardDeleter(
           .setParameter("ids", it.map { it.id })
           .resultList
 
-      val withTasks =
-        entityManager.createQuery(
-          """
-          from Translation t
-             left join fetch t.tasks tt
-             left join fetch tt.task
-           where t in :translations""",
-          Translation::class.java,
-        )
-          .setParameter("translations", withComments)
-          .resultList
-
-      withTasks
+      withComments
     }.toMutableList()
+
+
+  fun getAllTasks(languageWithData: Language)  =
+    entityManager.createQuery(
+      """from Task tk
+            join fetch tk.keys
+            where tk.language = :languageWithData""",
+      Task::class.java,
+    )
+      .setParameter("languageWithData",languageWithData)
+      .resultList
+      .toMutableList()
+
+
 
   private fun getWithFetchedTranslations(language: Language): Language {
     return entityManager.createQuery(
@@ -79,5 +85,9 @@ class LanguageHardDeleter(
 
   private val translationRepository by lazy {
     applicationContext.getBean(TranslationRepository::class.java)
+  }
+
+  private val taskRepository by lazy {
+    applicationContext.getBean(TaskRepository::class.java)
   }
 }
