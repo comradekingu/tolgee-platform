@@ -56,7 +56,7 @@ export const ControlsEditorMain: React.FC<ControlsProps> = ({
       >
         <T keyName="translations_cell_cancel" />
       </Button>
-      {task && !task.done && task.type === 'TRANSLATE' ? (
+      {task && task.userAssigned && !task.done && task.type === 'TRANSLATE' ? (
         <>
           <ButtonGroup size="small" ref={anchorEl as any}>
             <LoadingButton

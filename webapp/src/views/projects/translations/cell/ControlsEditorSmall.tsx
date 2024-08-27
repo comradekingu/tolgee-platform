@@ -65,7 +65,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
 
   const task = tasks?.[0];
 
-  const displayTaskButton = Boolean(task);
+  const displayTaskButton = Boolean(task?.userAssigned);
 
   const displayEditorMode = project.icuPlaceholders;
 
@@ -112,13 +112,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
             style={{ gridArea: 'task' }}
             data-cy="translations-cell-task-button"
             onClick={() => onTaskStateChange(!task?.done)}
-            color={
-              task?.userAssigned
-                ? task?.done
-                  ? 'secondary'
-                  : 'primary'
-                : undefined
-            }
+            color={task?.done ? 'secondary' : 'primary'}
           >
             <Task fontSize="small" />
           </ControlsButton>

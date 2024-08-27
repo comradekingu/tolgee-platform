@@ -104,14 +104,14 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
   if (displayComments) {
     spots.push('comments');
   }
-  if (task) {
+  if (task?.userAssigned) {
     spots.push('task');
   }
 
   const inDomTransitionButtons = displayTransitionButtons && active;
   const inDomEdit = displayEdit && active;
   const inDomComments = displayComments || active || lastFocusable;
-  const inDomTask = Boolean(task);
+  const inDomTask = Boolean(task?.userAssigned);
 
   const gridTemplateAreas = `'${spots.join(' ')}'`;
   const gridTemplateColumns = spots

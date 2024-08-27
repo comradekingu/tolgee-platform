@@ -1,5 +1,5 @@
 import { styled } from '@mui/material';
-import { Clear, FlagCircle } from '@mui/icons-material';
+import { Clear, FlagCircle, Task } from '@mui/icons-material';
 import { useTranslate } from '@tolgee/react';
 
 import { components } from 'tg.service/apiSchema.generated';
@@ -60,6 +60,7 @@ export const TranslationFlags: React.FC<Props> = ({
   const project = useProject();
   const { t } = useTranslate();
   const translation = keyData.translations[lang];
+  const task = keyData.tasks?.find((t) => t.languageTag === lang);
 
   const { updateTranslation } = useTranslationsActions();
 
@@ -111,7 +112,11 @@ export const TranslationFlags: React.FC<Props> = ({
       });
   };
 
-  if (translation?.auto || translation?.outdated) {
+  if (
+    translation?.auto ||
+    translation?.outdated ||
+    task?.userAssigned === false
+  ) {
     return (
       <StyledWrapper className={className}>
         {translation.auto && (
@@ -136,6 +141,13 @@ export const TranslationFlags: React.FC<Props> = ({
               onClick={handleClearOutdated}
               data-cy="translations-outdated-clear-button"
               className="clearButton"
+            />
+          </StyledContainer>
+        )}
+        {task?.userAssigned === false && (
+          <StyledContainer data-cy="translations-outdated-indicator">
+            <TranslationFlagIcon
+              icon={<Task color={task?.done ? 'secondary' : 'primary'} />}
             />
           </StyledContainer>
         )}
