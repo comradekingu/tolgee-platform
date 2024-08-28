@@ -39,6 +39,13 @@ export const ControlsEditorMain: React.FC<ControlsProps> = ({
   const anchorEl = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const task = tasks?.[0];
+  const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
+  const displayTaskControls =
+    task &&
+    task.id === prefilteredTask &&
+    task.userAssigned &&
+    !task.done &&
+    task.type === 'TRANSLATE';
 
   const withClose = (callback?: () => void) => () => {
     setOpen(false);
@@ -56,7 +63,7 @@ export const ControlsEditorMain: React.FC<ControlsProps> = ({
       >
         <T keyName="translations_cell_cancel" />
       </Button>
-      {task && task.userAssigned && !task.done && task.type === 'TRANSLATE' ? (
+      {displayTaskControls ? (
         <>
           <ButtonGroup size="small" ref={anchorEl as any}>
             <LoadingButton

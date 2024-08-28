@@ -121,145 +121,155 @@ export const TaskDetail = ({
       <StyledMainTitle>
         <T keyName="task_detail_title" />
       </StyledMainTitle>
-
-      <StyledSubtitle>
-        <TaskLabel task={data} />
-      </StyledSubtitle>
-      <Formik
-        initialValues={{
-          name: data.name,
-          description: data.description,
-          dueDate: data.dueDate,
-          assignees: data.assignees,
-        }}
-        enableReinitialize
-        validationSchema={Validation.UPDATE_TASK_FORM(t)}
-        onSubmit={(values, actions) => {
-          updateLoadable.mutate(
-            {
-              path: { projectId: project.id, taskId: task.id },
-              content: {
-                'application/json': {
-                  name: values.name,
-                  description: values.description,
-                  dueDate: values.dueDate,
-                  assignees: values.assignees.map((u) => u.id),
+      {!data ? null : (
+        <>
+          <StyledSubtitle>
+            <TaskLabel task={data} />
+          </StyledSubtitle>
+          <Formik
+            initialValues={{
+              name: data.name,
+              description: data.description,
+              dueDate: data.dueDate,
+              assignees: data.assignees,
+            }}
+            enableReinitialize
+            validationSchema={Validation.UPDATE_TASK_FORM(t)}
+            onSubmit={(values, actions) => {
+              updateLoadable.mutate(
+                {
+                  path: { projectId: project.id, taskId: task.id },
+                  content: {
+                    'application/json': {
+                      name: values.name,
+                      description: values.description,
+                      dueDate: values.dueDate,
+                      assignees: values.assignees.map((u) => u.id),
+                    },
+                  },
                 },
-              },
-            },
-            {
-              onSuccess() {
-                messageService.success(
-                  <T keyName="update_task_success_message" />
-                );
-                onClose();
-              },
-              onSettled() {
-                actions.setSubmitting(false);
-              },
-            }
-          );
-        }}
-      >
-        {({ values, handleSubmit, setFieldValue, isSubmitting, dirty }) => (
-          <StyledForm onSubmit={handleSubmit}>
-            <StyledTopPart>
-              <TextField
-                name="name"
-                label={t('task_detail_field_name')}
-                fullWidth
-                disabled={!canEditTask}
-              />
-              <AssigneeSearchSelect
-                label={t('task_detail_field_assignees')}
-                value={values.assignees}
-                onChange={(value) => setFieldValue('assignees', value)}
-                project={project}
-                disabled={!canEditTask}
-                filters={{
-                  filterMinimalScope: 'TRANSLATIONS_VIEW',
-                  filterViewLanguageId: task.language.id,
-                }}
-              />
-              <TaskDatePicker
-                value={values.dueDate ?? null}
-                onChange={(value) => setFieldValue('dueDate', value)}
-                label={t('task_detail_field_due_date')}
-                disabled={!canEditTask}
-              />
-            </StyledTopPart>
-            <TextField
-              label={t('task_detail_field_description')}
-              name="description"
-              multiline
-              minRows={3}
-              disabled={!canEditTask}
-            />
+                {
+                  onSuccess() {
+                    messageService.success(
+                      <T keyName="update_task_success_message" />
+                    );
+                    onClose();
+                  },
+                  onSettled() {
+                    actions.setSubmitting(false);
+                  },
+                }
+              );
+            }}
+          >
+            {({ values, handleSubmit, setFieldValue, isSubmitting, dirty }) => (
+              <StyledForm onSubmit={handleSubmit}>
+                <StyledTopPart>
+                  <TextField
+                    name="name"
+                    label={t('task_detail_field_name')}
+                    fullWidth
+                    disabled={!canEditTask}
+                  />
+                  <AssigneeSearchSelect
+                    label={t('task_detail_field_assignees')}
+                    value={values.assignees}
+                    onChange={(value) => setFieldValue('assignees', value)}
+                    project={project}
+                    disabled={!canEditTask}
+                    filters={{
+                      filterMinimalScope: 'TRANSLATIONS_VIEW',
+                      filterViewLanguageId: data.language.id,
+                    }}
+                  />
+                  <TaskDatePicker
+                    value={values.dueDate ?? null}
+                    onChange={(value) => setFieldValue('dueDate', value)}
+                    label={t('task_detail_field_due_date')}
+                    disabled={!canEditTask}
+                  />
+                </StyledTopPart>
+                <TextField
+                  label={t('task_detail_field_description')}
+                  name="description"
+                  multiline
+                  minRows={3}
+                  disabled={!canEditTask}
+                />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-                {t('task_detail_scope_title')}
-              </Typography>
-              <Box display="flex" alignItems="center">
-                <Tooltip
-                  title={t('task_detail_link_translations_tooltip')}
-                  disableInteractive
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
+                    {t('task_detail_scope_title')}
+                  </Typography>
+                  <Box display="flex" alignItems="center">
+                    <Tooltip
+                      title={t('task_detail_link_translations_tooltip')}
+                      disableInteractive
+                    >
+                      <IconButton
+                        component={Link}
+                        to={getLinkToTask(project, data)}
+                        target="_blank"
+                      >
+                        <TranslationIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip
+                      title={t('task_detail_summarize_tooltip')}
+                      disableInteractive
+                    >
+                      <IconButton onClick={() => downloadReport(project, data)}>
+                        <InsertDriveFile fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </Box>
+
+                <TaskScope
+                  task={data}
+                  perUserData={perUserReportLoadable.data}
+                />
+
+                <Box
+                  display="grid"
+                  gridTemplateColumns="repeat(4, 1fr)"
+                  pt="20px"
                 >
-                  <IconButton
-                    component={Link}
-                    to={getLinkToTask(project, task)}
-                    target="_blank"
+                  <TaskInfoItem
+                    label={t('task_detail_author_label')}
+                    value={data.author && <UserAccount user={data.author} />}
+                  />
+                  <TaskInfoItem
+                    label={t('task_detail_created_at_label')}
+                    value={formatDate(data.createdAt)}
+                  />
+                  <TaskInfoItem
+                    label={t('task_detail_closed_at_label')}
+                    value={data.closedAt ? formatDate(data.closedAt) : null}
+                  />
+                  <TaskInfoItem
+                    label={t('task_detail_project_label')}
+                    value={project.name}
+                  />
+                </Box>
+
+                <StyledActions>
+                  <Button onClick={onClose}>{t('global_cancel_button')}</Button>
+                  <LoadingButton
+                    color="primary"
+                    variant="contained"
+                    type="submit"
+                    loading={isSubmitting}
+                    disabled={!dirty}
                   >
-                    <TranslationIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip
-                  title={t('task_detail_summarize_tooltip')}
-                  disableInteractive
-                >
-                  <IconButton onClick={() => downloadReport(project, task)}>
-                    <InsertDriveFile fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </Box>
-
-            <TaskScope task={task} perUserData={perUserReportLoadable.data} />
-
-            <Box display="grid" gridTemplateColumns="repeat(4, 1fr)" pt="20px">
-              <TaskInfoItem
-                label={t('task_detail_author_label')}
-                value={task.author && <UserAccount user={task.author} />}
-              />
-              <TaskInfoItem
-                label={t('task_detail_created_at_label')}
-                value={formatDate(task.createdAt)}
-              />
-              <TaskInfoItem
-                label={t('task_detail_closed_at_label')}
-                value={task.closedAt ? formatDate(task.closedAt) : null}
-              />
-              <TaskInfoItem
-                label={t('task_detail_project_label')}
-                value={project.name}
-              />
-            </Box>
-
-            <StyledActions>
-              <Button onClick={onClose}>{t('global_cancel_button')}</Button>
-              <LoadingButton
-                color="primary"
-                variant="contained"
-                type="submit"
-                loading={isSubmitting}
-                disabled={!dirty}
-              >
-                {t('task_detail_submit_button')}
-              </LoadingButton>
-            </StyledActions>
-          </StyledForm>
-        )}
-      </Formik>
+                    {t('task_detail_submit_button')}
+                  </LoadingButton>
+                </StyledActions>
+              </StyledForm>
+            )}
+          </Formik>
+        </>
+      )}
     </>
   );
 };

@@ -65,7 +65,9 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
 
   const task = tasks?.[0];
 
-  const displayTaskButton = Boolean(task?.userAssigned);
+  const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
+  const displayTaskButton =
+    task && task.id === prefilteredTask && task.userAssigned && !task.done;
 
   const displayEditorMode = project.icuPlaceholders;
 

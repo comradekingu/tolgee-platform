@@ -1,16 +1,27 @@
-import { styled } from '@mui/material';
+import { Button, Dialog, styled } from '@mui/material';
 import { Clear, FlagCircle, Task } from '@mui/icons-material';
-import { useTranslate } from '@tolgee/react';
+import { T, useTranslate } from '@tolgee/react';
 
 import { components } from 'tg.service/apiSchema.generated';
 import { useApiMutation } from 'tg.service/http/useQueryApi';
 import { useProject } from 'tg.hooks/useProject';
 import { AutoTranslationIcon } from 'tg.component/AutoTranslationIcon';
 import { TranslationFlagIcon } from 'tg.component/TranslationFlagIcon';
-import { useTranslationsActions } from '../context/TranslationsContext';
+import {
+  useTranslationsActions,
+  useTranslationsSelector,
+} from '../context/TranslationsContext';
+import { TaskTooltipContent } from 'tg.component/task/TaskTooltipContent';
+import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
+import { useState } from 'react';
+import { TaskDetail } from 'tg.component/task/TaskDetail';
+import { Link } from 'react-router-dom';
+import { getLinkToTask } from 'tg.component/task/utils';
+import { stopAndPrevent } from 'tg.fixtures/eventHandler';
 
 type KeyWithTranslationsModel =
   components['schemas']['KeyWithTranslationsModel'];
+type TaskModel = components['schemas']['TaskModel'];
 
 const StyledWrapper = styled('div')`
   display: flex;
@@ -61,8 +72,14 @@ export const TranslationFlags: React.FC<Props> = ({
   const { t } = useTranslate();
   const translation = keyData.translations[lang];
   const task = keyData.tasks?.find((t) => t.languageTag === lang);
+  const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
+  const displayTaskFlag =
+    task && (task.id !== prefilteredTask || !task.userAssigned);
+  const { satisfiesPermission } = useProjectPermissions();
+  const canViewTasks = satisfiesPermission('tasks.view');
 
   const { updateTranslation } = useTranslationsActions();
+  const [taskDetailData, setTaskDetailData] = useState<TaskModel>();
 
   const clearAutoTranslatedState = useApiMutation({
     url: '/v2/projects/{projectId}/translations/{translationId}/dismiss-auto-translated-state',
@@ -112,11 +129,7 @@ export const TranslationFlags: React.FC<Props> = ({
       });
   };
 
-  if (
-    translation?.auto ||
-    translation?.outdated ||
-    task?.userAssigned === false
-  ) {
+  if (translation?.auto || translation?.outdated || displayTaskFlag) {
     return (
       <StyledWrapper className={className}>
         {translation.auto && (
@@ -144,13 +157,52 @@ export const TranslationFlags: React.FC<Props> = ({
             />
           </StyledContainer>
         )}
-        {task?.userAssigned === false && (
+        {displayTaskFlag && (
           <StyledContainer data-cy="translations-outdated-indicator">
             <TranslationFlagIcon
+              tooltip={
+                (task.userAssigned || canViewTasks) && (
+                  <TaskTooltipContent
+                    taskId={task.id}
+                    projectId={project.id}
+                    actions={(task) => (
+                      <>
+                        <Button
+                          component={Link}
+                          to={getLinkToTask(project, task)}
+                          size="small"
+                        >
+                          <T keyName="task_tooltip_content_open" />
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() => setTaskDetailData(task)}
+                        >
+                          <T keyName="task_tooltip_content_detail" />
+                        </Button>
+                      </>
+                    )}
+                  />
+                )
+              }
               icon={<Task color={task?.done ? 'secondary' : 'primary'} />}
             />
           </StyledContainer>
         )}
+        {taskDetailData && task && (
+          <Dialog
+            open={true}
+            onClose={() => setTaskDetailData(undefined)}
+            maxWidth="xl"
+            onClick={stopAndPrevent()}
+          >
+            <TaskDetail
+              task={taskDetailData}
+              onClose={() => setTaskDetailData(undefined)}
+              project={project}
+            />
+          </Dialog>
+        )}{' '}
       </StyledWrapper>
     );
   } else {

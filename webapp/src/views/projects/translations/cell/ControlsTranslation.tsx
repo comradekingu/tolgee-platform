@@ -9,6 +9,7 @@ import { components } from 'tg.service/apiSchema.generated';
 import { ControlsButton } from './ControlsButton';
 import { StateTransitionButtons } from './StateTransitionButtons';
 import { CELL_HIGHLIGHT_ON_HOVER, CELL_SHOW_ON_HOVER } from './styles';
+import { useTranslationsSelector } from '../context/TranslationsContext';
 
 type State = components['schemas']['TranslationViewModel']['state'];
 type TaskModel = components['schemas']['KeyTaskViewModel'];
@@ -93,7 +94,10 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
   const commentsPresent = Boolean(commentsCount);
   const displayComments = onComments || commentsPresent;
   const onlyResolved = commentsPresent && !unresolvedCommentCount;
+  const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
   const task = tasks?.[0];
+  const displayTaskButton =
+    task && task.id === prefilteredTask && task.userAssigned;
 
   if (displayTransitionButtons) {
     spots.push('state');
@@ -104,14 +108,14 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
   if (displayComments) {
     spots.push('comments');
   }
-  if (task?.userAssigned) {
+  if (displayTaskButton) {
     spots.push('task');
   }
 
   const inDomTransitionButtons = displayTransitionButtons && active;
   const inDomEdit = displayEdit && active;
   const inDomComments = displayComments || active || lastFocusable;
-  const inDomTask = Boolean(task?.userAssigned);
+  const inDomTask = displayTaskButton;
 
   const gridTemplateAreas = `'${spots.join(' ')}'`;
   const gridTemplateColumns = spots
