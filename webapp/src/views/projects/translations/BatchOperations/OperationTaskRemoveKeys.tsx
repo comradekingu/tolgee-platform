@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslate } from '@tolgee/react';
 
-import { useApiMutation } from 'tg.service/http/useQueryApi';
+import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 import { useProject } from 'tg.hooks/useProject';
 
 import { useTranslationsSelector } from '../context/TranslationsContext';
@@ -15,9 +15,29 @@ import { Task } from 'tg.component/task/taskSelect/types';
 type Props = OperationProps;
 
 export const OperationTaskRemoveKeys = ({ disabled, onFinished }: Props) => {
+  const filteredTask = useTranslationsSelector((c) => c.prefilter?.task);
   const [task, setTask] = useState<Task | null>(null);
   const project = useProject();
   const { t } = useTranslate();
+
+  const taskLoadable = useApiQuery({
+    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    method: 'get',
+    path: { projectId: project.id, taskId: filteredTask! },
+    options: {
+      enabled: typeof filteredTask === 'number',
+      onSuccess(data) {
+        setTask(data);
+      },
+      refetchOnMount: false,
+    },
+  });
+
+  useEffect(() => {
+    if (taskLoadable.data) {
+      setTask((task) => task ?? taskLoadable.data);
+    }
+  }, [taskLoadable.data]);
 
   const selection = useTranslationsSelector((c) => c.selection);
 
