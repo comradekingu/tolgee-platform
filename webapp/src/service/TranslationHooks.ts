@@ -53,6 +53,7 @@ export const useFinishTask = () =>
   useApiMutation({
     url: '/v2/projects/{projectId}/tasks/{taskId}/finish',
     method: 'post',
+    invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
 export const usePutTaskTranslation = () =>
