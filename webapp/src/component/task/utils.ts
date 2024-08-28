@@ -31,10 +31,10 @@ export const useTaskReport = () => {
     },
   });
 
-  function downloadReport(project: SimpleProjectModel, task: TaskModel) {
+  function downloadReport(projectId: number, task: TaskModel) {
     reportMutation.mutate(
       {
-        path: { projectId: project.id, taskId: task.id },
+        path: { projectId: projectId, taskId: task.id },
       },
       {
         async onSuccess(result) {

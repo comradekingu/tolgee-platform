@@ -3,7 +3,6 @@ import { ArrowDropDown, Clear } from '@mui/icons-material';
 import { Box, styled, IconButton, SxProps } from '@mui/material';
 
 import { stopAndPrevent } from 'tg.fixtures/eventHandler';
-import { components } from 'tg.service/apiSchema.generated';
 import { TextField } from 'tg.component/common/TextField';
 import {
   AssigneeFilters,
@@ -11,8 +10,6 @@ import {
 } from './AssigneeSearchSelectPopover';
 import { FakeInput } from 'tg.component/FakeInput';
 import { User } from 'tg.component/UserAccount';
-
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 
 const StyledClearButton = styled(IconButton)`
   margin: ${({ theme }) => theme.spacing(-1, -0.5, -1, -0.25)};
@@ -24,7 +21,7 @@ type Props = {
   label: React.ReactNode;
   sx?: SxProps;
   className?: string;
-  project: SimpleProjectModel;
+  projectId: number;
   disabled?: boolean;
   filters?: AssigneeFilters;
 };
@@ -35,7 +32,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
   label,
   sx,
   className,
-  project,
+  projectId,
   disabled,
   filters,
 }) => {
@@ -113,7 +110,7 @@ export const AssigneeSearchSelect: React.FC<Props> = ({
           selected={value}
           onSelect={handleSelectOrganization}
           anchorEl={anchorEl.current!}
-          project={project}
+          projectId={projectId}
           filters={filters}
         />
       </Box>

@@ -16,6 +16,7 @@ import DropZoneSvg from '../svgs/icons/dropzone.svg?react';
 import QSFinishedSvg from '../svgs/icons/qs-finished.svg?react';
 import StarsSvg from '../svgs/icons/stars.svg?react';
 import SlackSvg from '../svgs/icons/slack.svg?react';
+import TaskDetail from '../svgs/icons/taskDetail.svg?react';
 
 type IconProps = ComponentProps<typeof SvgIcon>;
 
@@ -79,4 +80,8 @@ export const StarsIcon: React.FC<IconProps> = (props) => (
 
 export const SlackIcon: React.FC<IconProps> = (props) => (
   <CustomIcon icon={SlackSvg} {...props} />
+);
+
+export const TaskDetailIcon: React.FC<IconProps> = (props) => (
+  <CustomIcon icon={TaskDetail} {...props} />
 );

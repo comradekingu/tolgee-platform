@@ -13,12 +13,11 @@ import {
 import { useTranslate } from '@tolgee/react';
 import { useDebounce } from 'use-debounce';
 
-import { components, operations } from 'tg.service/apiSchema.generated';
+import { operations } from 'tg.service/apiSchema.generated';
 import { useApiInfiniteQuery } from 'tg.service/http/useQueryApi';
 import { SpinnerProgress } from 'tg.component/SpinnerProgress';
 import { User, UserAccount } from 'tg.component/UserAccount';
 
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 export type AssigneeFilters =
   operations['getPossibleAssignees']['parameters']['query'];
 
@@ -66,7 +65,7 @@ type Props = {
   anchorEl: HTMLElement;
   selected: User[];
   ownedOnly?: boolean;
-  project: SimpleProjectModel;
+  projectId: number;
   anchorOrigin?: PopoverOrigin;
   transformOrigin?: PopoverOrigin;
   filters?: AssigneeFilters;
@@ -79,7 +78,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   onSelectImmediate,
   anchorEl,
   selected,
-  project,
+  projectId,
   anchorOrigin,
   transformOrigin,
   filters,
@@ -104,7 +103,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
   const usersLoadable = useApiInfiniteQuery({
     url: '/v2/projects/{projectId}/tasks/possible-assignees',
     method: 'get',
-    path: { projectId: project.id },
+    path: { projectId },
     query,
     options: {
       enabled: open,
@@ -115,7 +114,7 @@ export const AssigneeSearchSelectPopover: React.FC<Props> = ({
           lastPage.page.number! < lastPage.page.totalPages! - 1
         ) {
           return {
-            path: { projectId: project.id },
+            path: { projectId },
             query: {
               ...query,
               page: lastPage.page!.number! + 1,

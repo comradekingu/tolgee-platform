@@ -1,19 +1,16 @@
 import { useRef, useState } from 'react';
 import { useTranslate } from '@tolgee/react';
 
-import { components } from 'tg.service/apiSchema.generated';
 import { SubmenuItem } from './SubmenuItem';
 import { AssigneeSearchSelectPopover } from '../assigneeSelect/AssigneeSearchSelectPopover';
-
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 
 type Props = {
   value: number[];
   onChange: (value: number[]) => void;
-  project: SimpleProjectModel;
+  projectId: number;
 };
 
-export const SubfilterAssignees = ({ value, onChange, project }: Props) => {
+export const SubfilterAssignees = ({ value, onChange, projectId }: Props) => {
   const { t } = useTranslate();
   const [open, setOpen] = useState(false);
   const anchorEl = useRef<HTMLElement>(null);
@@ -33,7 +30,7 @@ export const SubfilterAssignees = ({ value, onChange, project }: Props) => {
           anchorEl={anchorEl.current!}
           selected={value.map((id) => ({ id, name: '', username: '' }))}
           onSelectImmediate={(users) => onChange(users.map((u) => u.id))}
-          project={project}
+          projectId={projectId}
           anchorOrigin={{
             vertical: 'top',
             horizontal: 'right',

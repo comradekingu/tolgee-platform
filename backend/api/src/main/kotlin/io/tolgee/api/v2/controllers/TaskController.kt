@@ -175,6 +175,17 @@ class TaskController(
     taskService.updateTaskKeys(projectHolder.projectEntity, taskId, dto)
   }
 
+  @GetMapping("/{taskId}/blocking-tasks")
+  @Operation(summary = "Get tasks which block this task")
+  @RequiresProjectPermissions([Scope.TASKS_EDIT])
+  @AllowApiAccess
+  fun getBlockingTasks(
+    @PathVariable
+    taskId: Long,
+  ): List<Long> {
+    return taskService.getBlockingTasks(projectHolder.projectEntity, taskId)
+  }
+
   @PostMapping("/{taskId}/finish")
   @Operation(summary = "Finish task")
   // permissions checked inside

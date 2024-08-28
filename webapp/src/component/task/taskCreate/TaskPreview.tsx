@@ -13,7 +13,6 @@ import { TranslationStateType } from './TranslationStateFilter';
 
 type TaskType = components['schemas']['TaskModel']['type'];
 type LanguageModel = components['schemas']['LanguageModel'];
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 
 const StyledContainer = styled('div')`
   display: grid;
@@ -49,7 +48,7 @@ type Props = {
   assigness: User[];
   onUpdateAssignees: (users: User[]) => void;
   filters: TranslationStateType[];
-  project: SimpleProjectModel;
+  projectId: number;
 };
 
 export const TaskPreview = ({
@@ -59,7 +58,7 @@ export const TaskPreview = ({
   assigness,
   onUpdateAssignees,
   filters,
-  project,
+  projectId,
 }: Props) => {
   const { t } = useTranslate();
   const formatNumber = useNumberFormatter();
@@ -68,7 +67,7 @@ export const TaskPreview = ({
   const statsLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/tasks/calculate-scope',
     method: 'post',
-    path: { projectId: project.id },
+    path: { projectId },
     content: { 'application/json': content },
     query: {
       // @ts-ignore add dependencies to url, so react query works correctly
@@ -128,7 +127,7 @@ export const TaskPreview = ({
       </Box>
       <AssigneeSearchSelect
         value={assigness}
-        project={project}
+        projectId={projectId}
         onChange={onUpdateAssignees}
         sx={{
           alignSelf: 'center',

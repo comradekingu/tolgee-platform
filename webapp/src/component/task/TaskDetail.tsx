@@ -31,7 +31,6 @@ import { getLinkToTask, useTaskReport } from './utils';
 import { Scope } from 'tg.fixtures/permissions';
 
 type TaskModel = components['schemas']['TaskModel'];
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 
 const StyledMainTitle = styled(DialogTitle)`
   padding-bottom: 0px;
@@ -67,29 +66,24 @@ const StyledActions = styled('div')`
 type Props = {
   task: TaskModel;
   onClose: () => void;
-  project: SimpleProjectModel;
+  projectId: number;
   projectScopes?: Scope[];
 };
 
-export const TaskDetail = ({
-  task,
-  onClose,
-  project,
-  projectScopes,
-}: Props) => {
+export const TaskDetail = ({ task, onClose, projectId }: Props) => {
   const { t } = useTranslate();
   const formatDate = useDateFormatter();
 
   const taskLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/tasks/{taskId}',
     method: 'get',
-    path: { projectId: project.id, taskId: task.id },
+    path: { projectId, taskId: task.id },
   });
 
   const perUserReportLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/tasks/{taskId}/per-user-report',
     method: 'get',
-    path: { projectId: project.id, taskId: task.id },
+    path: { projectId, taskId: task.id },
   });
 
   const updateLoadable = useApiMutation({
@@ -101,14 +95,11 @@ export const TaskDetail = ({
   const projectLoadable = useApiQuery({
     url: '/v2/projects/{projectId}',
     method: 'get',
-    path: { projectId: project.id },
-    options: {
-      enabled: Boolean(projectScopes),
-    },
+    path: { projectId },
   });
 
-  const scopes =
-    projectScopes ?? projectLoadable.data?.computedPermission.scopes ?? [];
+  const scopes = projectLoadable.data?.computedPermission.scopes ?? [];
+  const project = projectLoadable.data;
 
   const canEditTask = scopes.includes('tasks.edit');
 
@@ -138,7 +129,7 @@ export const TaskDetail = ({
             onSubmit={(values, actions) => {
               updateLoadable.mutate(
                 {
-                  path: { projectId: project.id, taskId: task.id },
+                  path: { projectId, taskId: task.id },
                   content: {
                     'application/json': {
                       name: values.name,
@@ -175,7 +166,7 @@ export const TaskDetail = ({
                     label={t('task_detail_field_assignees')}
                     value={values.assignees}
                     onChange={(value) => setFieldValue('assignees', value)}
-                    project={project}
+                    projectId={projectId}
                     disabled={!canEditTask}
                     filters={{
                       filterMinimalScope: 'TRANSLATIONS_VIEW',
@@ -208,7 +199,7 @@ export const TaskDetail = ({
                     >
                       <IconButton
                         component={Link}
-                        to={getLinkToTask(project, data)}
+                        to={project ? getLinkToTask(project, data) : ''}
                         target="_blank"
                       >
                         <TranslationIcon fontSize="small" />
@@ -218,7 +209,9 @@ export const TaskDetail = ({
                       title={t('task_detail_summarize_tooltip')}
                       disableInteractive
                     >
-                      <IconButton onClick={() => downloadReport(project, data)}>
+                      <IconButton
+                        onClick={() => downloadReport(projectId, data)}
+                      >
                         <InsertDriveFile fontSize="small" />
                       </IconButton>
                     </Tooltip>
@@ -249,7 +242,7 @@ export const TaskDetail = ({
                   />
                   <TaskInfoItem
                     label={t('task_detail_project_label')}
-                    value={project.name}
+                    value={project?.name}
                   />
                 </Box>
 

@@ -45,7 +45,7 @@ export const OperationTaskCreate = ({ disabled, onFinished }: Props) => {
           languages: languagesWithoutBase.map((l) => l.id),
         }}
         allLanguages={allLanguages}
-        project={project}
+        projectId={project.id}
         onFinished={onFinished}
       />
     </OperationContainer>

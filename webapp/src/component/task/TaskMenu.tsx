@@ -144,7 +144,7 @@ export const TaskMenu = ({
 
   function handleGetExcelReport() {
     onClose();
-    downloadReport(project, task);
+    downloadReport(project.id, task);
   }
 
   function handleCloneTask() {
@@ -251,7 +251,7 @@ export const TaskMenu = ({
           onClose={() => setTaskCreate(undefined)}
           onFinished={() => setTaskCreate(undefined)}
           allLanguages={languagesLoadable.data._embedded?.languages ?? []}
-          project={project}
+          projectId={project.id}
           initialValues={taskCreate}
         />
       )}

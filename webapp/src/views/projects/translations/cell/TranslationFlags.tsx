@@ -199,10 +199,10 @@ export const TranslationFlags: React.FC<Props> = ({
             <TaskDetail
               task={taskDetailData}
               onClose={() => setTaskDetailData(undefined)}
-              project={project}
+              projectId={project.id}
             />
           </Dialog>
-        )}{' '}
+        )}
       </StyledWrapper>
     );
   } else {

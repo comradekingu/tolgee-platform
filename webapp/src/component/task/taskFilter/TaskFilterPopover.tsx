@@ -92,7 +92,7 @@ export const TaskFilterPopover: React.FC<Props> = ({
         <SubfilterAssignees
           value={value.assignees ?? []}
           onChange={(assignees) => handleChange({ ...value, assignees })}
-          project={project}
+          projectId={project.id}
         />
       )}
 
@@ -101,7 +101,6 @@ export const TaskFilterPopover: React.FC<Props> = ({
           value={value.languages ?? []}
           onChange={(languages) => handleChange({ ...value, languages })}
           languages={languages ?? []}
-          project={project}
         />
       )}
 

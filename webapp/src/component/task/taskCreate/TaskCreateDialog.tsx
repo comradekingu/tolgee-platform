@@ -34,7 +34,6 @@ import {
 } from './TranslationStateFilter';
 
 type TaskType = components['schemas']['TaskModel']['type'];
-type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 type LanguageModel = components['schemas']['LanguageModel'];
 
 const TASK_TYPES: TaskType[] = ['TRANSLATE', 'REVIEW'];
@@ -89,7 +88,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onFinished: () => void;
-  project: SimpleProjectModel;
+  projectId: number;
   allLanguages: LanguageModel[];
   initialValues?: Partial<InitialValues>;
 };
@@ -98,7 +97,7 @@ export const TaskCreateDialog = ({
   open,
   onClose,
   onFinished,
-  project,
+  projectId,
   allLanguages,
   initialValues,
 }: Props) => {
@@ -119,7 +118,7 @@ export const TaskCreateDialog = ({
   const selectedLoadable = useApiQuery({
     url: '/v2/projects/{projectId}/translations/select-all',
     method: 'get',
-    path: { projectId: project.id },
+    path: { projectId },
     query: {
       ...filters,
       languages: allLanguages
@@ -167,7 +166,7 @@ export const TaskCreateDialog = ({
           }));
           createTasksLoadable.mutate(
             {
-              path: { projectId: project.id },
+              path: { projectId },
               query: {
                 filterState: stateFilters.filter((i) => i !== 'OUTDATED'),
                 filterOutdated: stateFilters.includes('OUTDATED'),
@@ -292,7 +291,7 @@ export const TaskCreateDialog = ({
                         setFieldValue(`assignees[${language}]`, users);
                       }}
                       filters={stateFilters}
-                      project={project}
+                      projectId={projectId}
                     />
                   ))}
                 </Box>

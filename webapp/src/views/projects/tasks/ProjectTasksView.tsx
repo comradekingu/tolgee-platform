@@ -159,7 +159,7 @@ export const ProjectTasksView = () => {
           <TaskDetail
             task={detail}
             onClose={handleDetailClose}
-            project={project}
+            projectId={project.id}
           />
         </Dialog>
       )}
@@ -173,7 +173,7 @@ export const ProjectTasksView = () => {
               .filter((l) => !l.base && languagesPreference.includes(l.tag))
               .map((l) => l.id),
           }}
-          project={project}
+          projectId={project.id}
           allLanguages={allLanguages}
         />
       )}

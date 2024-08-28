@@ -314,4 +314,19 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     userId: Long,
     type: TaskType,
   ): List<UserAccount>
+
+  @Query(
+    """
+      select distinct t.id
+      from Task t
+        join t.keys tt
+        join Task at on (at.id = :taskId and at.project.id = :projectId)
+        join at.keys att
+        join Key k on (element(att).key.id = k.id and element(tt).key.id = k.id)
+      where (t.id > :taskId or t.type != at.type)
+        and t.type >= at.type
+        and t.state = 'IN_PROGRESS'
+    """
+  )
+  fun getBlockingTaskIds(projectId: Long, taskId: Long): List<Long>
 }
