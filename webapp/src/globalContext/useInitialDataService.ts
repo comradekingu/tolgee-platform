@@ -34,6 +34,16 @@ export const useInitialDataService = () => {
     },
   });
 
+  const userTasksLoadable = useApiQuery({
+    url: '/v2/user-tasks',
+    method: 'get',
+    query: { size: 1, filterState: ['IN_PROGRESS'] },
+    options: {
+      enabled: Boolean(initialDataLoadable.data?.userInfo),
+      refetchInterval: 60_000,
+    },
+  });
+
   const [announcement, setAnnouncement] = useState<AnnouncementDto | undefined>(
     initialDataLoadable.data?.announcement
   );
@@ -198,6 +208,7 @@ export const useInitialDataService = () => {
           : undefined,
         announcement,
         isFetching,
+        userTasks: userTasksLoadable.data?.page?.totalElements,
       }
     : undefined;
 
