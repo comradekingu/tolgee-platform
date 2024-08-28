@@ -342,7 +342,10 @@ class TaskService(
     return taskRepository.getTaskKeys(projectEntity.id, taskId)
   }
 
-  fun getBlockingTasks(projectEntity: Project, taskId: Long): List<Long> {
+  fun getBlockingTasks(
+    projectEntity: Project,
+    taskId: Long,
+  ): List<Long> {
     return taskRepository.getBlockingTaskIds(projectEntity.id, taskId)
   }
 

@@ -326,7 +326,10 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       where (t.id > :taskId or t.type != at.type)
         and t.type >= at.type
         and t.state = 'IN_PROGRESS'
-    """
+    """,
   )
-  fun getBlockingTaskIds(projectId: Long, taskId: Long): List<Long>
+  fun getBlockingTaskIds(
+    projectId: Long,
+    taskId: Long,
+  ): List<Long>
 }

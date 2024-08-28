@@ -49,19 +49,16 @@ class LanguageHardDeleter(
       withComments
     }.toMutableList()
 
-
-  fun getAllTasks(languageWithData: Language)  =
+  fun getAllTasks(languageWithData: Language) =
     entityManager.createQuery(
       """from Task tk
             join fetch tk.keys
             where tk.language = :languageWithData""",
       Task::class.java,
     )
-      .setParameter("languageWithData",languageWithData)
+      .setParameter("languageWithData", languageWithData)
       .resultList
       .toMutableList()
-
-
 
   private fun getWithFetchedTranslations(language: Language): Language {
     return entityManager.createQuery(
