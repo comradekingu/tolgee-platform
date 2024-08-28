@@ -61,7 +61,7 @@ export const Tasks: React.FC<PanelContentProps> = ({
 };
 
 export const tasksCount = ({ keyData, language }: PanelContentData) => {
-  return (
-    keyData.tasks?.filter((t) => t.languageId === language.id)?.length ?? 0
-  );
+  return keyData.tasks?.filter((t) => t.languageId === language.id)?.length ?? 0
+    ? '...'
+    : null;
 };

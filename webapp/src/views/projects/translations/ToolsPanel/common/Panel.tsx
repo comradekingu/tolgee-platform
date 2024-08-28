@@ -75,11 +75,9 @@ export const Panel = ({
   const [itemsCount, setItemsCount] = useState<number | undefined>(undefined);
   const Component = component;
   const countContent =
-    (itemsCount !== undefined && itemsCount !== null) || itemsCountFunction
-      ? itemsCountFunction
-        ? itemsCountFunction(data)
-        : itemsCount
-      : null;
+    itemsCount !== undefined && itemsCount !== null
+      ? itemsCount
+      : itemsCountFunction?.(data) ?? null;
 
   const hidden = !countContent && hideWhenCountZero;
 
@@ -93,9 +91,7 @@ export const Panel = ({
         {icon}
         <StyledName>{name}</StyledName>
         {typeof itemsCount === 'number' || itemsCountFunction ? (
-          <StyledBadge>
-            {itemsCountFunction ? itemsCountFunction(data) : itemsCount}
-          </StyledBadge>
+          <StyledBadge>{countContent}</StyledBadge>
         ) : (
           <div />
         )}

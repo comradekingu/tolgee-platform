@@ -115,23 +115,27 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
   ): Page<Task>
 
   @Query(
-    """
-     select 
-        tt.key.id as keyId,
+    nativeQuery = true,
+    value = """
+     select distinct on (l.id, tt.key_id)
+        tt.key_id as keyId,
         l.id as languageId,
         l.tag as languageTag,
         t.id as taskId,
         tt.done as taskDone,
         CASE WHEN u.id IS NULL THEN FALSE ELSE TRUE END as taskAssigned,
         t.type as taskType
-     from Task t
-        join t.keys tt on element(tt).key.id in :keyIds
-        left join t.assignees u on u.id = :currentUserId
-        left join t.language l
+     from task t
+        join task_key tt on (t.id = tt.task_id and tt.task_project_id = t.project_id)
+        left join task_assignees ta on (ta.tasks_id = t.id and ta.tasks_project_id = t.project_id)
+        left join user_account u on (ta.assignees_id = u.id)
+        left join language l on (t.language_id = l.id)
      where
-        l.deletedAt is null
+        u.id = :currentUserId
+        and tt.key_id in :keyIds
+        and l.deleted_at is null
         and t.state = 'IN_PROGRESS'
-     order by t.type desc, t.id desc
+     order by l.id, tt.key_id, t.type desc, t.id desc
     """,
   )
   fun getByKeyId(
