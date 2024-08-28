@@ -18,13 +18,14 @@ type Props = {
   project: SimpleProjectModel;
   children: React.ReactElement<any, any>;
   actions?: Action[] | React.ReactNode | ((task: TaskModel) => React.ReactNode);
-};
+} & Omit<React.ComponentProps<typeof Tooltip>, 'title'>;
 
 export const TaskTooltip = ({
   taskId,
   project,
   children,
   actions = ['open', 'detail'],
+  ...tooltipProps
 }: Props) => {
   const [taskDetailData, setTaskDetailData] = useState<TaskModel>();
 
@@ -52,6 +53,7 @@ export const TaskTooltip = ({
   return (
     <>
       <Tooltip
+        {...tooltipProps}
         title={
           <TaskTooltipContent
             taskId={taskId}

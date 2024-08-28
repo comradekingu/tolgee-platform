@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { styled } from '@mui/material';
+import { Box, styled } from '@mui/material';
 import { LoadingSkeletonFadingIn } from 'tg.component/LoadingSkeleton';
 
 import { PanelContentData, PanelContentProps } from '../../common/types';
 import { TabMessage } from '../../common/TabMessage';
 import { useApiQuery } from 'tg.service/http/useQueryApi';
 import { TaskLabel } from 'tg.component/task/TaskLabel';
+import { TaskTooltip } from 'tg.component/task/TaskTooltip';
 
 const StyledContainer = styled('div')`
   display: flex;
@@ -45,11 +46,22 @@ export const Tasks: React.FC<PanelContentProps> = ({
     <StyledContainer>
       {tasksLoadable.data?._embedded?.tasks?.length ? (
         tasksLoadable.data._embedded.tasks.map((task) => (
-          <TaskLabel
+          <TaskTooltip
             key={task.id}
-            task={task}
-            sx={{ padding: 1, opacity: task.id === firstTask?.id ? 1 : 0.6 }}
-          />
+            taskId={task.id}
+            project={project}
+            enterDelay={1000}
+          >
+            <Box>
+              <TaskLabel
+                task={task}
+                sx={{
+                  padding: 1,
+                  opacity: task.id === firstTask?.id ? 1 : 0.6,
+                }}
+              />
+            </Box>
+          </TaskTooltip>
         ))
       ) : tasksLoadable.isLoading ? (
         <TabMessage>

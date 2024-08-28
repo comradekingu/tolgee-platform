@@ -4,7 +4,7 @@ import { useTranslate } from '@tolgee/react';
 import { Box, IconButton, styled, Tooltip, useTheme } from '@mui/material';
 import { AccessAlarm, MoreVert } from '@mui/icons-material';
 
-import { TranslationIcon } from 'tg.component/CustomIcons';
+import { TaskDetailIcon } from 'tg.component/CustomIcons';
 import { components } from 'tg.service/apiSchema.generated';
 import { BatchProgress } from 'tg.views/projects/translations/BatchOperations/OperationsSummary/BatchProgress';
 import { useDateFormatter } from 'tg.hooks/useLocale';
@@ -14,6 +14,7 @@ import { TaskMenu } from './TaskMenu';
 import { TaskLabel } from './TaskLabel';
 import { getLinkToTask } from './utils';
 import { TaskState } from './TaskState';
+import { stopAndPrevent } from 'tg.fixtures/eventHandler';
 
 type TaskModel = components['schemas']['TaskModel'];
 type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
@@ -25,6 +26,7 @@ const StyledContainer = styled('div')`
   display: contents;
   &:hover > * {
     background: ${({ theme }) => theme.palette.tokens.text._states.hover};
+    cursor: pointer;
   }
 `;
 
@@ -34,6 +36,8 @@ const StyledItem = styled(Box)`
   align-self: stretch;
   justify-self: stretch;
   gap: 8px;
+  color: ${({ theme }) => theme.palette.text.primary};
+  text-decoration: none;
 `;
 
 const StyledProgress = styled(StyledItem)`
@@ -83,6 +87,11 @@ export const TaskItem = ({
     setAnchorEl(null);
   };
 
+  const linkProps = {
+    component: Link,
+    to: getLinkToTask(project, task),
+  };
+
   const renderAssignees = (assignees: SimpleUserAccountModel[]) => {
     return (
       <>
@@ -111,17 +120,18 @@ export const TaskItem = ({
 
   return (
     <StyledContainer>
-      <StyledItem>
+      <StyledItem {...linkProps}>
         <TaskLabel sx={{ padding: '8px 0px 8px 16px' }} task={task} />
       </StyledItem>
       <StyledItem
+        {...linkProps}
         color={theme.palette.tokens.text.secondary}
         alignItems="center"
         justifyContent="center"
       >
         {t('task_keys_count', { value: task.totalItems })}
       </StyledItem>
-      <StyledProgress>
+      <StyledProgress {...linkProps}>
         {task.state === 'IN_PROGRESS' ? (
           <BatchProgress progress={task.doneItems} max={task.totalItems} />
         ) : (
@@ -135,7 +145,7 @@ export const TaskItem = ({
         ) : null}
       </StyledProgress>
       {showProject && (
-        <StyledItem>
+        <StyledItem {...linkProps}>
           <Tooltip title={<div>{project.name}</div>} disableInteractive>
             <div>
               <AvatarImg
@@ -151,7 +161,7 @@ export const TaskItem = ({
           </Tooltip>
         </StyledItem>
       )}
-      <StyledAssignees sx={{ paddingRight: '10px' }}>
+      <StyledAssignees sx={{ paddingRight: '10px' }} {...linkProps}>
         {renderAssignees(task.assignees.slice(0, ASSIGNEES_LIMIT))}
         {task.assignees.length > ASSIGNEES_LIMIT && (
           <Tooltip
@@ -167,15 +177,17 @@ export const TaskItem = ({
           </Tooltip>
         )}
       </StyledAssignees>
-      <StyledItem sx={{ pr: 1, gap: 0.5 }}>
+      <StyledItem sx={{ pr: 1, gap: 0.5 }} style={{ cursor: 'auto' }}>
         <IconButton
-          component={Link}
-          to={getLinkToTask(project, task)}
           size="small"
+          onClick={stopAndPrevent(() => onDetailOpen(task))}
         >
-          <TranslationIcon fontSize="small" />
+          <TaskDetailIcon fontSize="small" />
         </IconButton>
-        <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)}>
+        <IconButton
+          size="small"
+          onClick={stopAndPrevent((e) => setAnchorEl(e.currentTarget))}
+        >
           <MoreVert fontSize="small" />
         </IconButton>
       </StyledItem>
@@ -183,7 +195,6 @@ export const TaskItem = ({
         anchorEl={anchorEl}
         onClose={handleClose}
         task={task}
-        onDetailOpen={onDetailOpen}
         project={project}
         projectScopes={projectScopes}
       />

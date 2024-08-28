@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Divider, Menu, MenuItem, useTheme } from '@mui/material';
+import { Divider, Menu, MenuItem } from '@mui/material';
 import { T, useTranslate } from '@tolgee/react';
-import { Link } from 'react-router-dom';
 
 import { confirmation } from 'tg.hooks/confirmation';
 import { components } from 'tg.service/apiSchema.generated';
@@ -9,7 +8,7 @@ import { Scope } from 'tg.fixtures/permissions';
 import { messageService } from 'tg.service/MessageService';
 import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 
-import { getLinkToTask, useTaskReport } from './utils';
+import { useTaskReport } from './utils';
 import { InitialValues, TaskCreateDialog } from './taskCreate/TaskCreateDialog';
 import { useUser } from 'tg.globalContext/helpers';
 
@@ -19,7 +18,6 @@ type SimpleProjectModel = components['schemas']['SimpleProjectModel'];
 type Props = {
   anchorEl: HTMLElement | null;
   onClose: () => void;
-  onDetailOpen: (task: TaskModel) => void;
   task: TaskModel;
   project: SimpleProjectModel;
   projectScopes?: Scope[];
@@ -29,7 +27,6 @@ export const TaskMenu = ({
   anchorEl,
   onClose,
   task,
-  onDetailOpen,
   project,
   projectScopes,
 }: Props) => {
@@ -186,30 +183,10 @@ export const TaskMenu = ({
     );
   }
 
-  const withClose = (func: () => void) => () => {
-    func();
-    onClose();
-  };
-
   const { t } = useTranslate();
-  const theme = useTheme();
   return (
     <>
       <Menu anchorEl={anchorEl} open={isOpen} onClose={onClose}>
-        <MenuItem
-          component={Link}
-          to={getLinkToTask(project, task)}
-          style={{
-            textDecoration: 'none',
-            color: theme.palette.text.primary,
-            outline: 'none',
-          }}
-        >
-          {t('task_menu_open_translations')}
-        </MenuItem>
-        <MenuItem onClick={withClose(() => onDetailOpen(task))}>
-          {t('task_menu_task_detail')}
-        </MenuItem>
         {task.state === 'IN_PROGRESS' ? (
           <MenuItem
             onClick={() => handleMarkAsDone()}
