@@ -128,10 +128,11 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
      from task t
         join task_key tt on (t.id = tt.task_id and tt.task_project_id = t.project_id)
         left join task_assignees ta on (ta.tasks_id = t.id and ta.tasks_project_id = t.project_id)
-        left join user_account u on (ta.assignees_id = u.id and u.id = :currentUserId)
+        left join user_account u on ta.assignees_id = u.id
         left join language l on (t.language_id = l.id)
      where
         tt.key_id in :keyIds
+        and u.id = :currentUserId
         and l.deleted_at is null
         and t.state = 'IN_PROGRESS'
      order by l.id, tt.key_id, t.type desc, t.id desc

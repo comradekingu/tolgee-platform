@@ -1,6 +1,6 @@
 import { Tooltip, styled } from '@mui/material';
 
-const StyledImgWrapper = styled('div')`
+export const StyledImgWrapper = styled('div')`
   display: flex;
   & svg {
     font-size: 16px;
