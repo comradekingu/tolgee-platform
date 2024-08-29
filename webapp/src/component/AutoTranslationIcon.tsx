@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
-import { MtIcon, TranslationMemoryIcon } from 'tg.component/CustomIcons';
+import { Mt, TranslationMemory } from 'tg.component/CustomIcons';
 import { useServiceImg } from 'tg.views/projects/translations/ToolsPanel/panels/MachineTranslation/useServiceImg';
 import { TranslationFlagIcon } from './TranslationFlagIcon';
 
@@ -45,9 +45,9 @@ export const AutoTranslationIcon: React.FC<Props> = ({
           {provider && providerImg ? (
             <StyledProviderImg src={providerImg} />
           ) : provider ? (
-            <MtIcon />
+            <Mt />
           ) : (
-            <TranslationMemoryIcon />
+            <TranslationMemory />
           )}
         </StyledImgWrapper>
       }

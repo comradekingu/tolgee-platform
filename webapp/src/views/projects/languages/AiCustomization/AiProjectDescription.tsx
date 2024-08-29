@@ -3,7 +3,7 @@ import { Box, Button, IconButton, styled } from '@mui/material';
 import { Plus, Edit02 } from '@untitled-ui/icons-react';
 import { useState } from 'react';
 import { AiProjectDescriptionDialog } from './AiProjectDescriptionDialog';
-import { StarsIcon } from 'tg.component/CustomIcons';
+import { Stars } from 'tg.component/CustomIcons';
 import clsx from 'clsx';
 
 const EXAMPLE = 'App for teaching children about the world.';
@@ -61,7 +61,7 @@ export const AiProjectDescription = ({ description }: Props) => {
         <>
           <Box display="flex" gap={1} py="8px">
             <StyledLabel>
-              <StarsIcon />
+              <Stars />
               <Box>{t('project_ai_prompt_example_label')}</Box>
             </StyledLabel>
             <StyledItems>

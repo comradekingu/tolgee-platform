@@ -29,7 +29,7 @@ const StyledContainer = styled('div')`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-left: ${({ theme }) => theme.spacing(-2)};
+  margin-left: ${({ theme }) => theme.spacing(-1)};
   margin-right: ${({ theme }) => theme.spacing(-2)};
   padding: ${({ theme }) => theme.spacing(0, 1.5)};
   z-index: ${({ theme }) => theme.zIndex.appBar + 1};
@@ -50,7 +50,6 @@ const StyledSearchSpaced = styled('div')`
   align-items: center;
   gap: ${({ theme }) => theme.spacing(0.5)};
   padding-right: ${({ theme }) => theme.spacing(1)};
-  padding-left: ${({ theme }) => theme.spacing(1)};
   flex-grow: 1;
   position: relative;
 `;

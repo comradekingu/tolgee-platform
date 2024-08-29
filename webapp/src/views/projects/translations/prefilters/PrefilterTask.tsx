@@ -9,7 +9,7 @@ import { TaskLabel } from 'tg.component/task/TaskLabel';
 import { PrefilterContainer } from './ContainerPrefilter';
 import { TaskDetail } from 'tg.component/task/TaskDetail';
 import { TaskTooltip } from 'tg.component/task/TaskTooltip';
-import { TaskDetailIcon } from 'tg.component/CustomIcons';
+import { TaskDetail as TaskDetailIcon } from 'tg.component/CustomIcons';
 
 const StyledWarning = styled('div')`
   display: flex;
@@ -62,7 +62,7 @@ export const PrefilterTask = ({ taskId }: Props) => {
           <Box display="flex" gap={1}>
             <TaskLabel task={data} />
             <IconButton size="small" onClick={handleShowDetails}>
-              <TaskDetailIcon fontSize="small" />
+              <TaskDetailIcon width={20} height={20} />
             </IconButton>
             {blockingTasksLoadable.data?.length ? (
               <StyledWarning>

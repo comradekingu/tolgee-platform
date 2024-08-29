@@ -4,7 +4,7 @@ import { useTranslate } from '@tolgee/react';
 import { Box, IconButton, styled, Tooltip, useTheme } from '@mui/material';
 import { AlarmClock, DotsVertical } from '@untitled-ui/icons-react';
 
-import { TaskDetailIcon } from 'tg.component/CustomIcons';
+import { TaskDetail } from 'tg.component/CustomIcons';
 import { components } from 'tg.service/apiSchema.generated';
 import { BatchProgress } from 'tg.views/projects/translations/BatchOperations/OperationsSummary/BatchProgress';
 import { useDateFormatter } from 'tg.hooks/useLocale';
@@ -182,7 +182,7 @@ export const TaskItem = ({
           size="small"
           onClick={stopAndPrevent(() => onDetailOpen(task))}
         >
-          <TaskDetailIcon />
+          <TaskDetail />
         </IconButton>
         <IconButton
           size="small"

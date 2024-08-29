@@ -19,7 +19,7 @@ import { SideMenuItem } from './SideMenuItem';
 import { SideLogo } from './SideLogo';
 import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 import { useGlobalContext } from 'tg.globalContext/GlobalContext';
-import { IntegrationIcon } from 'tg.component/CustomIcons';
+import { Integration } from 'tg.component/CustomIcons';
 
 export const ProjectMenu = ({ id }) => {
   const { satisfiesPermission } = useProjectPermissions();
@@ -157,7 +157,7 @@ export const ProjectMenu = ({ id }) => {
           linkTo={LINKS.PROJECT_INTEGRATE.build({
             [PARAMS.PROJECT_ID]: id,
           })}
-          icon={<IntegrationIcon />}
+          icon={<Integration />}
           text={t('project_menu_integrate')}
           data-cy="project-menu-item-integrate"
           quickStart={{ itemKey: 'menu_integrate' }}

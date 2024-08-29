@@ -11,7 +11,7 @@ import {
 } from 'tg.fixtures/FileUploadFixtures';
 
 import { MAX_FILE_COUNT } from './ImportFileInput';
-import { DropzoneIcon } from 'tg.component/CustomIcons';
+import { Dropzone } from 'tg.component/CustomIcons';
 
 export interface ScreenshotDropzoneProps {
   onNewFiles: (files: FilesType) => void;
@@ -55,7 +55,7 @@ const StyledWrapper = styled(Box)`
   }
 `;
 
-const StyledValidIcon = styled(DropzoneIcon)`
+const StyledValidIcon = styled(Dropzone)`
   width: 100px;
   height: 100px;
   color: ${({ theme }) => theme.palette.import.progressDone};

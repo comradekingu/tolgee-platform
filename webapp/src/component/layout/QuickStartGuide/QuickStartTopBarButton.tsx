@@ -1,5 +1,5 @@
 import { Box, Button, styled } from '@mui/material';
-import { RocketIcon } from 'tg.component/CustomIcons';
+import { Rocket } from 'tg.component/CustomIcons';
 import {
   useGlobalActions,
   useGlobalContext,
@@ -34,7 +34,7 @@ export const QuickStartTopBarButton = () => {
             color="inherit"
           >
             <Box display="flex" gap={1} alignItems="center">
-              <RocketIcon fontSize="small" />
+              <Rocket width={20} height={20} />
               <QuickStartProgress percent={completedSteps / allSteps} />
             </Box>
           </StyledButton>

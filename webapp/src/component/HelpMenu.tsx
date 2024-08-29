@@ -29,7 +29,7 @@ import {
   usePreferredOrganization,
   useUser,
 } from 'tg.globalContext/helpers';
-import { SlackIcon } from './CustomIcons';
+import { Slack } from './CustomIcons';
 
 const BASE_URL = 'https://app.chatwoot.com';
 let scriptPromise: Promise<void> | null = null;
@@ -196,7 +196,7 @@ export const HelpMenu = () => {
         </MenuItem>
         <MenuItem component={Link} {...buttonLink('https://tolg.ee/slack')}>
           <ListItemIcon>
-            <SlackIcon />
+            <Slack />
           </ListItemIcon>
           <ListItemText
             primary={t('help_menu_slack_community')}

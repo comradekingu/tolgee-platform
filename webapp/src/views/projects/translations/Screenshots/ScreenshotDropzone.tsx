@@ -8,7 +8,7 @@ import { FileUploadFixtures } from 'tg.fixtures/FileUploadFixtures';
 import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 
 import { MAX_FILE_COUNT } from './ScreenshotGallery';
-import { DropzoneIcon } from 'tg.component/CustomIcons';
+import { Dropzone } from 'tg.component/CustomIcons';
 
 export interface ScreenshotDropzoneProps {
   validateAndUpload: (files: File[]) => void;
@@ -34,7 +34,7 @@ const StyledDropZoneValidation = styled(Box)`
   }
 `;
 
-const StyledValidIcon = styled(DropzoneIcon)`
+const StyledValidIcon = styled(Dropzone)`
   filter: drop-shadow(1px 1px 0px ${green[200]})
     drop-shadow(-1px 1px 0px ${green[200]})
     drop-shadow(1px -1px 0px ${green[200]})

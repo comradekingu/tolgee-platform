@@ -1,7 +1,7 @@
 import { Box, IconButton, styled } from '@mui/material';
 import { T } from '@tolgee/react';
 import { useMemo } from 'react';
-import { RocketIcon } from 'tg.component/CustomIcons';
+import { Rocket } from 'tg.component/CustomIcons';
 import {
   useGlobalActions,
   useGlobalContext,
@@ -67,7 +67,7 @@ export const QuickStartGuide = () => {
       <StyledArrow sx={{ opacity: topBarHeight ? 1 : 0 }} />
       <StyledHeader>
         <Box display="flex" gap="12px" alignItems="center">
-          <RocketIcon fontSize="small" />
+          <Rocket width={20} height={20} />
           <T keyName="guide_title" />
         </Box>
         <IconButton onClick={() => setQuickStartOpen(false)}>
