@@ -176,8 +176,8 @@ class TaskController(
   }
 
   @GetMapping("/{taskId}/blocking-tasks")
-  @Operation(summary = "Get tasks which block this task")
-  @RequiresProjectPermissions([Scope.TASKS_EDIT])
+  @Operation(summary = "Get task ids which block this task")
+  @UseDefaultPermissions
   @AllowApiAccess
   fun getBlockingTasks(
     @PathVariable

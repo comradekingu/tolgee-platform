@@ -14,6 +14,7 @@ import { TaskDetail } from 'tg.component/task/TaskDetail';
 import { MyTasksHeader } from './MyTasksHeader';
 import { useUrlSearchState } from 'tg.hooks/useUrlSearchState';
 import { TaskFilterType } from 'tg.component/task/taskFilter/TaskFilterPopover';
+import { useGlobalActions } from 'tg.globalContext/GlobalContext';
 
 type TaskWithProjectModel = components['schemas']['TaskWithProjectModel'];
 
@@ -27,6 +28,7 @@ export const MyTasksView = () => {
   const { t } = useTranslate();
   const [page, setPage] = useState(0);
   const [detail, setDetail] = useState<TaskWithProjectModel>();
+  const { setUserTasks } = useGlobalActions();
 
   const [search, setSearch] = useState('');
   const [showClosed, setShowClosed] = useState(false);
@@ -66,6 +68,16 @@ export const MyTasksView = () => {
     },
     options: {
       keepPreviousData: true,
+      onSuccess(data) {
+        if (
+          !showClosed &&
+          Object.values(filter).every((val) => !val?.length) &&
+          !search
+        ) {
+          // update global notification (only if no filters are applied)
+          setUserTasks(data.page?.totalElements ?? 0);
+        }
+      },
     },
   });
 

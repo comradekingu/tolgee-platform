@@ -25,6 +25,9 @@ export const TaskTooltipContent = ({ projectId, taskId, actions }: Props) => {
       projectId,
       taskId,
     },
+    fetchOptions: {
+      disableAuthRedirect: true,
+    },
   });
 
   useLoadingRegister(task.isFetching);
@@ -34,6 +37,11 @@ export const TaskTooltipContent = ({ projectId, taskId, actions }: Props) => {
   return (
     <Box sx={{ padding: 1 }} onClick={stopAndPrevent()}>
       {task.isLoading && <LoadingSkeleton sx={{ height: 24, width: 150 }} />}
+      {task.error?.code === 'operation_not_permitted' && (
+        <Box>
+          <T keyName="task_tooltip_content_no_access" />
+        </Box>
+      )}
       {task.data && (
         <Box sx={{ display: 'grid', gap: 1, justifyItems: 'start' }}>
           <TaskLabel task={task.data} />
