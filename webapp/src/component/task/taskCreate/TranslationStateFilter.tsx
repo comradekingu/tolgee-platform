@@ -1,4 +1,4 @@
-import { Close } from '@mui/icons-material';
+import { XClose } from '@untitled-ui/icons-react';
 import {
   Checkbox,
   ListItemText,
@@ -86,7 +86,7 @@ export const TranslationStateFilter = ({
               onClick={stopBubble(() => onChange([]))}
               tabIndex={-1}
             >
-              <Close fontSize="small" />
+              <XClose />
             </StyledInputButton>
           </Box>
         ) : null

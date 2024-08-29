@@ -9,7 +9,7 @@ import {
 import { BottomLinks } from './BottomLinks';
 import { items } from './quickStartConfig';
 import { QuickStartStep } from './QuickStartStep';
-import { KeyboardArrowUp } from '@mui/icons-material';
+import { ChevronUp } from '@untitled-ui/icons-react';
 import { QuickStartFinishStep } from './QuickStartFinishStep';
 
 const StyledContainer = styled(Box)`
@@ -71,7 +71,7 @@ export const QuickStartGuide = () => {
           <T keyName="guide_title" />
         </Box>
         <IconButton onClick={() => setQuickStartOpen(false)}>
-          <KeyboardArrowUp />
+          <ChevronUp />
         </IconButton>
       </StyledHeader>
       <Box />

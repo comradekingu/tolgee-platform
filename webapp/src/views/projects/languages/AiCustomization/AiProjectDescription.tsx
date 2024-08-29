@@ -1,6 +1,6 @@
 import { useTranslate } from '@tolgee/react';
 import { Box, Button, IconButton, styled } from '@mui/material';
-import { Add, Edit } from '@mui/icons-material';
+import { Plus, Edit02 } from '@untitled-ui/icons-react';
 import { useState } from 'react';
 import { AiProjectDescriptionDialog } from './AiProjectDescriptionDialog';
 import { StarsIcon } from 'tg.component/CustomIcons';
@@ -53,7 +53,7 @@ export const AiProjectDescription = ({ description }: Props) => {
               onClick={() => setDialogOpen(true)}
               data-cy="ai-customization-project-description-edit"
             >
-              <Edit />
+              <Edit02 width={19} height={19} />
             </IconButton>
           </Box>
         </>
@@ -72,7 +72,7 @@ export const AiProjectDescription = ({ description }: Props) => {
             <Button
               color="primary"
               variant="contained"
-              startIcon={<Add />}
+              startIcon={<Plus width={19} height={19} />}
               onClick={() => setDialogOpen(true)}
               data-cy="ai-customization-project-description-add"
             >

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useTranslate } from '@tolgee/react';
 import { Box, Menu, MenuItem, styled } from '@mui/material';
-import { Edit } from '@mui/icons-material';
+import { Edit02 } from '@untitled-ui/icons-react';
 import { useHistory } from 'react-router-dom';
 
 import { components } from 'tg.service/apiSchema.generated';
@@ -217,7 +217,7 @@ export const ProjectTotals: React.FC<{
           </StyledTileDataItem>
           {canEditLanguages && (
             <StyledTileEdit>
-              <Edit fontSize="small" />
+              <Edit02 width={20} height={20} />
             </StyledTileEdit>
           )}
         </StyledTile>
@@ -306,7 +306,7 @@ export const ProjectTotals: React.FC<{
           </StyledTileDataItem>
           {membersEditable && (
             <StyledTileEdit>
-              <Edit fontSize="small" />
+              <Edit02 width={20} height={20} />
             </StyledTileEdit>
           )}
         </StyledTile>

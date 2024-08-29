@@ -16,12 +16,12 @@ import {
   Button,
 } from '@mui/material';
 import {
-  Email,
   GitHub,
   Help as HelpIcon,
   MenuBook,
   Message,
 } from '@mui/icons-material';
+import { Mail01 } from '@untitled-ui/icons-react';
 import { T, useTranslate } from '@tolgee/react';
 
 import {
@@ -216,7 +216,7 @@ export const HelpMenu = () => {
         )}
         <MenuItem onClick={handleOpenDialog}>
           <ListItemIcon>
-            <Email />
+            <Mail01 />
           </ListItemIcon>
           <ListItemText primary={t('help_menu_email')} />
         </MenuItem>

@@ -1,4 +1,4 @@
-import { Check } from '@mui/icons-material';
+import { Check } from '@untitled-ui/icons-react';
 import { Box, SxProps, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { StyledBillingLink } from 'tg.component/billing/Decorations';

@@ -10,7 +10,7 @@ import {
 import { useDebounceCallback } from 'usehooks-ts';
 
 import { TextField } from 'tg.component/common/TextField';
-import { Search } from '@mui/icons-material';
+import { SearchSm } from '@untitled-ui/icons-react';
 import { useTranslate } from '@tolgee/react';
 import { TaskFilterType } from 'tg.component/task/taskFilter/TaskFilterPopover';
 import { TaskFilter } from 'tg.component/task/taskFilter/TaskFilter';
@@ -58,7 +58,7 @@ export const MyTasksHeader = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search fontSize="small" />
+                <SearchSm width={20} height={20} />
               </InputAdornment>
             ),
           }}

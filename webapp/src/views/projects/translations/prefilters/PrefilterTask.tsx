@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { T } from '@tolgee/react';
-import { Box, Dialog, IconButton, styled } from '@mui/material';
-import { Warning } from '@mui/icons-material';
+import { Box, Dialog, IconButton, styled, useTheme } from '@mui/material';
+import { AlertTriangle } from '@untitled-ui/icons-react';
 
 import { useApiQuery } from 'tg.service/http/useQueryApi';
 import { useProject } from 'tg.hooks/useProject';
@@ -29,6 +29,7 @@ type Props = {
 
 export const PrefilterTask = ({ taskId }: Props) => {
   const project = useProject();
+  const theme = useTheme();
   const [showDetails, setShowDetails] = useState(false);
 
   const { data } = useApiQuery({
@@ -65,7 +66,11 @@ export const PrefilterTask = ({ taskId }: Props) => {
             </IconButton>
             {blockingTasksLoadable.data?.length ? (
               <StyledWarning>
-                <Warning fontSize="small" color="warning" />
+                <AlertTriangle
+                  width={18}
+                  height={18}
+                  color={theme.palette.warning.main}
+                />
                 <Box>
                   <T keyName="task_filter_indicator_blocking_warning" />{' '}
                   {blockingTasksLoadable.data.map((taskId, i) => (

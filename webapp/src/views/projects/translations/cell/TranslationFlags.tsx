@@ -1,5 +1,5 @@
-import { Dialog, styled } from '@mui/material';
-import { Clear, FlagCircle, Task } from '@mui/icons-material';
+import { Dialog, styled, useTheme } from '@mui/material';
+import { XClose, Flag02, ClipboardCheck } from '@untitled-ui/icons-react';
 import { useTranslate } from '@tolgee/react';
 
 import { components } from 'tg.service/apiSchema.generated';
@@ -28,13 +28,14 @@ const StyledWrapper = styled('div')`
   gap: 2px;
 `;
 
-const StyledClearButton = styled(Clear)`
+const StyledClearButton = styled(XClose)`
   padding-left: 2px;
-  font-size: 18px;
+  width: 18px;
+  height: 18px;
   display: none;
 `;
 
-const ActiveFlagCircle = styled(FlagCircle)`
+const ActiveFlagCircle = styled(Flag02)`
   color: ${({ theme }) => theme.palette.primary.main};
 `;
 
@@ -68,6 +69,7 @@ export const TranslationFlags: React.FC<Props> = ({
   lang,
   className,
 }) => {
+  const theme = useTheme();
   const project = useProject();
   const { t } = useTranslate();
   const translation = keyData.translations[lang];
@@ -130,6 +132,21 @@ export const TranslationFlags: React.FC<Props> = ({
   if (translation?.auto || translation?.outdated || displayTaskFlag) {
     return (
       <StyledWrapper className={className}>
+        {displayTaskFlag && (
+          <StyledContainer data-cy="translations-outdated-indicator">
+            <TaskTooltip taskId={task.id} project={project}>
+              <StyledImgWrapper>
+                <ClipboardCheck
+                  color={
+                    task?.done
+                      ? theme.palette.secondary.main
+                      : theme.palette.primary.main
+                  }
+                />
+              </StyledImgWrapper>
+            </TaskTooltip>
+          </StyledContainer>
+        )}
         {translation.auto && (
           <StyledContainer data-cy="translations-auto-translated-indicator">
             <AutoTranslationIcon provider={translation.mtProvider} />
@@ -153,15 +170,6 @@ export const TranslationFlags: React.FC<Props> = ({
               data-cy="translations-outdated-clear-button"
               className="clearButton"
             />
-          </StyledContainer>
-        )}
-        {displayTaskFlag && (
-          <StyledContainer data-cy="translations-outdated-indicator">
-            <TaskTooltip taskId={task.id} project={project}>
-              <StyledImgWrapper>
-                <Task color={task?.done ? 'secondary' : 'primary'} />
-              </StyledImgWrapper>
-            </TaskTooltip>
           </StyledContainer>
         )}
         {taskDetailData && task && (

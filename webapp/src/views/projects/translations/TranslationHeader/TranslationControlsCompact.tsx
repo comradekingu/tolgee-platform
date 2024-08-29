@@ -1,15 +1,13 @@
 import { useState } from 'react';
 import {
-  Add,
-  AppsRounded,
-  Clear,
-  FilterList,
-  Search,
-  ViewListRounded,
-} from '@mui/icons-material';
+  Plus,
+  XClose,
+  FilterLines,
+  SearchSm,
+  Globe02,
+} from '@untitled-ui/icons-react';
 import { Badge, Button, ButtonGroup, IconButton, styled } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
-import LanguageIcon from '@mui/icons-material/Language';
 
 import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 
@@ -25,6 +23,7 @@ import { QuickStartHighlight } from 'tg.component/layout/QuickStartGuide/QuickSt
 import { getActiveFilters } from 'tg.component/translation/translationFilters/getActiveFilters';
 import { FiltersMenu } from 'tg.component/translation/translationFilters/FiltersMenu';
 import { useFiltersContent } from 'tg.component/translation/translationFilters/useFiltersContent';
+import { ViewCards, ViewList } from 'tg.component/CustomIcons';
 
 const StyledContainer = styled('div')`
   display: flex;
@@ -51,6 +50,7 @@ const StyledSearchSpaced = styled('div')`
   align-items: center;
   gap: ${({ theme }) => theme.spacing(0.5)};
   padding-right: ${({ theme }) => theme.spacing(1)};
+  padding-left: ${({ theme }) => theme.spacing(1)};
   flex-grow: 1;
   position: relative;
 `;
@@ -63,6 +63,10 @@ const StyledToggleButton = styled(Button)`
   padding: 0px 2px;
   height: 35px;
   min-height: 35px;
+  & svg {
+    width: 22px;
+    height: 22px;
+  }
 `;
 
 const StyledIconButton = styled(IconButton)`
@@ -139,7 +143,7 @@ export const TranslationControlsCompact: React.FC<Props> = ({
               }}
             />
             <StyledIconButton size="small" onClick={() => setSearchOpen(false)}>
-              <Clear />
+              <XClose />
             </StyledIconButton>
           </StyledSearchSpaced>
         ) : (
@@ -151,7 +155,7 @@ export const TranslationControlsCompact: React.FC<Props> = ({
                     size="small"
                     onClick={() => setSearchOpen(true)}
                   >
-                    <Search />
+                    <SearchSm />
                   </StyledIconButton>
                 </StyledButtonWrapper>
               </Badge>
@@ -162,7 +166,7 @@ export const TranslationControlsCompact: React.FC<Props> = ({
                     size="small"
                     onClick={(e) => setAnchorFiltersEl(e.currentTarget)}
                   >
-                    <FilterList />
+                    <FilterLines />
                   </StyledIconButton>
                 </StyledButtonWrapper>
               </Badge>
@@ -180,7 +184,7 @@ export const TranslationControlsCompact: React.FC<Props> = ({
                 size="small"
                 onClick={(e) => setAnchorLanguagesEl(e.currentTarget)}
               >
-                <LanguageIcon />
+                <Globe02 />
               </StyledIconButton>
 
               <LanguagesMenu
@@ -197,14 +201,14 @@ export const TranslationControlsCompact: React.FC<Props> = ({
                   onClick={() => handleViewChange('LIST')}
                   data-cy="translations-view-list-button"
                 >
-                  <ViewListRounded />
+                  <ViewList />
                 </StyledToggleButton>
                 <StyledToggleButton
                   color={view === 'TABLE' ? 'primary' : 'default'}
                   onClick={() => handleViewChange('TABLE')}
                   data-cy="translations-view-table-button"
                 >
-                  <AppsRounded />
+                  <ViewCards />
                 </StyledToggleButton>
               </ButtonGroup>
 
@@ -216,7 +220,7 @@ export const TranslationControlsCompact: React.FC<Props> = ({
                     onClick={handleAddTranslation}
                     data-cy="translations-add-button"
                   >
-                    <Add />
+                    <Plus />
                   </StyledIconButton>
                 </QuickStartHighlight>
               )}

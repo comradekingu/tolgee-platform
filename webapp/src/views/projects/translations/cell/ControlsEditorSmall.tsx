@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslate } from '@tolgee/react';
 import { Box, styled } from '@mui/material';
-import { Code, ContentCopy, Task } from '@mui/icons-material';
+import { Code01, ClipboardCheck, Copy06 } from '@untitled-ui/icons-react';
 
 import { components } from 'tg.service/apiSchema.generated';
 import { StateInType } from 'tg.constants/translationStates';
@@ -91,7 +91,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
                 : t('translations_editor_switch_hide_code')
             }
           >
-            <Code fontSize="small" />
+            <Code01 />
           </ControlsButton>
         )}
 
@@ -105,7 +105,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
             data-cy="translations-cell-insert-base-button"
             tooltip={t('translations_cell_insert_base')}
           >
-            <ContentCopy fontSize="small" />
+            <Copy06 />
           </ControlsButton>
         )}
 
@@ -116,7 +116,7 @@ export const ControlsEditorSmall: React.FC<ControlsProps> = ({
             onClick={() => onTaskStateChange(!task?.done)}
             color={task?.done ? 'secondary' : 'primary'}
           >
-            <Task fontSize="small" />
+            <ClipboardCheck />
           </ControlsButton>
         )}
       </StyledIcons>

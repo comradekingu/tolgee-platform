@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { ArrowDropDown, Clear } from '@mui/icons-material';
+import { ArrowDropDown } from '@mui/icons-material';
+import { XClose } from '@untitled-ui/icons-react';
 import { Box, styled, IconButton, SxProps } from '@mui/material';
 
 import { stopAndPrevent } from 'tg.fixtures/eventHandler';
@@ -74,7 +75,7 @@ export const ProjectSearchSelect: React.FC<Props> = ({
                     onClick={stopAndPrevent(handleClear)}
                     tabIndex={-1}
                   >
-                    <Clear fontSize="small" />
+                    <XClose width={18} />
                   </StyledClearButton>
                 )}
                 <StyledClearButton

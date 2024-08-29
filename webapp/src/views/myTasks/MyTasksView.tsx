@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home } from '@mui/icons-material';
+import { HomeLine } from '@untitled-ui/icons-react';
 import { Dialog, ListProps, PaperProps, styled } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
 
@@ -88,7 +88,11 @@ export const MyTasksView = () => {
         title={t('my_tasks_title')}
         maxWidth={800}
         navigation={[
-          [null, LINKS.ROOT.build(), <Home key={0} fontSize="small" />],
+          [
+            null,
+            LINKS.ROOT.build(),
+            <HomeLine key={0} width={20} height={20} />,
+          ],
           [t('my_tasks_title'), LINKS.MY_TASKS.build()],
         ]}
       >

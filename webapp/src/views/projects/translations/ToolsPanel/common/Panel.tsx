@@ -1,7 +1,7 @@
 import { Box, styled } from '@mui/material';
 import { PanelConfig, PanelContentProps } from './types';
 import { useState } from 'react';
-import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { ChevronDown, ChevronUp } from '@untitled-ui/icons-react';
 
 const StyledContainer = styled(Box)`
   display: grid;
@@ -102,9 +102,9 @@ export const Panel = ({
           data-cy-id={id}
         >
           {open ? (
-            <KeyboardArrowUp fontSize="small" />
+            <ChevronUp width={20} height={20} />
           ) : (
-            <KeyboardArrowDown fontSize="small" />
+            <ChevronDown width={20} height={20} />
           )}
         </StyledToggle>
       </StyledHeader>

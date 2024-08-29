@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { T } from '@tolgee/react';
 import { Box, IconButton, styled, TextField } from '@mui/material';
-import { Send } from '@mui/icons-material';
+import { Send03 } from '@untitled-ui/icons-react';
 import { LoadingSkeletonFadingIn } from 'tg.component/LoadingSkeleton';
 import { StickyDateSeparator } from 'tg.views/projects/translations/ToolsPanel/common/StickyDateSeparator';
 import { useUser } from 'tg.globalContext/helpers';
@@ -164,9 +164,9 @@ export const Comments: React.FC<PanelContentProps> = ({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleAddComment}
                 disabled={isAddingComment}
-                sx={{ my: '-7px', alignSelf: 'end' }}
+                sx={{ my: '-6px', alignSelf: 'end' }}
               >
-                <Send fontSize="small" color="inherit" />
+                <Send03 width={20} height={20} color="inherit" />
               </IconButton>
             ),
           }}

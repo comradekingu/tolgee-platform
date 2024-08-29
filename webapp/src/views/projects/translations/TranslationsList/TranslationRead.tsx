@@ -9,6 +9,7 @@ import { TranslationLanguage } from './TranslationLanguage';
 const StyledContainer = styled('div')`
   display: grid;
   grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas:
     'language    controls-t '
     'translation translation '

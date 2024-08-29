@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { Box, styled } from '@mui/material';
 import { green, red } from '@mui/material/colors';
-import { HighlightOff } from '@mui/icons-material';
+import { XCircle } from '@untitled-ui/icons-react';
 import React, { FunctionComponent, useState } from 'react';
 
 import {
@@ -56,12 +56,14 @@ const StyledWrapper = styled(Box)`
 `;
 
 const StyledValidIcon = styled(DropzoneIcon)`
-  font-size: 100px;
+  width: 100px;
+  height: 100px;
   color: ${({ theme }) => theme.palette.import.progressDone};
 `;
 
-const StyledInvalidIcon = styled(HighlightOff)`
-  font-size: 100px;
+const StyledInvalidIcon = styled(XCircle)`
+  width: 100px;
+  height: 100px;
   fill: ${({ theme }) => theme.palette.error.main};
 `;
 

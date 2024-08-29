@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslate } from '@tolgee/react';
 import { Box, IconButton, styled, Tooltip, useTheme } from '@mui/material';
-import { AccessAlarm, MoreVert } from '@mui/icons-material';
+import { AlarmClock, DotsVertical } from '@untitled-ui/icons-react';
 
 import { TaskDetailIcon } from 'tg.component/CustomIcons';
 import { components } from 'tg.service/apiSchema.generated';
@@ -139,7 +139,7 @@ export const TaskItem = ({
         )}
         {task.dueDate ? (
           <Box display="flex" alignItems="center" gap={0.5}>
-            <AccessAlarm sx={{ fontSize: 16 }} />
+            <AlarmClock style={{ fontSize: 16 }} />
             {formatDate(task.dueDate, { timeZone: 'UTC' })}
           </Box>
         ) : null}
@@ -182,13 +182,13 @@ export const TaskItem = ({
           size="small"
           onClick={stopAndPrevent(() => onDetailOpen(task))}
         >
-          <TaskDetailIcon fontSize="small" />
+          <TaskDetailIcon />
         </IconButton>
         <IconButton
           size="small"
           onClick={stopAndPrevent((e) => setAnchorEl(e.currentTarget))}
         >
-          <MoreVert fontSize="small" />
+          <DotsVertical />
         </IconButton>
       </StyledItem>
       <TaskMenu

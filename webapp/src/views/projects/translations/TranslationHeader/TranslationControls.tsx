@@ -1,18 +1,19 @@
-import { Add, AppsRounded, ViewListRounded } from '@mui/icons-material';
+import { Plus } from '@untitled-ui/icons-react';
 import { Button, ButtonGroup, styled } from '@mui/material';
 import { T, useTranslate } from '@tolgee/react';
 
 import { LanguagesSelect } from 'tg.component/common/form/LanguagesSelect/LanguagesSelect';
+import { ViewCards, ViewList } from 'tg.component/CustomIcons';
 import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 import TranslationsSearchField from './TranslationsSearchField';
+import { TranslationFilters } from 'tg.component/translation/translationFilters/TranslationFilters';
+import { QuickStartHighlight } from 'tg.component/layout/QuickStartGuide/QuickStartHighlight';
 
 import {
   useTranslationsActions,
   useTranslationsSelector,
 } from '../context/TranslationsContext';
-import { TranslationFilters } from 'tg.component/translation/translationFilters/TranslationFilters';
 import { StickyHeader } from './StickyHeader';
-import { QuickStartHighlight } from 'tg.component/layout/QuickStartGuide/QuickStartHighlight';
 
 const StyledContainer = styled('div')`
   display: flex;
@@ -93,21 +94,21 @@ export const TranslationControls: React.FC<Props> = ({ onDialogOpen }) => {
               onClick={() => changeView('LIST')}
               data-cy="translations-view-list-button"
             >
-              <ViewListRounded />
+              <ViewList />
             </StyledToggleButton>
             <StyledToggleButton
               color={view === 'TABLE' ? 'primary' : 'default'}
               onClick={() => changeView('TABLE')}
               data-cy="translations-view-table-button"
             >
-              <AppsRounded />
+              <ViewCards />
             </StyledToggleButton>
           </ButtonGroup>
 
           {canCreateKeys && (
             <QuickStartHighlight itemKey="add_key">
               <Button
-                startIcon={<Add />}
+                startIcon={<Plus width={19} height={19} />}
                 color="primary"
                 variant="contained"
                 onClick={handleAddTranslation}

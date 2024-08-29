@@ -1,4 +1,5 @@
-import { ArrowDropDown, Close } from '@mui/icons-material';
+import { ArrowDropDown } from '@mui/icons-material';
+import { XClose } from '@untitled-ui/icons-react';
 import { Box, IconButton, styled, SxProps, Tooltip } from '@mui/material';
 import { useRef, useState } from 'react';
 import { TextField } from 'tg.component/common/TextField';
@@ -182,7 +183,7 @@ export const TaskFilter = ({
                   onClick={stopBubble(() => onChange({}))}
                   tabIndex={-1}
                 >
-                  <Close fontSize="small" />
+                  <XClose />
                 </StyledInputButton>
               )}
               <StyledInputButton

@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { useDebounce } from 'use-debounce';
 import { useTranslate } from '@tolgee/react';
 import { Checkbox, styled, Tooltip, Box } from '@mui/material';
-import { Bolt } from '@mui/icons-material';
+import { Zap } from '@untitled-ui/icons-react';
 
 import { LimitedHeightText } from 'tg.component/LimitedHeightText';
 import { components } from 'tg.service/apiSchema.generated';
@@ -98,11 +98,12 @@ const StyledTags = styled('div')`
   min-height: 28px;
 `;
 
-const StyledBolt = styled(Bolt)`
+const StyledBolt = styled(Zap)`
   position: absolute;
   bottom: 12px;
   left: 12px;
-  font-size: 16px;
+  width: 16px;
+  height: 16px;
 `;
 
 type Props = {

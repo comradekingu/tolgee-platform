@@ -1,5 +1,5 @@
-import { Warning } from '@mui/icons-material';
-import { Box, Skeleton, styled, Tooltip } from '@mui/material';
+import { AlertTriangle } from '@untitled-ui/icons-react';
+import { Box, Skeleton, styled, Tooltip, useTheme } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
 
 import { components } from 'tg.service/apiSchema.generated';
@@ -62,6 +62,7 @@ export const TaskPreview = ({
 }: Props) => {
   const { t } = useTranslate();
   const formatNumber = useNumberFormatter();
+  const theme = useTheme();
 
   const content = { keys, type, language: language.id };
   const statsLoadable = useApiQuery({
@@ -91,11 +92,16 @@ export const TaskPreview = ({
           <StyledMetric>{t('create_task_preview_keys')}</StyledMetric>
           <StyledMetric>
             {statsLoadable.data ? (
-              <Box display="flex" gap={0.5} alignItems="center">
+              <Box display="flex" alignItems="center">
                 {formatNumber(statsLoadable.data.keyCount)}
                 {statsLoadable.data.keyCount !== keys.length && (
                   <Tooltip title={t('create_task_preview_missing_keys_hint')}>
-                    <Warning fontSize="inherit" color="warning" />
+                    <Box display="flex" alignItems="center">
+                      <AlertTriangle
+                        height={15}
+                        color={theme.palette.tokens.warning.main}
+                      />
+                    </Box>
                   </Tooltip>
                 )}
               </Box>

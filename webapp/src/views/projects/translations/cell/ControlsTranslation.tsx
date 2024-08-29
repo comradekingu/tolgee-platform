@@ -1,7 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
 import { Badge, Box, styled } from '@mui/material';
-import { Check, Comment, Edit, Task } from '@mui/icons-material';
+import {
+  Check,
+  MessageTextSquare02,
+  Edit02,
+  ClipboardCheck,
+} from '@untitled-ui/icons-react';
 import { T } from '@tolgee/react';
 
 import { StateInType } from 'tg.constants/translationStates';
@@ -50,7 +55,8 @@ const StyledBadge = styled(Badge)`
 
 const StyledCheckIcon = styled(Check)`
   color: ${({ theme }) => theme.palette.emphasis[100]};
-  font-size: 14px;
+  width: 14px !important;
+  height: 14px !important;
   margin: -5px;
 `;
 
@@ -147,7 +153,7 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
           className={CELL_SHOW_ON_HOVER}
           tooltip={<T keyName="translations_cell_edit" />}
         >
-          <Edit fontSize="small" />
+          <Edit02 />
         </ControlsButton>
       )}
       {inDomComments && (
@@ -163,12 +169,12 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
         >
           {onlyResolved ? (
             <StyledBadge
-              badgeContent={<StyledCheckIcon fontSize="small" />}
+              badgeContent={<StyledCheckIcon />}
               classes={{
                 badge: 'resolved',
               }}
             >
-              <Comment fontSize="small" />
+              <MessageTextSquare02 />
             </StyledBadge>
           ) : (
             <StyledBadge
@@ -176,7 +182,7 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
               color="primary"
               classes={{ badge: 'unresolved' }}
             >
-              <Comment fontSize="small" />
+              <MessageTextSquare02 />
             </StyledBadge>
           )}
         </ControlsButton>
@@ -194,7 +200,7 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
               : undefined
           }
         >
-          <Task fontSize="small" />
+          <ClipboardCheck />
         </ControlsButton>
       )}
     </StyledControlsWrapper>

@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { InsertDriveFile } from '@mui/icons-material';
+import { File06, Translate01 } from '@untitled-ui/icons-react';
 
 import { useApiMutation, useApiQuery } from 'tg.service/http/useQueryApi';
 import { TextField } from 'tg.component/common/form/fields/TextField';
@@ -26,7 +26,6 @@ import { TaskInfoItem } from './TaskInfoItem';
 import { useDateFormatter } from 'tg.hooks/useLocale';
 import { TaskScope } from './TaskScope';
 import { UserAccount } from 'tg.component/UserAccount';
-import { TranslationIcon } from 'tg.component/CustomIcons';
 import { getLinkToTask, useTaskReport } from './utils';
 import { Scope } from 'tg.fixtures/permissions';
 
@@ -202,7 +201,7 @@ export const TaskDetail = ({ task, onClose, projectId }: Props) => {
                         to={project ? getLinkToTask(project, data) : ''}
                         target="_blank"
                       >
-                        <TranslationIcon fontSize="small" />
+                        <Translate01 />
                       </IconButton>
                     </Tooltip>
                     <Tooltip
@@ -212,7 +211,7 @@ export const TaskDetail = ({ task, onClose, projectId }: Props) => {
                       <IconButton
                         onClick={() => downloadReport(projectId, data)}
                       >
-                        <InsertDriveFile fontSize="small" />
+                        <File06 />
                       </IconButton>
                     </Tooltip>
                   </Box>

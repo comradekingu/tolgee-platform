@@ -10,7 +10,7 @@ import { Panel } from './common/Panel';
 
 import { PANELS, PANELS_WHEN_INACTIVE } from './panelsList';
 import { useOpenPanels } from './useOpenPanels';
-import { Close } from '@mui/icons-material';
+import { XClose } from '@untitled-ui/icons-react';
 import { T } from '@tolgee/react';
 import { useProjectPermissions } from 'tg.hooks/useProjectPermissions';
 
@@ -111,7 +111,7 @@ export const ToolsPanel = () => {
             </Typography>
           </StyledTitle>
           <StyledButton onClick={() => setSidePanelOpen(false)}>
-            <Close />
+            <XClose />
           </StyledButton>
           {PANELS_WHEN_INACTIVE.map((config) => (
             <Panel

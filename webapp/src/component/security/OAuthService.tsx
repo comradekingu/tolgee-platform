@@ -1,7 +1,7 @@
 import React from 'react';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
-import LoginIcon from '@mui/icons-material/Login';
+import { LogIn01 } from '@untitled-ui/icons-react';
 import { LINKS, PARAMS } from 'tg.constants/links';
 import { T } from '@tolgee/react';
 import { v4 as uuidv4 } from 'uuid';
@@ -67,7 +67,7 @@ export const oauth2Service = (
   return {
     id: 'oauth2',
     authenticationUrl: authUrl.toString(),
-    buttonIcon: <LoginIcon />,
+    buttonIcon: <LogIn01 />,
     loginButtonTitle: <T keyName="login_oauth2_login_button" />,
     signUpButtonTitle: <T keyName="login_oauth2_signup_button" />,
   };

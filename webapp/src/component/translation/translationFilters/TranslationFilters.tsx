@@ -1,5 +1,5 @@
 import { T, useTranslate } from '@tolgee/react';
-import { Clear } from '@mui/icons-material';
+import { XClose } from '@untitled-ui/icons-react';
 import {
   Select,
   Typography,
@@ -42,7 +42,6 @@ const StyledInputContent = styled('div')`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  overflow: hidden;
 `;
 
 const StyledInputText = styled(Typography)`
@@ -154,7 +153,7 @@ export const TranslationFilters = ({
                 onMouseDown={stopAndPrevent()}
                 data-cy="translations-filter-clear-all"
               >
-                <Clear fontSize="small" />
+                <XClose width={20} height={20} />
               </StyledClearButton>
             </Tooltip>
           )}

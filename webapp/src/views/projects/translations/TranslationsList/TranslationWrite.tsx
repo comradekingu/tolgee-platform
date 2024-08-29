@@ -14,7 +14,7 @@ import { useMissingPlaceholders } from '../cell/useMissingPlaceholders';
 import { TranslationVisual } from '../translationVisual/TranslationVisual';
 import { ControlsEditorReadOnly } from '../cell/ControlsEditorReadOnly';
 import { useBaseTranslation } from '../useBaseTranslation';
-import { Help } from '@mui/icons-material';
+import { HelpCircle } from '@untitled-ui/icons-react';
 import { useTranslate } from '@tolgee/react';
 
 const StyledContainer = styled('div')`
@@ -171,7 +171,7 @@ export const TranslationWrite: React.FC<Props> = ({ tools }) => {
                   rel="noreferrer noopener"
                   href="https://tolgee.io/platform/projects_and_organizations/editing_translations"
                 >
-                  <Help fontSize="small" />
+                  <HelpCircle width={20} height={20} />
                 </IconButton>
               </Tooltip>
               <MissingPlaceholders

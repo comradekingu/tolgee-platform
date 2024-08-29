@@ -17,7 +17,7 @@ import {
 } from 'tg.service/http/useQueryApi';
 import { BaseAdministrationView } from './components/BaseAdministrationView';
 import { Link } from 'react-router-dom';
-import { Delete } from '@mui/icons-material';
+import { Delete } from '@untitled-ui/icons-react';
 import { useMessage } from 'tg.hooks/useSuccessMessage';
 import { confirmation } from 'tg.hooks/confirmation';
 import { components } from 'tg.service/billingApiSchema.generated';
