@@ -1,6 +1,5 @@
 import React from 'react';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import GoogleIcon from '@mui/icons-material/Google';
+import { GitHub, Google } from 'tg.component/CustomIcons';
 import { LogIn01 } from '@untitled-ui/icons-react';
 import { LINKS, PARAMS } from 'tg.constants/links';
 import { T } from '@tolgee/react';
@@ -27,7 +26,7 @@ export const gitHubService = (clientId: string): OAuthService => {
     authenticationUrl: encodeURI(
       `${GITHUB_BASE}?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email`
     ),
-    buttonIcon: <GitHubIcon />,
+    buttonIcon: <GitHub width={20} height={20} />,
     loginButtonTitle: <T keyName="login_github_login_button" />,
     signUpButtonTitle: <T keyName="login_github_signup_button" />,
   };
@@ -42,7 +41,7 @@ export const googleService = (clientId: string): OAuthService => {
     authenticationUrl: encodeURI(
       `${GOOGLE_BASE}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid+email+https://www.googleapis.com/auth/userinfo.profile`
     ),
-    buttonIcon: <GoogleIcon />,
+    buttonIcon: <Google width={20} height={20} />,
     loginButtonTitle: <T keyName="login_google_login_button" />,
     signUpButtonTitle: <T keyName="login_google_signup_button" />,
   };

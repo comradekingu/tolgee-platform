@@ -7,7 +7,7 @@ import {
   SxProps,
 } from '@mui/material';
 import { useTranslate } from '@tolgee/react';
-import { ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropDown } from 'tg.component/CustomIcons';
 
 import { components } from 'tg.service/apiSchema.generated';
 import { TextField } from 'tg.component/common/TextField';

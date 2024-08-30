@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ListItemText, Popover } from '@mui/material';
-import { ArrowRight } from '@mui/icons-material';
+import { ArrowRight } from 'tg.component/CustomIcons';
 
 import { SearchSelectMulti } from 'tg.component/searchSelect/SearchSelectMulti';
 import { CompactMenuItem } from 'tg.component/ListComponents';

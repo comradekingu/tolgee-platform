@@ -16,12 +16,11 @@ import {
   Button,
 } from '@mui/material';
 import {
-  GitHub,
-  Help as HelpIcon,
-  MenuBook,
-  Message,
-} from '@mui/icons-material';
-import { Mail01 } from '@untitled-ui/icons-react';
+  BookOpen01,
+  MessageSquare01,
+  Mail01,
+  HelpCircle,
+} from '@untitled-ui/icons-react';
 import { T, useTranslate } from '@tolgee/react';
 
 import {
@@ -29,7 +28,7 @@ import {
   usePreferredOrganization,
   useUser,
 } from 'tg.globalContext/helpers';
-import { Slack } from './CustomIcons';
+import { GitHub, Slack } from './CustomIcons';
 
 const BASE_URL = 'https://app.chatwoot.com';
 let scriptPromise: Promise<void> | null = null;
@@ -144,7 +143,7 @@ export const HelpMenu = () => {
       >
         <StyledHelpButton onClick={handleOpen} id="help-button">
           <Fab color="primary" size="small">
-            <HelpIcon fontSize="small" />
+            <HelpCircle />
           </Fab>
         </StyledHelpButton>
       </Tooltip>
@@ -164,7 +163,7 @@ export const HelpMenu = () => {
           {...buttonLink('https://tolgee.io/platform')}
         >
           <ListItemIcon>
-            <MenuBook />
+            <BookOpen01 />
           </ListItemIcon>
           <ListItemText primary={t('help_menu_documentation')} />
         </MenuItem>
@@ -206,7 +205,7 @@ export const HelpMenu = () => {
         {displayChat && (
           <MenuItem onClick={openChatwoot}>
             <ListItemIcon>
-              <Message />
+              <MessageSquare01 />
             </ListItemIcon>
             <ListItemText
               primary={t('help_menu_chat_with_us')}

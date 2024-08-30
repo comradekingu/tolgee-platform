@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { T } from '@tolgee/react';
 import { Button, ButtonGroup, Menu, MenuItem, styled } from '@mui/material';
-import { ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropDown } from 'tg.component/CustomIcons';
 
 import LoadingButton from 'tg.component/common/form/LoadingButton';
 import { components } from 'tg.service/apiSchema.generated';

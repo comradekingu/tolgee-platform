@@ -12,3 +12,8 @@ export { default as Rocket } from '../svgs/icons/rocket.svg?react';
 export { default as RocketFilled } from '../svgs/icons/rocket-filled.svg?react';
 export { default as Tada } from '../svgs/icons/tada.svg?react';
 export { default as QsFinished } from '../svgs/icons/qs-finished.svg?react';
+export { default as GitHub } from '../svgs/icons/github.svg?react';
+export { default as ArrowDropDown } from '../svgs/icons/arrow-drop-down.svg?react';
+export { default as ArrowRight } from '../svgs/icons/arrow-right.svg?react';
+export { default as CheckBoxOutlineBlank } from '../svgs/icons/check-box-outline-blank.svg?react';
+export { default as Google } from '../svgs/icons/google.svg?react';

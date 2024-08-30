@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Checkbox, ListItemText, Menu, MenuItem, styled } from '@mui/material';
-import { ArrowRight } from '@mui/icons-material';
+import { ArrowRight } from 'tg.component/CustomIcons';
 
 import { TRANSLATION_STATES } from 'tg.constants/translationStates';
 import { decodeFilter, OptionType } from './tools';

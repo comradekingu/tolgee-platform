@@ -1,6 +1,6 @@
 import { ComponentProps, FunctionComponent, useRef, useState } from 'react';
 import { Button, styled, Tooltip, Popover, Checkbox } from '@mui/material';
-import { ArrowDropDown, CheckBoxOutlineBlank } from '@mui/icons-material';
+import { ArrowDropDown, CheckBoxOutlineBlank } from 'tg.component/CustomIcons';
 import { useTranslate } from '@tolgee/react';
 
 import { LanguagesPermittedList } from 'tg.component/languages/LanguagesPermittedList';
