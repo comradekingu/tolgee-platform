@@ -6,7 +6,6 @@ import io.tolgee.model.Project
 import io.tolgee.model.UserAccount
 import io.tolgee.model.enums.TaskType
 import io.tolgee.model.task.Task
-import io.tolgee.model.task.TaskId
 import io.tolgee.model.views.KeysScopeView
 import io.tolgee.model.views.TaskPerUserReportView
 import io.tolgee.model.views.TaskScopeView
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.Optional
 
 const val TASK_SEARCH = """
     (
@@ -39,11 +39,11 @@ const val TASK_FILTERS = """
     )
     and (
         :#{#filters.filterId} is null
-        or tk.id in :#{#filters.filterId}
+        or tk.number in :#{#filters.filterId}
     )
     and (
         :#{#filters.filterNotId} is null
-        or tk.id not in :#{#filters.filterNotId}
+        or tk.number not in :#{#filters.filterNotId}
     )
     and (
         :#{#filters.filterProject} is null
@@ -76,7 +76,7 @@ const val TASK_FILTERS = """
 """
 
 @Repository
-interface TaskRepository : JpaRepository<Task, TaskId> {
+interface TaskRepository : JpaRepository<Task, Long> {
   @Query(
     """
      select tk
@@ -121,13 +121,13 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         tt.key_id as keyId,
         l.id as languageId,
         l.tag as languageTag,
-        t.id as taskId,
+        t.number as taskNumber,
         tt.done as taskDone,
         CASE WHEN u.id IS NULL THEN FALSE ELSE TRUE END as taskAssigned,
         t.type as taskType
      from task t
-        join task_key tt on (t.id = tt.task_id and tt.task_project_id = t.project_id)
-        left join task_assignees ta on (ta.tasks_id = t.id and ta.tasks_project_id = t.project_id)
+        join task_key tt on (t.id = tt.task_id)
+        left join task_assignees ta on (ta.tasks_id = t.id)
         left join user_account u on ta.assignees_id = u.id
         left join language l on (t.language_id = l.id)
      where
@@ -164,10 +164,10 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       where
         t.project = :project
         and l.deletedAt is null
-      order by t.id desc
+      order by t.number desc
     """,
   )
-  fun findByProjectOrderByIdDesc(project: Project): List<Task>
+  fun findByProjectOrderByNumberDesc(project: Project): List<Task>
 
   @Query(
     nativeQuery = true,
@@ -177,7 +177,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
           left join (
             select key.id as key_id from key
                 join task_key on (key.id = task_key.key_id)
-                join task on (task_key.task_id = task.id and task_key.task_project_id = :projectId)
+                join task on (task_key.task_id = task.id)
                 left join language l on (task.language_id = l.id)
             where task.type = :taskType
                 and task.language_id = :languageId
@@ -215,12 +215,13 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       select k.id
       from Key k
           left join k.tasks tt
-      where k.project.id = :projectId and tt.task.id = :taskId
+          left join tt.task t
+      where k.project.id = :projectId and t.number = :taskNumber
     """,
   )
   fun getTaskKeys(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
   ): List<Long>
 
   @Query(
@@ -243,7 +244,6 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
     value = """
       select
           tk.id as taskId,
-          tk.project.id as projectId,
           count(k.id) as totalItems,
           coalesce(sum(case when tt.done then 1 else 0 end), 0) as doneItems,
           coalesce(sum(bt.characterCount), 0) as baseCharacterCount,
@@ -268,7 +268,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         left join Key k on element(tt).key.id = k.id
         left join k.translations as btr on btr.language.id = :baseLangId 
       where tk.project.id = :projectId
-        and tk.id = :taskId
+        and tk.number = :taskNumber
         and tt.done
         and u.id is not NULL
       group by u
@@ -276,7 +276,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
   )
   fun perUserReport(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
     baseLangId: Long,
   ): List<TaskPerUserReportView>
 
@@ -285,14 +285,14 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
       select u
       from UserAccount u
         join u.tasks tk
-      where tk.id = :taskId
+      where tk.number = :taskNumber
         and tk.project.id = :projectId
         and u.id = :userId
     """,
   )
   fun findAssigneeById(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
     userId: Long,
   ): List<UserAccount>
 
@@ -318,20 +318,33 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
 
   @Query(
     """
-      select distinct t.id
+      select distinct t.number
       from Task t
         join t.keys tt
-        join Task at on (at.id = :taskId and at.project.id = :projectId)
+        join Task at on (at.number = :taskNumber and at.project.id = :projectId)
         join at.keys att
         join Key k on (element(att).key.id = k.id and element(tt).key.id = k.id)
-      where (t.id > :taskId or t.type != at.type)
+      where (t.number > :taskNumber or t.type != at.type)
         and t.language = at.language
         and t.type >= at.type
         and t.state = 'IN_PROGRESS'
     """,
   )
-  fun getBlockingTaskIds(
+  fun getBlockingTaskNumbers(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
   ): List<Long>
+
+
+  @Query(
+    """
+      from Task t
+      where t.number = :taskNumber
+        and t.project.id = :projectId
+    """,
+  )
+  fun findByNumber(
+    projectId: Long,
+    taskNumber: Long
+  ): Optional<Task>
 }

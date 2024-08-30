@@ -74,19 +74,19 @@ export const TaskDetail = ({ task, onClose, projectId }: Props) => {
   const formatDate = useDateFormatter();
 
   const taskLoadable = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'get',
-    path: { projectId, taskId: task.id },
+    path: { projectId, taskNumber: task.number },
   });
 
   const perUserReportLoadable = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/per-user-report',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/per-user-report',
     method: 'get',
-    path: { projectId, taskId: task.id },
+    path: { projectId, taskNumber: task.number },
   });
 
   const updateLoadable = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'put',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
@@ -128,7 +128,7 @@ export const TaskDetail = ({ task, onClose, projectId }: Props) => {
             onSubmit={(values, actions) => {
               updateLoadable.mutate(
                 {
-                  path: { projectId, taskId: task.id },
+                  path: { projectId, taskNumber: task.number },
                   content: {
                     'application/json': {
                       name: values.name,

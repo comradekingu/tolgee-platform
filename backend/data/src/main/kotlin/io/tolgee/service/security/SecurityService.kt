@@ -86,12 +86,12 @@ class SecurityService(
 
   fun hasTaskEditScopeOrIsAssigned(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
   ) {
     try {
       checkProjectPermission(projectId, Scope.TASKS_EDIT)
     } catch (err: PermissionException) {
-      val assignees = taskService.findAssigneeById(projectId, taskId, activeUser.id)
+      val assignees = taskService.findAssigneeById(projectId, taskNumber, activeUser.id)
       if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
         throw err
       }
@@ -100,12 +100,12 @@ class SecurityService(
 
   fun hasTaskViewScopeOrIsAssigned(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
   ) {
     try {
       checkProjectPermission(projectId, Scope.TASKS_VIEW)
     } catch (err: PermissionException) {
-      val assignees = taskService.findAssigneeById(projectId, taskId, activeUser.id)
+      val assignees = taskService.findAssigneeById(projectId, taskNumber, activeUser.id)
       if (assignees.isEmpty() || assignees[0].id != activeUser.id) {
         throw err
       }

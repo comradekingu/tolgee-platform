@@ -45,19 +45,19 @@ export const useDeleteTag = () =>
 
 export const usePutTask = () =>
   useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'put',
   });
 
 export const useFinishTask = () =>
   useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/finish',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/finish',
     method: 'post',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
 export const usePutTaskTranslation = () =>
   useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/keys/{keyId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/keys/{keyId}',
     method: 'put',
   });

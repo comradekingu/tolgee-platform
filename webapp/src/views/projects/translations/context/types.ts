@@ -37,7 +37,7 @@ export type UpdateTranslation = {
 };
 
 export type UpdateTask = {
-  taskId: number;
+  taskNumber: number;
   data: UpdateTaskRequest;
 };
 
@@ -81,7 +81,7 @@ export type SetTranslationState = {
 
 export type SetTaskTranslationState = {
   done: boolean;
-  taskId: number;
+  taskNumber: number;
   keyId: number;
 };
 

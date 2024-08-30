@@ -31,7 +31,7 @@ export const usePrefilter = (): PrefilterType => {
 
   const activityId = stringToNumber(activity);
   const failedJobId = stringToNumber(failedJob);
-  const taskId = stringToNumber(task);
+  const taskNumber = stringToNumber(task);
 
   function clear() {
     setActivity(undefined);
@@ -47,8 +47,8 @@ export const usePrefilter = (): PrefilterType => {
     result.activity = activityId;
   } else if (failedJobId !== undefined) {
     result.failedJob = failedJobId;
-  } else if (taskId !== undefined) {
-    result.task = taskId;
+  } else if (taskNumber !== undefined) {
+    result.task = taskNumber;
   }
 
   return result;

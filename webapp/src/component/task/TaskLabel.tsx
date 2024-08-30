@@ -1,7 +1,7 @@
 import { Box, styled, SxProps, Tooltip } from '@mui/material';
 import { FlagImage } from 'tg.component/languages/FlagImage';
 import { components } from 'tg.service/apiSchema.generated';
-import { TaskId } from './TaskId';
+import { TaskNumber } from './TaskId';
 import { TaskTypeChip } from './TaskTypeChip';
 
 type TaskModel = components['schemas']['TaskModel'];
@@ -39,7 +39,7 @@ export const TaskLabel = ({ task, sx, className }: Props) => {
         </Box>
       </Tooltip>
       <StyledTaskName sx={{ flexShrink: 1 }}>{task.name}</StyledTaskName>
-      <TaskId>{task.id}</TaskId>
+      <TaskNumber>{task.number}</TaskNumber>
       <TaskTypeChip type={task.type} />
     </StyledContainer>
   );

@@ -12,7 +12,6 @@ import io.tolgee.model.enums.TaskState
 import io.tolgee.model.enums.TaskType
 import io.tolgee.model.key.Key
 import io.tolgee.model.task.Task
-import io.tolgee.model.task.TaskId
 import io.tolgee.model.task.TaskKey
 import io.tolgee.model.task.TaskKeyId
 import io.tolgee.model.views.*
@@ -117,8 +116,8 @@ class TaskService(
     filters: TranslationScopeFilters,
   ): Task {
     // Find the maximum ID for the given project
-    val lastTask = taskRepository.findByProjectOrderByIdDesc(project).firstOrNull()
-    val newId = (lastTask?.id ?: 0L) + 1
+    val lastTask = taskRepository.findByProjectOrderByNumberDesc(project).firstOrNull()
+    val newNumber = (lastTask?.number ?: 0L) + 1
 
     val language = checkLanguage(dto.languageId!!, project)
     val assignees = checkAssignees(dto.assignees ?: mutableSetOf(), project)
@@ -133,7 +132,7 @@ class TaskService(
 
     val task = Task()
 
-    task.id = newId
+    task.number = newNumber
     task.project = project
     task.name = dto.name
     task.type = dto.type
@@ -156,11 +155,11 @@ class TaskService(
   @Transactional
   fun updateTask(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
     dto: UpdateTaskRequest,
   ): TaskWithScopeView {
     val task =
-      taskRepository.findById(TaskId(projectEntity, taskId)).or {
+      taskRepository.findByNumber(projectEntity.id, taskNumber).or {
         throw NotFoundException(Message.TASK_NOT_FOUND)
       }.get()
 
@@ -199,33 +198,35 @@ class TaskService(
   @Transactional
   fun deleteTask(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ) {
-    val taskComposedId = TaskId(projectEntity, taskId)
-    taskKeyRepository.deleteByTask(entityManager.getReference(Task::class.java, taskComposedId))
-    taskRepository.deleteById(taskComposedId)
+    val task = taskRepository.findByNumber(projectEntity.id, taskNumber).or {
+      throw NotFoundException(Message.TASK_NOT_FOUND)
+    }.get()
+    taskKeyRepository.deleteByTask(task)
+    taskRepository.delete(task)
   }
 
   @Transactional
   fun getTask(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ): TaskWithScopeView {
-    val taskComposedId = TaskId(projectEntity, taskId)
-    val task = taskRepository.getReferenceById(taskComposedId)
+    val task = taskRepository.findByNumber(projectEntity.id, taskNumber).or {
+      throw NotFoundException(Message.TASK_NOT_FOUND)
+    }.get()
     return getTasksWithScope(listOf(task)).first()
   }
 
   @Transactional
   fun updateTaskKeys(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
     dto: UpdateTaskKeysRequest,
   ) {
-    val task =
-      taskRepository.findById(TaskId(projectEntity, taskId)).or {
-        throw NotFoundException(Message.TASK_NOT_FOUND)
-      }.get()
+    val task = taskRepository.findByNumber(projectEntity.id, taskNumber).or {
+      throw NotFoundException(Message.TASK_NOT_FOUND)
+    }.get()
 
     dto.removeKeys?.let { toRemove ->
       val taskKeysToRemove =
@@ -253,14 +254,18 @@ class TaskService(
   @Transactional
   fun updateTaskKey(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
     keyId: Long,
     dto: UpdateTaskKeyRequest,
   ): UpdateTaskKeyResponse {
+    val task = taskRepository.findByNumber(projectEntity.id, taskNumber).or {
+      throw NotFoundException(Message.TASK_NOT_FOUND)
+    }.get()
+
     val taskKey =
       taskKeyRepository.findById(
         TaskKeyId(
-          task = entityManager.getReference(Task::class.java, TaskId(projectEntity, taskId)),
+          task = task,
           key = entityManager.getReference(Key::class.java, keyId),
         ),
       ).or {
@@ -282,7 +287,7 @@ class TaskService(
     taskKeyRepository.saveAndFlush(taskKey)
 
     if (!previousValue && taskKey.done) {
-      val taskItem = getTask(projectEntity, taskId)
+      val taskItem = getTask(projectEntity, taskNumber)
       return UpdateTaskKeyResponse(
         done = taskKey.done,
         taskFinished = taskItem.doneItems == taskItem.totalItems,
@@ -297,10 +302,10 @@ class TaskService(
 
   fun findAssigneeById(
     projectId: Long,
-    taskId: Long,
+    taskNumber: Long,
     userId: Long,
   ): List<UserAccount> {
-    return taskRepository.findAssigneeById(projectId, taskId, userId)
+    return taskRepository.findAssigneeById(projectId, taskNumber, userId)
   }
 
   fun findAssigneeByKey(
@@ -337,16 +342,16 @@ class TaskService(
   @Transactional
   fun getTaskKeys(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ): List<Long> {
-    return taskRepository.getTaskKeys(projectEntity.id, taskId)
+    return taskRepository.getTaskKeys(projectEntity.id, taskNumber)
   }
 
   fun getBlockingTasks(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ): List<Long> {
-    return taskRepository.getBlockingTaskIds(projectEntity.id, taskId)
+    return taskRepository.getBlockingTaskNumbers(projectEntity.id, taskNumber)
   }
 
   fun getKeysWithTasks(
@@ -365,11 +370,11 @@ class TaskService(
 
   fun getReport(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ): List<TaskPerUserReportView> {
     return taskRepository.perUserReport(
       projectEntity.id,
-      taskId,
+      taskNumber,
       projectEntity.baseLanguage!!.id,
     )
   }
@@ -418,10 +423,10 @@ class TaskService(
   private fun getTasksWithScope(tasks: Collection<Task>): List<TaskWithScopeView> {
     val scopes = taskRepository.getTasksScopes(tasks)
     return tasks.map { task ->
-      val scope = scopes.find { it.taskId == task.id && it.projectId == task.project.id }!!
+      val scope = scopes.find { it.taskId == task.id }!!
       TaskWithScopeView(
         project = task.project,
-        id = task.id,
+        number = task.number,
         name = task.name,
         description = task.description,
         type = task.type,
@@ -443,10 +448,10 @@ class TaskService(
 
   fun getExcelFile(
     projectEntity: Project,
-    taskId: Long,
+    taskNumber: Long,
   ): ByteArray {
-    val task = getTask(projectEntity, taskId)
-    val report = getReport(projectEntity, taskId)
+    val task = getTask(projectEntity, taskNumber)
+    val report = getReport(projectEntity, taskNumber)
 
     val workbook = TaskReportHelper(task, report).generateExcelReport()
 

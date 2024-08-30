@@ -22,14 +22,14 @@ export const OperationTaskAddKeys = ({ disabled, onFinished }: Props) => {
   const selection = useTranslationsSelector((c) => c.selection);
 
   const addTaskKeysLoadable = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/keys',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/keys',
     method: 'put',
   });
 
   function handleAddKeys() {
     addTaskKeysLoadable.mutate(
       {
-        path: { projectId: project.id, taskId: task!.id },
+        path: { projectId: project.id, taskNumber: task!.number },
         content: { 'application/json': { addKeys: selection } },
       },
       {

@@ -284,7 +284,7 @@ When null, resulting file will be a flat key-value object.
       key.tasks =
         translationsWithTasks[key.keyId]?.map {
           KeyTaskView(
-            it.taskId,
+            it.taskNumber,
             it.languageId,
             it.languageTag,
             it.taskDone,

@@ -42,7 +42,7 @@ export const ControlsEditorMain: React.FC<ControlsProps> = ({
   const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
   const displayTaskControls =
     task &&
-    task.id === prefilteredTask &&
+    task.number === prefilteredTask &&
     task.userAssigned &&
     !task.done &&
     task.type === 'TRANSLATE';

@@ -13,7 +13,7 @@ export const Prefilter = ({ prefilter }: Props) => {
   } else if (prefilter?.failedJob) {
     return <PrefilterFailedJob jobId={prefilter.failedJob} />;
   } else if (prefilter?.task) {
-    return <PrefilterTask taskId={prefilter.task} />;
+    return <PrefilterTask taskNumber={prefilter.task} />;
   }
   return null;
 };

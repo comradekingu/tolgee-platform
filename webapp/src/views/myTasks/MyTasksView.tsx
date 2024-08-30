@@ -135,7 +135,7 @@ export const MyTasksView = () => {
               showProject={true}
             />
           )}
-          getKey={(task) => `${task.project?.id}.${task.id}`}
+          getKey={(task) => `${task.project?.id}.${task.number}`}
           itemSeparator={() => <StyledSeparator />}
         />
       </BaseView>

@@ -146,7 +146,7 @@ export const useTranslationsService = (props: Props) => {
         ? [props.prefilter.activity]
         : undefined,
     filterFailedKeysOfJob: props.prefilter?.failedJob,
-    filterTaskId:
+    filterTaskNumber:
       props.prefilter?.task !== undefined ? [props.prefilter.task] : undefined,
   };
 

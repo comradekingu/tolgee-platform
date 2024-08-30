@@ -18,9 +18,9 @@ export const useTaskService = ({ translations }: Props) => {
   const finishTask = useFinishTask();
   const putTaskTranslation = usePutTaskTranslation();
 
-  const handleFinishTask = ({ taskId, data }: UpdateTask) => {
+  const handleFinishTask = ({ taskNumber, data }: UpdateTask) => {
     return finishTask.mutateAsync({
-      path: { projectId: project.id, taskId: taskId },
+      path: { projectId: project.id, taskNumber: taskNumber },
     });
   };
 
@@ -29,7 +29,7 @@ export const useTaskService = ({ translations }: Props) => {
       {
         path: {
           projectId: project.id,
-          taskId: data.taskId,
+          taskNumber: data.taskNumber,
           keyId: data.keyId,
         },
         content: {
@@ -48,7 +48,9 @@ export const useTaskService = ({ translations }: Props) => {
               keyId: data.keyId,
               value: {
                 tasks: key?.tasks?.map((t) =>
-                  t.id === data.taskId ? { ...t, done: response.done } : t
+                  t.number === data.taskNumber
+                    ? { ...t, done: response.done }
+                    : t
                 ),
               },
             },
@@ -62,7 +64,7 @@ export const useTaskService = ({ translations }: Props) => {
               ),
               onConfirm() {
                 handleFinishTask({
-                  taskId: data.taskId,
+                  taskNumber: data.taskNumber,
                   data: { state: 'DONE' },
                 }).then(() => {
                   translations.refetchTranslations();

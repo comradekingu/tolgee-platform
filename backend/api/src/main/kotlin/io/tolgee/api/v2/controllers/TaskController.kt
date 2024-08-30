@@ -2,6 +2,7 @@ package io.tolgee.api.v2.controllers
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import io.tolgee.activity.data.ActivityType
 import io.tolgee.dtos.request.task.*
 import io.tolgee.dtos.request.userAccount.UserAccountPermissionsFilters
 import io.tolgee.hateoas.task.TaskModel
@@ -86,58 +87,58 @@ class TaskController(
     return taskModelAssembler.toModel(task)
   }
 
-  @GetMapping("/{taskId}")
+  @GetMapping("/{taskNumber}")
   @Operation(summary = "Get task")
   @UseDefaultPermissions
   @AllowApiAccess
   fun getTask(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): TaskModel {
     // user can view tasks assigned to him
-    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
-    val task = taskService.getTask(projectHolder.projectEntity, taskId)
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
+    val task = taskService.getTask(projectHolder.projectEntity, taskNumber)
     return taskModelAssembler.toModel(task)
   }
 
-  @PutMapping("/{taskId}")
+  @PutMapping("/{taskNumber}")
   @Operation(summary = "Update task")
   @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun updateTask(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
     @RequestBody @Valid
     dto: UpdateTaskRequest,
   ): TaskModel {
-    val task = taskService.updateTask(projectHolder.projectEntity, taskId, dto)
+    val task = taskService.updateTask(projectHolder.projectEntity, taskNumber, dto)
     return taskModelAssembler.toModel(task)
   }
 
-  @GetMapping("/{taskId}/per-user-report")
+  @GetMapping("/{taskNumber}/per-user-report")
   @Operation(summary = "Report who did what")
   @UseDefaultPermissions
   @AllowApiAccess
   fun getPerUserReport(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): List<TaskPerUserReportModel> {
-    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
 
-    val result = taskService.getReport(projectHolder.projectEntity, taskId)
+    val result = taskService.getReport(projectHolder.projectEntity, taskNumber)
     return result.map { taskPerUserReportModelAssembler.toModel(it) }
   }
 
-  @GetMapping("/{taskId}/csv-report")
+  @GetMapping("/{taskNumber}/csv-report")
   @Operation(summary = "Report who did what")
   @UseDefaultPermissions
   @AllowApiAccess
   fun getCsvReport(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): ResponseEntity<ByteArrayResource> {
-    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
-    val byteArray = taskService.getExcelFile(projectHolder.projectEntity, taskId)
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
+    val byteArray = taskService.getExcelFile(projectHolder.projectEntity, taskNumber)
     val resource = ByteArrayResource(byteArray)
 
     val headers = HttpHeaders()
@@ -148,59 +149,59 @@ class TaskController(
     return ResponseEntity(resource, headers, HttpStatus.OK)
   }
 
-  @GetMapping("/{taskId}/keys")
+  @GetMapping("/{taskNumber}/keys")
   @Operation(summary = "Get task keys")
   @UseDefaultPermissions
   @AllowApiAccess
   fun getTaskKeys(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): TaskKeysResponse {
-    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
+    securityService.hasTaskViewScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
     return TaskKeysResponse(
-      keys = taskService.getTaskKeys(projectHolder.projectEntity, taskId),
+      keys = taskService.getTaskKeys(projectHolder.projectEntity, taskNumber),
     )
   }
 
-  @PutMapping("/{taskId}/keys")
+  @PutMapping("/{taskNumber}/keys")
   @Operation(summary = "Add or remove task keys")
   @RequiresProjectPermissions([Scope.TASKS_EDIT])
   @AllowApiAccess
   fun updateTaskKeys(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
     @RequestBody @Valid
     dto: UpdateTaskKeysRequest,
   ) {
-    taskService.updateTaskKeys(projectHolder.projectEntity, taskId, dto)
+    taskService.updateTaskKeys(projectHolder.projectEntity, taskNumber, dto)
   }
 
-  @GetMapping("/{taskId}/blocking-tasks")
+  @GetMapping("/{taskNumber}/blocking-tasks")
   @Operation(summary = "Get task ids which block this task")
   @UseDefaultPermissions
   @AllowApiAccess
   fun getBlockingTasks(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): List<Long> {
-    return taskService.getBlockingTasks(projectHolder.projectEntity, taskId)
+    return taskService.getBlockingTasks(projectHolder.projectEntity, taskNumber)
   }
 
-  @PostMapping("/{taskId}/finish")
+  @PostMapping("/{taskNumber}/finish")
   @Operation(summary = "Finish task")
   // permissions checked inside
   @UseDefaultPermissions
   @AllowApiAccess
   fun finishTask(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
   ): TaskModel {
     // user can only finish tasks assigned to him
-    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
     val task =
       taskService.updateTask(
         projectHolder.projectEntity,
-        taskId,
+        taskNumber,
         UpdateTaskRequest(
           state = TaskState.DONE,
         ),
@@ -208,22 +209,22 @@ class TaskController(
     return taskModelAssembler.toModel(task)
   }
 
-  @PutMapping("/{taskId}/keys/{keyId}")
+  @PutMapping("/{taskNumber}/keys/{keyId}")
   @Operation(summary = "Update task key")
   // permissions checked inside
   @UseDefaultPermissions
   @AllowApiAccess
   fun updateTaskKey(
     @PathVariable
-    taskId: Long,
+    taskNumber: Long,
     @PathVariable
     keyId: Long,
     @RequestBody @Valid
     dto: UpdateTaskKeyRequest,
   ): UpdateTaskKeyResponse {
     // user can only update tasks assigned to him
-    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskId)
-    return taskService.updateTaskKey(projectHolder.projectEntity, taskId, keyId, dto)
+    securityService.hasTaskEditScopeOrIsAssigned(projectHolder.projectEntity.id, taskNumber)
+    return taskService.updateTaskKey(projectHolder.projectEntity, taskNumber, keyId, dto)
   }
 
   @PostMapping("/create-multiple")

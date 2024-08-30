@@ -83,7 +83,9 @@ class TaskReportHelper(
 
     sheet.createRow(6).let {
       it.createCell(0).setCellValue("Created at")
-      it.createCell(1).setCellValue(formatDate(task.createdAt))
+      task.createdAt?.let { createdAt ->
+        it.createCell(1).setCellValue(formatDate(createdAt))
+      }
     }
 
     sheet.createRow(7).let {

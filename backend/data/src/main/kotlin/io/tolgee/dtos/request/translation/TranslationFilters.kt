@@ -103,5 +103,5 @@ To filter default namespace, set to empty string.
   @field:Parameter(
     description = "Select only keys which are in specified task",
   )
-  var filterTaskId: List<Long>? = null
+  var filterTaskNumber: List<Long>? = null
 }

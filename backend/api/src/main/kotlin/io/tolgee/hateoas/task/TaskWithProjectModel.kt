@@ -10,7 +10,7 @@ import org.springframework.hateoas.server.core.Relation
 
 @Relation(collectionRelation = "tasks", itemRelation = "task")
 data class TaskWithProjectModel(
-  var id: Long = 0L,
+  var number: Long = 0L,
   var name: String = "",
   var description: String = "",
   var type: TaskType = TaskType.TRANSLATE,
@@ -22,7 +22,7 @@ data class TaskWithProjectModel(
   var baseWordCount: Long = 0,
   var baseCharacterCount: Long = 0,
   var author: SimpleUserAccountModel? = null,
-  var createdAt: Long = 0,
+  var createdAt: Long? = 0,
   var closedAt: Long? = null,
   var state: TaskState = TaskState.IN_PROGRESS,
   var project: SimpleProjectModel,

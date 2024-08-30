@@ -34,13 +34,13 @@ export const TaskMenu = ({
   const isOpen = Boolean(anchorEl);
   const [taskCreate, setTaskCreate] = useState<Partial<InitialValues>>();
   const updateMutation = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'put',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
 
   const finishMutation = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/finish',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/finish',
     method: 'post',
     invalidatePrefix: ['/v2/projects/{projectId}/tasks', '/v2/user-tasks'],
   });
@@ -82,7 +82,7 @@ export const TaskMenu = ({
   });
 
   const taskKeysMutation = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/keys',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/keys',
     method: 'get',
   });
 
@@ -93,7 +93,7 @@ export const TaskMenu = ({
         onClose();
         updateMutation.mutate(
           {
-            path: { projectId: project.id, taskId: task.id },
+            path: { projectId: project.id, taskNumber: task.number },
             content: { 'application/json': { state: 'CLOSED' } },
           },
           {
@@ -109,7 +109,7 @@ export const TaskMenu = ({
   function handleChangeState(state: TaskModel['state']) {
     updateMutation.mutate(
       {
-        path: { projectId: project.id, taskId: task.id },
+        path: { projectId: project.id, taskNumber: task.number },
         content: { 'application/json': { state } },
       },
       {
@@ -126,7 +126,7 @@ export const TaskMenu = ({
   function handleMarkAsDone() {
     finishMutation.mutate(
       {
-        path: { projectId: project.id, taskId: task.id },
+        path: { projectId: project.id, taskNumber: task.number },
       },
       {
         onSuccess() {
@@ -147,7 +147,7 @@ export const TaskMenu = ({
   function handleCloneTask() {
     taskKeysMutation.mutate(
       {
-        path: { projectId: project.id, taskId: task.id },
+        path: { projectId: project.id, taskNumber: task.number },
       },
       {
         onSuccess(data) {
@@ -166,7 +166,7 @@ export const TaskMenu = ({
   function handleCreateReviewTask() {
     taskKeysMutation.mutate(
       {
-        path: { projectId: project.id, taskId: task.id },
+        path: { projectId: project.id, taskNumber: task.number },
       },
       {
         onSuccess(data) {

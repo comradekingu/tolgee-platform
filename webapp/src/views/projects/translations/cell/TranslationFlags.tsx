@@ -76,7 +76,7 @@ export const TranslationFlags: React.FC<Props> = ({
   const task = keyData.tasks?.find((t) => t.languageTag === lang);
   const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
   const displayTaskFlag =
-    task && (task.id !== prefilteredTask || !task.userAssigned);
+    task && (task.number !== prefilteredTask || !task.userAssigned);
 
   const { updateTranslation } = useTranslationsActions();
   const [taskDetailData, setTaskDetailData] = useState<TaskModel>();
@@ -134,7 +134,7 @@ export const TranslationFlags: React.FC<Props> = ({
       <StyledWrapper className={className}>
         {displayTaskFlag && (
           <StyledContainer data-cy="translations-outdated-indicator">
-            <TaskTooltip taskId={task.id} project={project}>
+            <TaskTooltip taskNumber={task.number} project={project}>
               <StyledImgWrapper>
                 <ClipboardCheck
                   color={

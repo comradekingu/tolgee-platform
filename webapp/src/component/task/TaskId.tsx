@@ -12,6 +12,6 @@ type Props = {
   className?: string;
 };
 
-export const TaskId = ({ children, sx, className }: Props) => {
+export const TaskNumber = ({ children, sx, className }: Props) => {
   return <Container {...{ sx, className }}>#{children}</Container>;
 };

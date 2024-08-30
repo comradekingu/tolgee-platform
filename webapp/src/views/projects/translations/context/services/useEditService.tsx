@@ -388,7 +388,7 @@ export const useEditService = ({
       ) {
         await taskService.setTaskTranslationState({
           keyId: position.keyId,
-          taskId: task.id,
+          taskNumber: task.number,
           done: true,
         });
       }

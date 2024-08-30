@@ -11,7 +11,7 @@ export const getLinkToTask = (project: SimpleProjectModel, task: TaskModel) => {
   return (
     `${LINKS.PROJECT_TRANSLATIONS.build({
       [PARAMS.PROJECT_ID]: project.id,
-    })}?task=${task.id}&` +
+    })}?task=${task.number}&` +
     Array.from(languages)
       .map((l) => `languages=${l}`)
       .join('&')
@@ -24,7 +24,7 @@ function toFileName(label: string) {
 
 export const useTaskReport = () => {
   const reportMutation = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/csv-report',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/csv-report',
     method: 'get',
     fetchOptions: {
       rawResponse: true,
@@ -34,7 +34,7 @@ export const useTaskReport = () => {
   function downloadReport(projectId: number, task: TaskModel) {
     reportMutation.mutate(
       {
-        path: { projectId: projectId, taskId: task.id },
+        path: { projectId: projectId, taskNumber: task.number },
       },
       {
         async onSuccess(result) {

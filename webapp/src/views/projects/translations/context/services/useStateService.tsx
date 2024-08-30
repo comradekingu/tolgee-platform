@@ -40,7 +40,7 @@ export const useStateService = ({ translations, taskService }: Props) => {
           ) {
             taskService.setTaskTranslationState({
               keyId: data.keyId,
-              taskId: task.id,
+              taskNumber: task.number,
               done: true,
             });
           }

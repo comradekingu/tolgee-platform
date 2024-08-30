@@ -72,14 +72,14 @@ export interface paths {
   "/v2/projects/{projectId}/users/{userId}/revoke-access": {
     put: operations["revokePermission"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/keys/{keyId}": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/keys/{keyId}": {
     put: operations["updateTaskKey"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/keys": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/keys": {
     get: operations["getTaskKeys"];
     put: operations["updateTaskKeys"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}": {
     get: operations["getTask"];
     put: operations["updateTask"];
   };
@@ -364,7 +364,7 @@ export interface paths {
     /** Sends a test request to the webhook */
     post: operations["test"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/finish": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/finish": {
     post: operations["finishTask"];
   };
   "/v2/projects/{projectId}/tasks/create-multiple": {
@@ -596,13 +596,13 @@ export interface paths {
     /** Returns all used project namespaces. Response contains default (null) namespace if used. */
     get: operations["getUsedNamespaces"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/per-user-report": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/per-user-report": {
     get: operations["getPerUserReport"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/csv-report": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/csv-report": {
     get: operations["getCsvReport"];
   };
-  "/v2/projects/{projectId}/tasks/{taskId}/blocking-tasks": {
+  "/v2/projects/{projectId}/tasks/{taskNumber}/blocking-tasks": {
     get: operations["getBlockingTasks"];
   };
   "/v2/projects/{projectId}/tasks/possible-assignees": {
@@ -1168,6 +1168,14 @@ export interface components {
        */
       stateChangeLanguageIds?: number[];
       /**
+       * @deprecated
+       * @description Deprecated (use translateLanguageIds).
+       *
+       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
+       * @example 200001,200004
+       */
+      permittedLanguageIds?: number[];
+      /**
        * @description Granted scopes to the user. When user has type permissions, this field contains permission scopes of the type.
        * @example KEYS_EDIT,TRANSLATIONS_VIEW
        */
@@ -1201,14 +1209,6 @@ export interface components {
         | "tasks.view"
         | "tasks.edit"
       )[];
-      /**
-       * @deprecated
-       * @description Deprecated (use translateLanguageIds).
-       *
-       * List of languages current user has TRANSLATE permission to. If null, all languages edition is permitted.
-       * @example 200001,200004
-       */
-      permittedLanguageIds?: number[];
     };
     LanguageModel: {
       /** Format: int64 */
@@ -1391,7 +1391,7 @@ export interface components {
     };
     TaskModel: {
       /** Format: int64 */
-      id: number;
+      number: number;
       name: string;
       description: string;
       type: "TRANSLATE" | "REVIEW";
@@ -1409,7 +1409,7 @@ export interface components {
       baseCharacterCount: number;
       author?: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
-      createdAt: number;
+      createdAt?: number;
       /** Format: int64 */
       closedAt?: number;
       state: "IN_PROGRESS" | "DONE" | "CLOSED";
@@ -2226,17 +2226,17 @@ export interface components {
     };
     RevealedPatModel: {
       token: string;
+      description: string;
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     SetOrganizationRoleDto: {
       roleType: "MEMBER" | "OWNER";
@@ -2372,19 +2372,19 @@ export interface components {
     RevealedApiKeyModel: {
       /** @description Resulting user's api key */
       key: string;
+      description: string;
       /** Format: int64 */
       id: number;
       username?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
-      description: string;
-      scopes: string[];
+      /** Format: int64 */
+      expiresAt?: number;
       projectName: string;
       userFullName?: string;
+      scopes: string[];
     };
     SuperTokenRequest: {
       /** @description Has to be provided when TOTP enabled */
@@ -2469,11 +2469,11 @@ export interface components {
     };
     KeysScopeView: {
       /** Format: int64 */
-      keyCount: number;
-      /** Format: int64 */
       wordCount: number;
       /** Format: int64 */
       characterCount: number;
+      /** Format: int64 */
+      keyCount: number;
     };
     GetKeysRequestDto: {
       keys: components["schemas"]["KeyDefinitionDto"][];
@@ -3382,7 +3382,7 @@ export interface components {
     };
     TaskWithProjectModel: {
       /** Format: int64 */
-      id: number;
+      number: number;
       name: string;
       description: string;
       type: "TRANSLATE" | "REVIEW";
@@ -3400,7 +3400,7 @@ export interface components {
       baseCharacterCount: number;
       author?: components["schemas"]["SimpleUserAccountModel"];
       /** Format: int64 */
-      createdAt: number;
+      createdAt?: number;
       /** Format: int64 */
       closedAt?: number;
       state: "IN_PROGRESS" | "DONE" | "CLOSED";
@@ -3528,6 +3528,8 @@ export interface components {
         | "SLACK_INTEGRATION"
       )[];
       quickStart?: components["schemas"]["QuickStartModel"];
+      /** @example This is a beautiful organization full of beautiful and clever people */
+      description?: string;
       /** @example Beautiful organization */
       name: string;
       /** Format: int64 */
@@ -3538,12 +3540,10 @@ export interface components {
        * Can be null when user has direct access to one of the projects owned by the organization.
        */
       currentUserRole?: "MEMBER" | "OWNER";
-      /** @example This is a beautiful organization full of beautiful and clever people */
-      description?: string;
-      avatar?: components["schemas"]["Avatar"];
+      basePermissions: components["schemas"]["PermissionModel"];
       /** @example btforg */
       slug: string;
-      basePermissions: components["schemas"]["PermissionModel"];
+      avatar?: components["schemas"]["Avatar"];
     };
     PublicBillingConfigurationDTO: {
       enabled: boolean;
@@ -3604,9 +3604,9 @@ export interface components {
       defaultFileStructureTemplate: string;
     };
     DocItem: {
+      description?: string;
       name: string;
       displayName?: string;
-      description?: string;
     };
     PagedModelProjectModel: {
       _embedded?: {
@@ -3701,23 +3701,23 @@ export interface components {
       formalitySupported: boolean;
     };
     KeySearchResultView: {
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
       translation?: string;
       baseTranslation?: string;
       namespace?: string;
-      description?: string;
     };
     KeySearchSearchResultModel: {
       view?: components["schemas"]["KeySearchResultView"];
+      description?: string;
       name: string;
       /** Format: int64 */
       id: number;
       translation?: string;
       baseTranslation?: string;
       namespace?: string;
-      description?: string;
     };
     PagedModelKeySearchSearchResultModel: {
       _embedded?: {
@@ -3844,7 +3844,11 @@ export interface components {
         | "WEBHOOK_CONFIG_CREATE"
         | "WEBHOOK_CONFIG_UPDATE"
         | "WEBHOOK_CONFIG_DELETE"
-        | "COMPLEX_TAG_OPERATION";
+        | "COMPLEX_TAG_OPERATION"
+        | "TASK_CREATE"
+        | "TASK_UPDATE"
+        | "TASK_KEYS_UPDATE"
+        | "TASK_FINISH";
       author?: components["schemas"]["ProjectActivityAuthorModel"];
       modifiedEntities?: {
         [key: string]: components["schemas"]["ModifiedEntityModel"][];
@@ -4015,7 +4019,7 @@ export interface components {
     /** @description Tasks related to this key */
     KeyTaskViewModel: {
       /** Format: int64 */
-      id: number;
+      number: number;
       /** Format: int64 */
       languageId: number;
       languageTag: string;
@@ -4274,17 +4278,17 @@ export interface components {
     };
     PatWithUserModel: {
       user: components["schemas"]["SimpleUserAccountModel"];
+      description: string;
       /** Format: int64 */
       id: number;
-      /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
-      lastUsedAt?: number;
       /** Format: int64 */
       createdAt: number;
       /** Format: int64 */
       updatedAt: number;
-      description: string;
+      /** Format: int64 */
+      lastUsedAt?: number;
+      /** Format: int64 */
+      expiresAt?: number;
     };
     PagedModelOrganizationModel: {
       _embedded?: {
@@ -4401,19 +4405,19 @@ export interface components {
        * @description Languages for which user has translate permission.
        */
       permittedLanguageIds?: number[];
+      description: string;
       /** Format: int64 */
       id: number;
       username?: string;
       /** Format: int64 */
       projectId: number;
       /** Format: int64 */
-      expiresAt?: number;
-      /** Format: int64 */
       lastUsedAt?: number;
-      description: string;
-      scopes: string[];
+      /** Format: int64 */
+      expiresAt?: number;
       projectName: string;
       userFullName?: string;
+      scopes: string[];
     };
     PagedModelUserAccountModel: {
       _embedded?: {
@@ -5622,7 +5626,7 @@ export interface operations {
   updateTaskKey: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         keyId: number;
         projectId: number;
       };
@@ -5676,7 +5680,7 @@ export interface operations {
   getTaskKeys: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -5724,7 +5728,7 @@ export interface operations {
   updateTaskKeys: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -5773,7 +5777,7 @@ export interface operations {
   getTask: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -5821,7 +5825,7 @@ export interface operations {
   updateTask: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -7939,7 +7943,7 @@ export interface operations {
         /** Select only keys which were not successfully translated by batch job with provided id */
         filterFailedKeysOfJob?: number;
         /** Select only keys which are in specified task */
-        filterTaskId?: number[];
+        filterTaskNumber?: number[];
         /** Zero-based page index (0..N) */
         page?: number;
         /** The size of the page to be returned */
@@ -10482,7 +10486,7 @@ export interface operations {
   finishTask: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -14310,7 +14314,7 @@ export interface operations {
   getPerUserReport: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -14358,7 +14362,7 @@ export interface operations {
   getCsvReport: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -14406,7 +14410,7 @@ export interface operations {
   getBlockingTasks: {
     parameters: {
       path: {
-        taskId: number;
+        taskNumber: number;
         projectId: number;
       };
     };
@@ -15786,7 +15790,7 @@ export interface operations {
         /** Select only keys which were not successfully translated by batch job with provided id */
         filterFailedKeysOfJob?: number;
         /** Select only keys which are in specified task */
-        filterTaskId?: number[];
+        filterTaskNumber?: number[];
       };
       path: {
         projectId: number;
@@ -15886,7 +15890,7 @@ export interface operations {
         /** Select only keys which were not successfully translated by batch job with provided id */
         filterFailedKeysOfJob?: number;
         /** Select only keys which are in specified task */
-        filterTaskId?: number[];
+        filterTaskNumber?: number[];
       };
       path: {
         projectId: number;

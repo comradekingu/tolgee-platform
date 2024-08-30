@@ -24,24 +24,24 @@ const StyledTaskId = styled('span')`
 `;
 
 type Props = {
-  taskId: number;
+  taskNumber: number;
 };
 
-export const PrefilterTask = ({ taskId }: Props) => {
+export const PrefilterTask = ({ taskNumber }: Props) => {
   const project = useProject();
   const theme = useTheme();
   const [showDetails, setShowDetails] = useState(false);
 
   const { data } = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'get',
-    path: { projectId: project.id, taskId },
+    path: { projectId: project.id, taskNumber },
   });
 
   const blockingTasksLoadable = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/blocking-tasks',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/blocking-tasks',
     method: 'get',
-    path: { projectId: project.id, taskId },
+    path: { projectId: project.id, taskNumber },
   });
 
   if (!data) {
@@ -73,10 +73,10 @@ export const PrefilterTask = ({ taskId }: Props) => {
                 />
                 <Box>
                   <T keyName="task_filter_indicator_blocking_warning" />{' '}
-                  {blockingTasksLoadable.data.map((taskId, i) => (
-                    <React.Fragment key={taskId}>
-                      <TaskTooltip taskId={taskId} project={project}>
-                        <StyledTaskId>#{taskId}</StyledTaskId>
+                  {blockingTasksLoadable.data.map((taskNumber, i) => (
+                    <React.Fragment key={taskNumber}>
+                      <TaskTooltip taskNumber={taskNumber} project={project}>
+                        <StyledTaskId>#{taskNumber}</StyledTaskId>
                       </TaskTooltip>
                       {i !== blockingTasksLoadable.data.length - 1 && ', '}
                     </React.Fragment>

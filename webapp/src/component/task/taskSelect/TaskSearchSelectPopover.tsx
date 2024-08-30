@@ -166,7 +166,7 @@ export const TaskSearchSelectPopover: React.FC<Props> = ({
             clearOnEscape={false}
             noOptionsText={t('global_nothing_found')}
             loadingText={t('global_loading_text')}
-            isOptionEqualToValue={(o, v) => o.id === v.id}
+            isOptionEqualToValue={(o, v) => o.number === v.number}
             onInputChange={(_, value, reason) =>
               reason === 'input' && setInputValue(value)
             }
@@ -174,19 +174,19 @@ export const TaskSearchSelectPopover: React.FC<Props> = ({
             PopperComponent={PopperComponent}
             PaperComponent={PaperComponent}
             renderOption={(props, option) => (
-              <React.Fragment key={option.id}>
+              <React.Fragment key={option.number}>
                 <MenuItem
                   {...props}
                   onClick={() => {
                     onSelect(option);
                   }}
-                  selected={option.id === selected?.id}
+                  selected={option.number === selected?.number}
                   data-cy="task-select-item"
                 >
                   <TaskSearchSelectItem data={option} />
                 </MenuItem>
                 {usersLoadable.hasNextPage &&
-                  option.id === items![items!.length - 1].id && (
+                  option.number === items![items!.length - 1].number && (
                     <Box display="flex" justifyContent="center" mt={0.5}>
                       <Button
                         size="small"

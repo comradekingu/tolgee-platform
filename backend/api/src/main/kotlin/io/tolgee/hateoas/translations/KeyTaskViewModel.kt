@@ -4,7 +4,7 @@ import io.tolgee.model.enums.TaskType
 import org.springframework.hateoas.RepresentationModel
 
 open class KeyTaskViewModel(
-  val id: Long,
+  val number: Long,
   val languageId: Long,
   val languageTag: String,
   val done: Boolean,

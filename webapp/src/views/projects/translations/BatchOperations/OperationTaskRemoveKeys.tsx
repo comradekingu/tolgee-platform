@@ -21,9 +21,9 @@ export const OperationTaskRemoveKeys = ({ disabled, onFinished }: Props) => {
   const { t } = useTranslate();
 
   const taskLoadable = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'get',
-    path: { projectId: project.id, taskId: filteredTask! },
+    path: { projectId: project.id, taskNumber: filteredTask! },
     options: {
       enabled: typeof filteredTask === 'number',
       onSuccess(data) {
@@ -42,14 +42,14 @@ export const OperationTaskRemoveKeys = ({ disabled, onFinished }: Props) => {
   const selection = useTranslationsSelector((c) => c.selection);
 
   const addTaskKeysLoadable = useApiMutation({
-    url: '/v2/projects/{projectId}/tasks/{taskId}/keys',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}/keys',
     method: 'put',
   });
 
   function handleAddKeys() {
     addTaskKeysLoadable.mutate(
       {
-        path: { projectId: project.id, taskId: task!.id },
+        path: { projectId: project.id, taskNumber: task!.number },
         content: { 'application/json': { removeKeys: selection } },
       },
       {

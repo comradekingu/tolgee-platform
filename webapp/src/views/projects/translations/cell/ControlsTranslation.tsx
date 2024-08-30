@@ -103,7 +103,7 @@ export const ControlsTranslation: React.FC<ControlsProps> = ({
   const prefilteredTask = useTranslationsSelector((c) => c.prefilter?.task);
   const task = tasks?.[0];
   const displayTaskButton =
-    task && task.id === prefilteredTask && task.userAssigned;
+    task && task.number === prefilteredTask && task.userAssigned;
 
   if (displayTransitionButtons) {
     spots.push('state');

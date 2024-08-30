@@ -20,7 +20,7 @@ class TaskWithProjectModelAssembler(
   ) {
   override fun toModel(entity: TaskWithScopeView): TaskWithProjectModel {
     return TaskWithProjectModel(
-      id = entity.id,
+      number = entity.number,
       name = entity.name,
       description = entity.description,
       type = entity.type,
@@ -36,7 +36,7 @@ class TaskWithProjectModelAssembler(
       dueDate = entity.dueDate?.time,
       assignees = entity.assignees.map { simpleUserAccountModelAssembler.toModel(it) }.toMutableSet(),
       author = entity.author?.let { simpleUserAccountModelAssembler.toModel(it) },
-      createdAt = entity.createdAt.time,
+      createdAt = entity.createdAt?.time,
       closedAt = entity.closedAt?.time,
       totalItems = entity.totalItems,
       doneItems = entity.doneItems,

@@ -12,18 +12,22 @@ import { TaskLabel } from './TaskLabel';
 type TaskModel = components['schemas']['TaskModel'];
 
 type Props = {
-  taskId: number;
+  taskNumber: number;
   projectId: number;
   actions?: React.ReactNode | ((task: TaskModel) => React.ReactNode);
 };
 
-export const TaskTooltipContent = ({ projectId, taskId, actions }: Props) => {
+export const TaskTooltipContent = ({
+  projectId,
+  taskNumber,
+  actions,
+}: Props) => {
   const task = useApiQuery({
-    url: '/v2/projects/{projectId}/tasks/{taskId}',
+    url: '/v2/projects/{projectId}/tasks/{taskNumber}',
     method: 'get',
     path: {
       projectId,
-      taskId,
+      taskNumber,
     },
     fetchOptions: {
       disableAuthRedirect: true,

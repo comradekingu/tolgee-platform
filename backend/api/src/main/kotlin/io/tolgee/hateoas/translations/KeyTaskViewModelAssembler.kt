@@ -13,7 +13,7 @@ class KeyTaskViewModelAssembler :
   ) {
   override fun toModel(view: KeyTaskView): KeyTaskViewModel {
     return KeyTaskViewModel(
-      id = view.id,
+      number = view.number,
       languageId = view.languageId,
       languageTag = view.languageTag,
       done = view.done,

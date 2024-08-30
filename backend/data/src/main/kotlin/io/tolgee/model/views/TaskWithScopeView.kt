@@ -10,7 +10,7 @@ import java.util.*
 
 data class TaskWithScopeView(
   val project: Project,
-  val id: Long,
+  val number: Long,
   val name: String,
   val description: String,
   val type: TaskType,
@@ -19,7 +19,7 @@ data class TaskWithScopeView(
   val assignees: MutableSet<UserAccount>,
   val keys: MutableSet<TaskKey>,
   val author: UserAccount,
-  val createdAt: Date,
+  val createdAt: Date?,
   val state: TaskState,
   val closedAt: Date?,
   val totalItems: Long,

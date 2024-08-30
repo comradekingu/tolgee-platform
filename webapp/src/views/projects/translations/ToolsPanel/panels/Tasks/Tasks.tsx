@@ -47,8 +47,8 @@ export const Tasks: React.FC<PanelContentProps> = ({
       {tasksLoadable.data?._embedded?.tasks?.length ? (
         tasksLoadable.data._embedded.tasks.map((task) => (
           <TaskTooltip
-            key={task.id}
-            taskId={task.id}
+            key={task.number}
+            taskNumber={task.number}
             project={project}
             enterDelay={1000}
           >
@@ -57,7 +57,7 @@ export const Tasks: React.FC<PanelContentProps> = ({
                 task={task}
                 sx={{
                   padding: 1,
-                  opacity: task.id === firstTask?.id ? 1 : 0.6,
+                  opacity: task.number === firstTask?.number ? 1 : 0.6,
                 }}
               />
             </Box>
