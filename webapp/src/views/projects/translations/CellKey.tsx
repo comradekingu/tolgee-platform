@@ -102,8 +102,8 @@ const StyledBolt = styled(Zap)`
   position: absolute;
   bottom: 12px;
   left: 12px;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 `;
 
 type Props = {

@@ -325,6 +325,7 @@ interface TaskRepository : JpaRepository<Task, TaskId> {
         join at.keys att
         join Key k on (element(att).key.id = k.id and element(tt).key.id = k.id)
       where (t.id > :taskId or t.type != at.type)
+        and t.language = at.language
         and t.type >= at.type
         and t.state = 'IN_PROGRESS'
     """,

@@ -2,6 +2,7 @@ import { ComponentProps } from 'react';
 import { DatePicker } from '@mui/x-date-pickers';
 
 import { TextField as NonFormTextField } from 'tg.component/common/TextField';
+import { Calendar } from '@untitled-ui/icons-react';
 
 const DueDatePicker = (props: ComponentProps<typeof NonFormTextField>) => {
   return <NonFormTextField {...props} />;
@@ -39,6 +40,7 @@ export const TaskDatePicker = ({ value, onChange, label, disabled }: Props) => {
       }}
       slots={{
         textField: DueDatePicker,
+        openPickerIcon: Calendar,
       }}
     />
   );

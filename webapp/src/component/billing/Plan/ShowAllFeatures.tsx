@@ -22,7 +22,8 @@ const StyledButton = styled(Box)`
 `;
 
 const StyledIcon = styled(Share04)`
-  font-size: 15px;
+  width: 15px;
+  height: 15px;
   position: relative;
   top: 2px;
 `;
